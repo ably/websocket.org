@@ -1,36 +1,30 @@
 ---
-title: Welcome to Starlight
-description: Get started building your docs site with Starlight.
+title: Welcome to all things WebSockets 
+description: Everything you need to know, in one place.
 template: splash
 hero:
-  tagline: Congrats on setting up a new Starlight project!
+  tagline: WebSocket, WebSocket, WebSocket, WebSocket, WebSocket....
   image:
-    file: ../../assets/houston.webp
+    file: ../../assets/websocket-logo.png
   actions:
-    - text: Example Guide
-      link: /guides/example/
+    - text: Websocket Guide
+      link: /guides/websockets/
       icon: right-arrow
       variant: primary
-    - text: Read the Starlight docs
-      link: https://starlight.astro.build
-      icon: external
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 
-## Next steps
+## Dive in
 
-<CardGrid stagger>
-	<Card title="Update content" icon="pencil">
+<CardGrid>
+	<LinkCard title="WebSockets Guide" icon="pencil" href="/guides/websockets">
 		Edit `src/content/docs/index.mdx` to see this page change.
-	</Card>
-	<Card title="Add new content" icon="add-document">
+	</LinkCard>
+	<LinkCard title="WebSockets Browser API" icon="add-document" href="/reference/websocket-api">
 		Add Markdown or MDX files to `src/content/docs` to create new pages.
-	</Card>
-	<Card title="Configure your site" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
-	</Card>
-	<Card title="Read the docs" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
-	</Card>
+	</LinkCard>
+	<LinkCard title="Websocket Echo Server" icon="add-document" href="/reference/websocket-echo">
+		Add Markdown or MDX files to `src/content/docs` to create new pages.
+	</LinkCard>
 </CardGrid>
