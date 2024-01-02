@@ -22,6 +22,9 @@ export default defineConfig({
 					autogenerate: { directory: 'reference' },
 				},
 			],
+			editLink: {
+				baseUrl: 'https://github.com/ably/websocket.org/edit/main/',
+			},
 			components: {
 				Head: './src/components/head.astro',
 			},
