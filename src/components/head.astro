@@ -1,0 +1,8 @@
+---
+import Default from '@astrojs/starlight/components/Head.astro';
+import type { Props } from '@astrojs/starlight/props';
+import GA4 from './ga4.astro';
+---
+
+<Default {...Astro.props}><slot /></Default>
+<GA4 {...Astro.props} />
