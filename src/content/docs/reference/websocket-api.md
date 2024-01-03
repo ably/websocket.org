@@ -1,6 +1,6 @@
 ---
-title: WebSockets API Reference
-description: Reference API for WebSockets in a browser
+title: WebSocket API
+description: A reference for the WebSocket API — its events, methods, and properties, alongside usage examples for each of them.
 ---
 
 # The WebSocket API (WebSockets)

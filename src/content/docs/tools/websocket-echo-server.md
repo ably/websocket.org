@@ -1,5 +1,5 @@
 ---
-title: WebSockets Echo Server
+title: WebSocket Echo Server
 description: Public free endpoint used for testing Websockets, SSE and HTTP
 ---
 
