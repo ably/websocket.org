@@ -1,30 +1,51 @@
 ---
-title: Welcome to all things WebSockets 
+title: WebSockets handbook
 description: Everything you need to know, in one place.
 template: splash
 hero:
-  tagline: WebSocket, WebSocket, WebSocket, WebSocket, WebSocket....
+  tagline: WebSockets revolutionized the web, turning clunky, slow real-time interactions into sleek, low-latency experiences, making them the go-to for dynamic, user-friendly applications.
   image:
     file: ../../assets/websocket-logo.png
   actions:
-    - text: Websocket Guide
-      link: /guides/websockets/
+    - text: History of WebSockets
+      link: /guides/road-to-websockets/
+      icon: right-arrow
+      variant: primary
+    - text: Websocket Protocol
+      link: /guides/websocket-protocol/
       icon: right-arrow
       variant: primary
 ---
 
 import { LinkCard, CardGrid } from '@astrojs/starlight/components';
 
-## Dive in
+## Guides
 
 <CardGrid>
-	<LinkCard title="WebSockets Guide" icon="pencil" href="/guides/websockets">
+	<LinkCard title="The Road to WebSockets" icon="pencil" href="/guides/road-to-websockets/">
+    Edit `src/content/docs/index.mdx` to see this page change.
+  </LinkCard>
+  <LinkCard title="WebSocket Protocol" icon="pencil" href="/guides/websocket-protocol/">
+    Edit `src/content/docs/index.mdx` to see this page change.
+  </LinkCard>
+  <LinkCard title="Building a WebSocket App" icon="pencil" href="/guides/building-a-websocket-app/">
 		Edit `src/content/docs/index.mdx` to see this page change.
 	</LinkCard>
-	<LinkCard title="WebSockets Browser API" icon="add-document" href="/reference/websocket-api">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
+  <LinkCard title="WebSockets at Scale" icon="pencil" href="/guides/websockets-at-scale/">
+		Edit `src/content/docs/index.mdx` to see this page change.
 	</LinkCard>
-	<LinkCard title="Websocket Echo Server" icon="add-document" href="/reference/websocket-echo">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
+</CardGrid>
+
+## References, Tools and Resources
+
+<CardGrid>
+	<LinkCard title="WebSocket API Reference" icon="pencil" href="/reference/websocket-api/">
+    Edit `src/content/docs/index.mdx` to see this page change.
+  </LinkCard>
+  <LinkCard title="WebSocket Echo Server" icon="pencil" href="/tools/websocket-echo-server/">
+    Edit `src/content/docs/index.mdx` to see this page change.
+  </LinkCard>
+  <LinkCard title="WebSocket Resources" icon="pencil" href="/tools/websocket-resources/">
+		Edit `src/content/docs/index.mdx` to see this page change.
 	</LinkCard>
 </CardGrid>

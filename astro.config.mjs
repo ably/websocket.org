@@ -14,12 +14,23 @@ export default defineConfig({
 					label: 'Guides',
 					items: [
 						// Each item here is one entry in the navigation menu.
-						{ label: 'WebSocket Guide', link: '/guides/websockets/' },
+						{ label: 'The Road to WebSockets', link: '/guides/road-to-websockets/' },
+						{ label: 'WebSocket Protocol', link: '/guides/websocket-protocol/' },
+						{ label: 'Building a WebSocket App', link: '/guides/building-a-websocket-app/' },
+						{ label: 'WebSockets at Scale', link: '/guides/websockets-at-scale/' },
 					],
 				},
 				{
 					label: 'Reference',
 					autogenerate: { directory: 'reference' },
+				},
+				{
+					label: 'Tools',
+					autogenerate: { directory: 'tools' },
+				},
+				{
+					label: 'Resource',
+					autogenerate: { directory: 'resources' },
 				},
 			],
 			editLink: {

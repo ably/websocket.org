@@ -1,10 +1,10 @@
 {
     "redirects": [
-        { "source": "/me", "destination": "/profile.html", "permanent": true },
-        { "source": "/echo.html", "destination": "/reference/websocket-echo", "permanent": false },
+        { "source": "/echo.html", "destination": "/tools/websocket-echo-server", "permanent": true },
+        { "source": "/echo", "destination": "/tools/websocket-echo-server", "permanent": false },
         { "source": "/demos/racer/run/", "destination": "https://ably.com/examples", "permanent": true },
         { "source": "/index.html", "destination": "/", "permanent": true },
-        { "source": "/aboutwebsocket.html", "destination": "/guides/websockets", "permanent": false },
-        { "source": "/quantum.html", "destination": "https://ably.com/topic/websockets-history", "permanent": true }
+        { "source": "/aboutwebsocket.html", "destination": "/guides/websocket-protocol", "permanent": true },
+        { "source": "/quantum.html", "destination": "/guides/road-to-websockets", "permanent": true }
     ]
 }
