@@ -3,6 +3,8 @@ title: The Road to WebSockets
 description: A look at how web technologies evolved since the inception of the World Wide `Web``, culminating with the emergence of WebSockets, a vastly superior improvement on HTTP for building realtime web apps.
 ---
 
+Networking sockets were first defined in RFC 147 in 1971 for the Advanced Research Projects Agency Network (ARPANET) as part of the first of computer networks to implement the TCP/IP (internet) protocol suite that became the networking foundation of the Internet. 
+
 > During the 1990s, the web rapidly grew into the dominant way to exchange information. Increasing numbers of users became accustomed to the experience of browsing the web, while browser providers constantly released new features and enhancements.
 
 The first realtime web apps started to appear in the 2000s, attempting to deliver responsive, dynamic, and interactive end-user experiences. However, at that time, the realtime web was difficult to achieve and slower than we’re used to nowadays; it was delivered by hacking existing HTTP-based technologies that were not designed and optimized for realtime applications. It quickly became obvious that a better alternative was needed.
@@ -12,7 +14,7 @@ In this first chapter, we’ll look at how web technologies evolved, culminating
 
 In 1989, while working at the European Organization for Nuclear Research (CERN) as a software engineer, Tim Berners-Lee became frustrated with how difficult it was to access information stored on different computers (and, on top of that, running different types of software). This prompted Berners-Lee to develop a project called “WorldWideWeb”.
 
-The project proposed a “web” of hypertext documents, which could be viewed by browsers over the internet using a client-server architecture. The web had the potential to connect the world in a way that was not previously possible, and made it much easier for people everywhere to get information, share, and communicate. Initially used at CERN, the web was soon made available to the world, with the first websites for everyday use starting to appear in 1993-1994.
+The project proposed a “web” of hypertext documents, which could be viewed by browsers over the internet using the networking cpabilities of the internet protocol suite. The web had the potential to connect the world in a way that was not previously possible, and made it much easier for people everywhere to get information, share, and communicate. Initially used at CERN, the web was soon made available to the world, with the first websites for everyday use starting to appear in 1993-1994.
 
 Berners-Lee managed to create the web by combining two existing technologies: hypertext and the internet. In the process, he developed three core building blocks:
 
