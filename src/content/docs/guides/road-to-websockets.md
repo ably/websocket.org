@@ -14,7 +14,7 @@ In this first chapter, we’ll look at how web technologies evolved, culminating
 
 In 1989, while working at the European Organization for Nuclear Research (CERN) as a software engineer, Tim Berners-Lee became frustrated with how difficult it was to access information stored on different computers (and, on top of that, running different types of software). This prompted Berners-Lee to develop a project called “WorldWideWeb”.
 
-The project proposed a “web” of hypertext documents, which could be viewed by browsers over the internet using the networking cpabilities of the internet protocol suite. The web had the potential to connect the world in a way that was not previously possible, and made it much easier for people everywhere to get information, share, and communicate. Initially used at CERN, the web was soon made available to the world, with the first websites for everyday use starting to appear in 1993-1994.
+The project proposed a “web” of hypertext documents, which could be viewed by browsers over the internet using the networking capabilities of the internet protocol suite. The web had the potential to connect the world in a way that was not previously possible, and made it much easier for people everywhere to get information, share, and communicate. Initially used at CERN, the web was soon made available to the world, with the first websites for everyday use starting to appear in 1993-1994.
 
 Berners-Lee managed to create the web by combining two existing technologies: hypertext and the internet. In the process, he developed three core building blocks:
 
