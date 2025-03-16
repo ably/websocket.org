@@ -1,12 +1,12 @@
 ---
-title: The Road to WebSockets
-description: A look at how web technologies evolved since the inception of the World Wide `Web``, culminating with the emergence of WebSockets, a vastly superior improvement on HTTP for building realtime web apps.
+title: The Road to SSE
+description: A look at how web technologies evolved since the inception of the World Wide Web, culminating with the emergence of Server-Sent Events (SSE), a powerful technology for building realtime web apps.
 ---
 
 > During the 1990s, the web rapidly grew into the dominant way to exchange information. Increasing numbers of users became accustomed to the experience of browsing the web, while browser providers constantly released new features and enhancements.
 
 The first realtime web apps started to appear in the 2000s, attempting to deliver responsive, dynamic, and interactive end-user experiences. However, at that time, the realtime web was difficult to achieve and slower than we’re used to nowadays; it was delivered by hacking existing HTTP-based technologies that were not designed and optimized for realtime applications. It quickly became obvious that a better alternative was needed.
-In this first chapter, we’ll look at how web technologies evolved, culminating with the emergence of WebSockets, a vastly superior improvement on HTTP for building realtime web apps.
+In this first chapter, we’ll look at how web technologies evolved, culminating with the emergence of Server-Sent Events (SSE), a powerful technology for building realtime web apps.
 
 # The World Wide Web is born
 
@@ -183,29 +183,29 @@ A request/response protocol by design, HTTP doesn’t support bidirectional, alw
 
 With the web continuously evolving, and user expectations of rich, realtime web-based experiences growing, it was becoming increasingly obvious that an alternative to HTTP was needed.
 
-## Enter WebSockets
+## Enter Server-Sent Events (SSE)
 
-In 2008, the pain and limitations of using Comet when implementing anything resembling realtime were being felt particularly keenly by developers Michael Carter and Ian Hickson. Through collaboration on [IRC](https://go.ably.com/m92) and [W3C mailing lists](https://go.ably.com/sg9), they came up with a plan to introduce a new standard for modern, truly realtime communication on the web. Thus, the name “WebSocket’’ was coined.
+In 2008, the pain and limitations of using Comet when implementing anything resembling realtime were being felt particularly keenly by developers. Through collaboration on various forums and mailing lists, they came up with a plan to introduce a new standard for modern, truly realtime communication on the web. Thus, the name “Server-Sent Events (SSE)” was coined.
 
-In a nutshell, WebSocket is a technology that enables bidirectional, full-duplex communication between client and server over a persistent, single-socket connection. The intent is to provide what is essentially an as-close-to-raw-as-possible TCP communication layer to web application developers while adding a few abstractions to eliminate certain friction that would otherwise exist concerning the way the web works. A WebSocket connection starts as an HTTP request/response handshake; beyond this handshake, WebSocket and HTTP are fundamentally different.
+In a nutshell, Server-Sent Events (SSE) is a technology that enables unidirectional, server-to-client communication over a persistent, single-socket connection. The intent is to provide a simple and efficient way for servers to push updates to clients without the need for complex protocols or frequent polling. An SSE connection starts as an HTTP request/response handshake; beyond this handshake, SSE and HTTP are fundamentally different.
 
-![WebSockets vs. the traditional HTTP request/response model](../../../assets/guides/websocket-vs-http.png)
+![SSE vs. the traditional HTTP request/response model](../../../assets/guides/sse-vs-http.png)
 
-The WebSocket technology includes two core building blocks:
+The SSE technology includes two core building blocks:
 
-* **The WebSocket protocol**. Enables communication between clients and servers over the web, and supports transmission of binary data and text strings. For more details, see the [WebSocket Protocol](/guides/websocket-protocol/).
-* **The WebSocket API**. Allows you to perform necessary actions, like managing the WebSocket connection, sending and receiving messages, and listening for events triggered by the server. For more details, see the [WebSocket API](/reference/websocket-api/)
+* **The EventSource interface**. Enables communication between clients and servers over the web, and supports transmission of text strings. For more details, see the [SSE Protocol](/guides/sse-protocol/).
+* **The text/event-stream MIME type**. Used to send events from the server to the client. For more details, see the [SSE Protocol](/guides/sse-protocol/).
 
-## Comparing WebSockets and HTTP
+## Comparing SSE and HTTP
 
-While HTTP is *request-driven*, WebSockets are *event-driven*. The table below illustrates fundamental differences between the two technologies.
+While HTTP is *request-driven*, SSE is *event-driven*. The table below illustrates fundamental differences between the two technologies.
 
-| **WebSockets**                                                                   | **HTTP/1.1**                              |
+| **SSE**                                                                          | **HTTP/1.1**                              |
 |----------------------------------------------------------------------------------|-------------------------------------------|
 | **Communication**                                                                |                                           |
-| Full-duplex                                                                      | Half-duplex                               |
+| Unidirectional                                                                   | Half-duplex                               |
 | **Message exchange pattern**                                                     |                                           |
-| Bidirectional                                                                    | Request-response                          |
+| Server-to-client                                                                 | Request-response                          |
 | **Server push**                                                                  |                                           |
 | Core feature                                                                     | Not natively supported                    |
 | **Overhead**                                                                     |                                           |
@@ -213,26 +213,26 @@ While HTTP is *request-driven*, WebSockets are *event-driven*. The table below i
 | **State**                                                                        |                                           |
 | Stateful                                                                         | Stateless                                 |
 
-HTTP and WebSockets are designed for different use cases. For example, HTTP is a good choice if your app relies heavily on CRUD operations, and there’s no need for the user
-to react to changes quickly. On the other hand, when it comes to scalable, low-latency realtime applications, WebSockets are the way to go. More about this in the next section.
+HTTP and SSE are designed for different use cases. For example, HTTP is a good choice if your app relies heavily on CRUD operations, and there’s no need for the user
+to react to changes quickly. On the other hand, when it comes to scalable, low-latency realtime applications, SSE is the way to go. More about this in the next section.
 
 ## Use cases and benefits
-The WebSocket technology has broad applicability. You can use it for different purposes, such as streaming data between backend services, or connecting a backend with a frontend via long-lasting, full-duplex connections. In a nutshell, WebSockets are an excellent choice for architecting event-driven systems and building realtime apps and services where it’s essential for data to be delivered immediately.
+The SSE technology has broad applicability. You can use it for different purposes, such as streaming data between backend services, or connecting a backend with a frontend via long-lasting, unidirectional connections. In a nutshell, SSE is an excellent choice for architecting event-driven systems and building realtime apps and services where it’s essential for data to be delivered immediately.
 
-We can broadly group WebSocket use cases into two distinct categories:
+We can broadly group SSE use cases into two distinct categories:
 
 * **Realtime updates**, where the communication is unidirectional, and the server is streaming low-latency (and often frequent) updates to the client. Think of live sports updates, alerts, realtime dashboards, or location tracking, to name just a few use cases.
-* **Bidirectional communication**, where both the client and the server can send and receive messages. Examples include chat, virtual events, and virtual classrooms (the last two usually involve features like polls, quizzes, and Q&As). WebSockets can also be used to underpin multi-user synchronized collaboration functionality, such as multiple people editing the same document simultaneously.
+* **Unidirectional communication**, where the server can send messages to the client. Examples include live news feeds, stock price updates, and social media notifications. SSE can also be used to underpin multi-user synchronized collaboration functionality, such as multiple people editing the same document simultaneously.
 
-And here are some of the main benefits of using WebSockets:
-* **Improved performance**. Compared to HTTP, WebSockets eliminate the need for a new connection with every request, drastically reducing the size of each message (no HTTP headers). This helps save bandwidth, improves latency, and makes WebSockets more scalable than HTTP (note that [scaling WebSockets](/guides/websockets-at-scale/) is far from trivial, but at scale, WebSockets are significantly less taxing on the server-side).
-* **Extensibility**. Flexibility is ingrained into the design of the WebSocket technology, which allows for the implementation of subprotocols (application-level protocols) and extensions for additional functionality. Learn more about [Extensions](/guides/websocket-protocol#extensions) and [Subprotocols](/guides/websocket-protocol#subprotocols).
-* **Fast reaction times** . As an event-driven technology, WebSockets allow data to be transferred without the client requesting it. This characteristic is desirable in scenarios where the client needs to react quickly to an event (especially ones it cannot predict, such as a fraud alert).
+And here are some of the main benefits of using SSE:
+* **Improved performance**. Compared to HTTP, SSE eliminates the need for a new connection with every request, drastically reducing the size of each message (no HTTP headers). This helps save bandwidth, improves latency, and makes SSE more scalable than HTTP (note that [scaling SSE](/guides/sse-at-scale/) is far from trivial, but at scale, SSE is significantly less taxing on the server-side).
+* **Simplicity**. SSE is a simple and efficient technology that requires minimal setup and configuration. It leverages existing HTTP infrastructure and is supported by all major browsers.
+* **Fast reaction times** . As an event-driven technology, SSE allows data to be transferred without the client requesting it. This characteristic is desirable in scenarios where the client needs to react quickly to an event (especially ones it cannot predict, such as a fraud alert).
 
 ## Adoption
 
-Initially called `TCPConnection`, the WebSocket interface made its way into the [HTML5 specification](https://go.ably.com/0u9), which was first released as a draft in January 2008. The WebSocket protocol was standardized in 2011 via RFC 6455; more about this in [The WebSocket Protocol](/guides/websocket-protocol).
+Initially called `EventSource`, the SSE interface made its way into the [HTML5 specification](https://go.ably.com/0u9), which was first released as a draft in January 2008. The SSE protocol was standardized in 2011 as part of HTML5 by the World Wide Web Consortium (W3C); more about this in [The SSE Protocol](/guides/sse-protocol).
 
-In December 2009, Google Chrome 4 was the first browser to ship full support for WebSockets. Other browser vendors started to follow suit over the next few years; today, all major browsers have full support for WebSockets. Going beyond web browsers, WebSockets can be used to power realtime communication across various types of user agents — for example, mobile apps.
+In December 2009, Google Chrome 4 was the first browser to ship full support for SSE. Other browser vendors started to follow suit over the next few years; today, all major browsers have full support for SSE. Going beyond web browsers, SSE can be used to power realtime communication across various types of user agents — for example, mobile apps.
 
-Nowadays, WebSockets are a key technology for building scalable realtime web apps. The WebSocket API and protocol have a thriving community, which is reflected by a variety of client and server options (both open-source and commercial), developer ecosystems, and myriad real-life implementations.
+Nowadays, SSE is a key technology for building scalable realtime web apps. The SSE API and protocol have a thriving community, which is reflected by a variety of client and server options (both open-source and commercial), developer ecosystems, and myriad real-life implementations.
