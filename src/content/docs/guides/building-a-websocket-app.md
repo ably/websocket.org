@@ -129,6 +129,6 @@ WebSockets are fundamentally hard to scale because connections to your WebSocket
 
 In addition to having to share state using additional technology, broadcasting to all subscribed clients becomes difficult, because any given WebSocketServer node knows only about the clients connected to itself.
 
-There are multiple ways to solve this: either by using some form of direct connection between the cluster nodes that are handling the traffic, or by using an external pub/sub mechanism. This is sometimes called "adding a backplane" to your infrastructure, and is yet another moving part that makes scaling WebSockets difficult.
+There are multiple ways to solve this: either by using some form of direct connection between the cluster nodes that are handling the traffic, or by using an external pub/sub mechanism. This is sometimes called "adding a backplane" to your infrastructure, and is yet another moving part that makes [scaling WebSockets](https://ably.com/topic/the-challenge-of-scaling-websockets) difficult.
 
-See Chapter 5: WebSockets at Scale for a more in-depth read about the engineering challenges involved in scaling WebSockets.
+See Chapter 5: WebSockets at Scale for a more in-depth read about the engineering challenges involved in scaling WebSockets. For production applications, you might want to consider using a realtime platform like [Ably](https://ably.com/) that handles the complexity of scaling WebSockets for you.

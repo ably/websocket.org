@@ -6,6 +6,7 @@ description: A collection of articles, videos, and WebSocket solutions you might
 ## References
 
 - Alex Russell, [Comet: Low Latency Data for the Browser](https://infrequently.org/2006/03/comet-low-latency-data-for-the-browser/)
+- [Ably WebSockets Guide](https://ably.com/topic/websockets)
 - [Berkeley sockets](https://en.wikipedia.org/wiki/Berkeley_sockets)
 - [Can I use WebSockets?](https://caniuse.com/websockets)
 - [Django Channels](https://channels.readthedocs.io/en/stable/)
@@ -34,6 +35,7 @@ description: A collection of articles, videos, and WebSocket solutions you might
 - [RFC 6455: The WebSocket Protocol](https://datatracker.ietf.org/doc/html/rfc6455)
 - [RFC 7519: JSON Web Token (JWT)](https://datatracker.ietf.org/doc/html/rfc7519)
 - [RFC 8441: Bootstrapping WebSockets with HTTP/2](https://datatracker.ietf.org/doc/html/rfc8441)
+- [Scaling WebSockets: The Challenge Explained](https://ably.com/topic/the-challenge-of-scaling-websockets)
 - [Server-Sent Events (SSE): A Conceptual Deep Dive](https://www.ably.io/blog/server-sent-events)
 - [Server-sent events, HTML Living Standard](https://html.spec.whatwg.org/multipage/server-sent-events.html)
 - [Simple Network Management Protocol](https://en.wikipedia.org/wiki/Simple_Network_Management_Protocol)
@@ -48,6 +50,7 @@ description: A collection of articles, videos, and WebSocket solutions you might
 - [The websocket-extensions framework](https://github.com/faye/websocket-extensions-node)
 - Tsviatko Yovtchev, [Delta Compression: A practical guide to diff algorithms and delta file formats](https://www.ably.io/blog/delta-compression-for-json-rest-apis/)
 - [W3C mailing lists, TCPConnection feedback](https://lists.w3.org/Archives/Public/public-webapps/2008JulSep/0251.html)
+- [WebSocket Load Balancing Guide](https://ably.com/topic/when-and-how-to-load-balance-websockets-at-scale)
 - [Websocket Pubsub open source projects on GitHub](https://github.com/topics/websocket-pubsub)
 - [Web sockets, HTML Living Standard](https://html.spec.whatwg.org/multipage/web-sockets.html)
 - [ws: a Node.js WebSocket library](https://github.com/websockets/ws)
@@ -63,6 +66,9 @@ description: A collection of articles, videos, and WebSocket solutions you might
 
 ## Further reading
 
+- [Ably's WebSocket Guide](https://ably.com/topic/websockets)
+- [The Challenge of Scaling WebSockets](https://ably.com/topic/the-challenge-of-scaling-websockets)
+- [WebSocket Load Balancing at Scale](https://ably.com/topic/when-and-how-to-load-balance-websockets-at-scale)
 - [WebSockets Security: Main Attacks and Risks](https://www.wallarm.com/what/websockets-security-main-attacks-and-risks)
 - [WebSocket Security - Cross-Site Hijacking (CSWSH)](https://www.christian-schneider.net/CrossSiteWebSocketHijacking.html)
 - [The Future of Web Software Is HTML-over-WebSockets](https://alistapart.com/article/the-future-of-web-software-is-html-over-websockets/)

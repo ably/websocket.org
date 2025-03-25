@@ -5,7 +5,7 @@ description: A reference for the WebSocket API — its events, methods, and prop
 
 # The WebSocket API (WebSockets)
 
-The WebSocket API is an advanced technology that makes it possible to open a persistent two-way, full-duplex communication channel between a web client and a server. With this API, you can send messages to a server and receive event-driven responses without having to poll the server for a reply.
+The [WebSocket API](https://ably.com/topic/websockets) is an advanced technology that makes it possible to open a persistent two-way, full-duplex communication channel between a web client and a server. With this API, you can send messages to a server and receive event-driven responses without having to poll the server for a reply.
 
 Defined in the [HTML Living Standard](https://html.spec.whatwg.org/multipage/web-sockets.html), the WebSocket API enables you to build web applications that are truly realtime and less resource-intensive on both the client and the server compared to HTTP techniques.
 
@@ -38,13 +38,13 @@ The WebSocket constructor contains a required parameter — the URL to the WebSo
 
 ```javascript
 // Creating a WebSocket connection
-const socket = new WebSocket('wss://example.org');
+const socket = new WebSocket('wss://echo.websocket.org');
 
 // Creating a WebSocket connection with a specific protocol
-const socket = new WebSocket('wss://example.org', 'myCustomProtocol');
+const socket = new WebSocket('wss://echo.websocket.org', 'myCustomProtocol');
 
 // Creating a WebSocket connection with multiple protocols
-const socket = new WebSocket('wss://example.org', ['protocol1', 'protocol2']);
+const socket = new WebSocket('wss://echo.websocket.org', ['protocol1', 'protocol2']);
 ```
 
 ### Connection states

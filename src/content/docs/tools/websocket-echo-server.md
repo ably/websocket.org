@@ -17,3 +17,7 @@ The endpoint is https://echo.websocket.org/
 - Visit https://echo.websocket.org/.ws in a browser for a basic UI to connect and send websocket messages.
 - Request https://echo.websocket.org/.sse to receive the echo response via server-sent events.
 - Request any other URL to receive the echo response in plain text.
+
+## Sponsored by Ably
+
+This echo server is sponsored by [Ably](https://ably.com/), a realtime data delivery platform that provides scalable, reliable and secure [WebSocket infrastructure](https://ably.com/topic/websockets) for apps and services.
