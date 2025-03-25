@@ -3,7 +3,7 @@ title: WebSockets at Scale
 description: Overview of the numerous engineering decisions and technical trade-offs involved in building a system at scale. Specifically, a system that is capable of handling thousands or even millions of concurrent end-user devices as they connect, consume, and send messages over WebSockets.
 ---
 
-This chapter covers the main aspects to consider when you set out to build a system at scale. By this, I mean a system to handle thousands or even millions of concurrent end-user devices as they connect, consume, and send messages over WebSockets. As you will see, scaling WebSockets is non-trivial, and involves numerous engineering decisions and technical trade-offs.
+This chapter covers the main aspects to consider when you set out to build a system at scale. By this, I mean a system to handle thousands or even millions of concurrent end-user devices as they connect, consume, and send messages over WebSockets. As you will see, [scaling WebSockets](https://ably.com/topic/the-challenge-of-scaling-websockets) is non-trivial, and involves numerous engineering decisions and technical trade-offs.
 
 ## The scalability of your server layer
 
@@ -30,7 +30,7 @@ Despite its increased complexity, horizontal scaling is worth pursuing, as it al
 
 ## Load balancing
 
-Load balancing is the process of distributing incoming network traffic (WebSocket connections in our case) across a group of backend servers (usually called a server farm). When you scale horizontally, your load balancing strategy is fundamental.
+[Load balancing WebSockets](https://ably.com/topic/when-and-how-to-load-balance-websockets-at-scale) is the process of distributing incoming network traffic (WebSocket connections in our case) across a group of backend servers (usually called a server farm). When you scale horizontally, your load balancing strategy is fundamental.
 
 A load balancer — which can be a physical device, a virtualized instance running on specialized hardware, or a software process — acts as a "traffic cop". Sitting between clients and your backend server farm, the load balancer receives and then routes incoming connections to available servers capable of handling them.
 
@@ -99,7 +99,7 @@ Here are some other benefits you gain by using pub/sub:
 * **Elasticity**. There's no need to pre-define a set number of publishers or subscribers. They can be added to a required channel depending on the usage.
 * **Ease of development & fast integration**. Pub/sub is agnostic to programming language and communication protocol, which enables disparate components of a system to be integrated faster compared to legacy alternatives.
 
-There are numerous projects built with WebSockets and pub/sub, and plenty of open-source libraries and commercial solutions combining these two elements, so it's unlikely you'll have to build your own WebSockets + pub/sub capability from scratch. Examples of open-source solutions you can use include: Socket.IO with the Redis pub/sub adapter, SocketCluster, or Django Channels. Of course, when choosing an open-source solution, you have to deploy it, manage it, and scale it yourself — this is, without a doubt, a tough engineering challenge.
+There are numerous projects built with WebSockets and pub/sub, and plenty of open-source libraries and commercial solutions combining these two elements, so it's unlikely you'll have to build your own WebSockets + pub/sub capability from scratch. Examples of open-source solutions you can use include: Socket.IO with the Redis pub/sub adapter, SocketCluster, or Django Channels. Of course, when choosing an open-source solution, you have to deploy it, manage it, and scale it yourself — this is, without a doubt, a tough engineering challenge. Alternatively, you can use a commercial platform like [Ably](https://ably.com/) that handles the complexities of scaling WebSockets for you.
 
 ## Fallback transports
 
