@@ -18,6 +18,7 @@ export default defineConfig({
 						{ label: 'WebSocket Protocol', link: '/guides/websocket-protocol/' },
 						{ label: 'Building a WebSocket App', link: '/guides/building-a-websocket-app/' },
 						{ label: 'WebSockets at Scale', link: '/guides/websockets-at-scale/' },
+						{ label: 'The Future of WebSockets', link: '/guides/future-of-websockets/' },
 					],
 				},
 				{
