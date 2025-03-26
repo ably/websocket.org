@@ -3,8 +3,6 @@ title: WebSocket Echo Server
 description: Public free endpoint used for testing Websockets, SSE and HTTP
 ---
 
-# WebSocket Echo Server
-
 We run a free very simple endpoint server with support for websockets and server-sent events (SSE) so that you can test your websocket and SSE clients easily.
 
 The server is designed for testing HTTP proxies and clients. It echoes information about HTTP request headers and bodies back to the client.
