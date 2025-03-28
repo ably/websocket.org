@@ -131,7 +131,7 @@ Example\r\n
 When chunked transfer encoding is used, each server response includes `Transfer-Encoding: chunked`, while the `Content-Length` header is omitted.
 :::
 
-[Server-Sent Events (SSE)](https://go.ably.com/irg) is another option you can leverage to implement HTTP streaming. SSE is a server push technology commonly used to send message updates or continuous data streams to a browser client. SSE aims to enhance native, cross-browser server-to-client streaming through a JavaScript API called EventSource, standardized11 as part of HTML5 by the World Wide Web Consortium (W3C).
+[Server-Sent Events (SSE)](https://go.ably.com/irg) is another option you can leverage to implement HTTP streaming. SSE is a server push technology commonly used to send message updates or continuous data streams to a browser client. SSE aims to enhance native, cross-browser server-to-client streaming through a JavaScript API called EventSource, standardized as part of HTML5 by the World Wide Web Consortium (W3C).
 
 Here's a quick example of opening a stream over SSE:
 
