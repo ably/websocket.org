@@ -12,7 +12,7 @@
     "lint:fix": "markdownlint --fix 'src/**/*.md' 'src/**/*.mdx'",
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,astro,css,md,mdx}'",
     "format:check": "prettier --check 'src/**/*.{js,jsx,ts,tsx,astro,css,md,mdx}'",
-    "prepare": "husky install"
+    "prepare": "husky"
   },
   "dependencies": {
     "@astrojs/check": "^0.3.1",
