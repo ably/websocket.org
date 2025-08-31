@@ -1,32 +1,32 @@
 ---
-title: "{API/Reference Title}"
-description: "{Technical reference description - 150-160 characters}"
+title: '{API/Reference Title}'
+description: '{Technical reference description - 150-160 characters}'
 author: "Matt O'Riordan"
-authorRole: "Co-founder & CEO, Ably"
-date: {YYYY-MM-DD}
-lastModified: {YYYY-MM-DD}
-category: "reference"
-tags: 
+authorRole: 'Co-founder & CEO, Ably'
+date: { YYYY-MM-DD }
+lastModified: { YYYY-MM-DD }
+category: 'reference'
+tags:
   - websocket
   - api
   - reference
-  - {additional-tag}
+  - { additional-tag }
 seo:
-  title: "{SEO title - max 60 characters}"
-  description: "{SEO meta description - 150-160 characters}"
-  keywords: 
+  title: '{SEO title - max 60 characters}'
+  description: '{SEO meta description - 150-160 characters}'
+  keywords:
     - websocket api
-    - {keyword1}
-    - {keyword2}
-  canonicalUrl: "/reference/{url-slug}/"
-  ogImage: "/images/og/{reference-name}.png"
+    - { keyword1 }
+    - { keyword2 }
+  canonicalUrl: '/reference/{url-slug}/'
+  ogImage: '/images/og/{reference-name}.png'
 toc: true
 sidebar:
-  order: {number}
-  label: "{Sidebar Label}"
+  order: { number }
+  label: '{Sidebar Label}'
 ---
 
-# {API/Reference Title}
+## {API/Reference Title}
 
 {Brief introduction explaining what this reference covers.}
 
@@ -38,13 +38,13 @@ sidebar:
 
 ```javascript
 // Example syntax
-{code example}
+// {code example}
 ```
 
 ## Parameters
 
-| Parameter | Type | Required | Description | Default |
-|-----------|------|----------|-------------|---------|
+| Parameter | Type   | Required | Description   | Default   |
+| --------- | ------ | -------- | ------------- | --------- |
 | `{param}` | {type} | {Yes/No} | {description} | {default} |
 
 ## Return Value
@@ -57,14 +57,18 @@ sidebar:
 
 ```javascript
 // {Example description}
-{code}
+{
+  code;
+}
 ```
 
 ### Advanced Example
 
 ```javascript
 // {Example description}
-{code}
+{
+  code;
+}
 ```
 
 ## Browser Compatibility
@@ -73,8 +77,8 @@ sidebar:
 
 ## Common Errors
 
-| Error | Cause | Solution |
-|-------|-------|----------|
+| Error   | Cause   | Solution   |
+| ------- | ------- | ---------- |
 | {error} | {cause} | {solution} |
 
 ## Related Methods/APIs
@@ -84,5 +88,6 @@ sidebar:
 
 ## Specifications
 
-- [RFC 6455](https://datatracker.ietf.org/doc/html/rfc6455) - The WebSocket Protocol
+- [RFC 6455](https://datatracker.ietf.org/doc/html/rfc6455) - The WebSocket
+  Protocol
 - [WHATWG WebSocket Standard](https://websockets.spec.whatwg.org/)

@@ -65,8 +65,7 @@ const fullOgImage = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage}
 <meta name="twitter:site" content="@ablyrealtime" />
 
 <!-- JSON-LD Structured Data -->
-<script type="application/ld+json">
-{JSON.stringify({
+<script type="application/ld+json" set:html={JSON.stringify({
   "@context": "https://schema.org",
   "@type": ogType === 'article' ? 'TechArticle' : 'WebPage',
   "headline": title,
@@ -94,5 +93,5 @@ const fullOgImage = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage}
     "@type": "WebPage",
     "@id": fullCanonicalUrl
   }
-})}
+})}>
 </script>

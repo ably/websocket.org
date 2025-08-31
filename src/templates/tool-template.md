@@ -1,35 +1,35 @@
 ---
-title: "{Tool Name}"
-description: "{Tool description - what it does - 150-160 characters}"
+title: '{Tool Name}'
+description: '{Tool description - what it does - 150-160 characters}'
 author: "Matt O'Riordan"
-authorRole: "Co-founder & CEO, Ably"
-date: {YYYY-MM-DD}
-lastModified: {YYYY-MM-DD}
-category: "tool"
-tags: 
+authorRole: 'Co-founder & CEO, Ably'
+date: { YYYY-MM-DD }
+lastModified: { YYYY-MM-DD }
+category: 'tool'
+tags:
   - websocket
   - tool
-  - {tool-type}
+  - { tool-type }
 seo:
-  title: "{Tool Name} - WebSocket {Tool Type}"
-  description: "{SEO meta description - 150-160 characters}"
-  keywords: 
+  title: '{Tool Name} - WebSocket {Tool Type}'
+  description: '{SEO meta description - 150-160 characters}'
+  keywords:
     - websocket {tool-type}
-    - {keyword1}
-    - {keyword2}
-  canonicalUrl: "/tools/{url-slug}/"
-  ogImage: "/images/og/{tool-name}.png"
+    - { keyword1 }
+    - { keyword2 }
+  canonicalUrl: '/tools/{url-slug}/'
+  ogImage: '/images/og/{tool-name}.png'
 toc: true
 sidebar:
-  order: {number}
-  label: "{Tool Name}"
+  order: { number }
+  label: '{Tool Name}'
 toolConfig:
-  interactive: {true/false}
-  requiresJS: {true/false}
-  apiEndpoint: "{/api/tool-name}"
+  interactive: { true/false }
+  requiresJS: { true/false }
+  apiEndpoint: '{/api/tool-name}'
 ---
 
-# {Tool Name}
+## {Tool Name}
 
 {Brief description of what the tool does and why it's useful.}
 

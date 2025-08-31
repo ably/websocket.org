@@ -1,10 +1,11 @@
 # Content Templates
 
-This directory contains templates for creating consistent content across WebSocket.org.
+This directory contains templates for creating consistent content across
+WebSocket.org.
 
 ## Available Templates
 
-```
+```text
 templates/
 ├── guide-template.md         # Educational guides and tutorials
 ├── reference-template.md     # API and technical reference docs
@@ -16,35 +17,45 @@ templates/
 ## Template Types
 
 ### 📚 Guides (`guide-template.md`)
+
 Use for educational content that teaches concepts or implementations:
+
 - WebSocket protocol explanations
 - Implementation tutorials
 - Best practices guides
 - Architecture patterns
 
 ### 📖 Reference (`reference-template.md`)
+
 Use for technical reference documentation:
+
 - API documentation
 - Protocol specifications
 - Method/function references
 - Configuration options
 
 ### 🛠️ Tools (`tool-template.md`)
+
 Use for interactive tool documentation:
+
 - Frame inspector
 - Connection debugger
 - Compression simulator
 - Any interactive utilities
 
 ### 🔗 Resources (`resource-template.md`)
+
 Use for external resources and libraries:
+
 - WebSocket libraries
 - Related specifications
 - Third-party tools
 - Community resources
 
 ### 🧩 Components (`component-template.astro`)
+
 Use for creating reusable Astro components:
+
 - UI components
 - Layout components
 - Interactive elements
@@ -61,6 +72,7 @@ Use for creating reusable Astro components:
 ## Template Variables
 
 Common variables to replace:
+
 - `{YYYY-MM-DD}` - Date in ISO format (e.g., 2024-08-31)
 - `{Guide Title}` - The main title of your content
 - `{url-slug}` - URL-friendly version (lowercase, hyphens)
@@ -88,4 +100,5 @@ cp src/templates/component-template.astro src/components/MyComponent.astro
 
 ## Questions?
 
-Refer to the [Content Style Guide](/docs/content-style-guide.md) or open an issue on GitHub.
+Refer to the [Content Style Guide](/docs/content-style-guide.md) or open an
+issue on GitHub.

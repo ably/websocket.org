@@ -1,16 +1,20 @@
 ---
 title: WebSocket Resources
-description: A collection of articles, videos, and WebSocket solutions you might want to explore.
+description:
+  A collection of articles, videos, and WebSocket solutions you might want to
+  explore.
 ---
 
 ## References
 
-- Alex Russell, [Comet: Low Latency Data for the Browser](https://infrequently.org/2006/03/comet-low-latency-data-for-the-browser/)
+- Alex Russell,
+  [Comet: Low Latency Data for the Browser](https://infrequently.org/2006/03/comet-low-latency-data-for-the-browser/)
 - [Ably WebSockets Guide](https://ably.com/topic/websockets)
 - [Berkeley sockets](https://en.wikipedia.org/wiki/Berkeley_sockets)
 - [Can I use WebSockets?](https://caniuse.com/websockets)
 - [Django Channels](https://channels.readthedocs.io/en/stable/)
-- Dr. Paddy Byers, [Engineering dependability and fault tolerance in a distributed system](https://www.ably.io/blog/engineering-dependability-and-fault-tolerance-in-a-distributed-system)
+- Dr. Paddy Byers,
+  [Engineering dependability and fault tolerance in a distributed system](https://www.ably.io/blog/engineering-dependability-and-fault-tolerance-in-a-distributed-system)
 - [Everything You Need To Know About Publish/Subscribe](https://dev.to/maurogarcia_19/everything-you-need-to-know-about-publish-subscribe-24ja)
 - [Grafana](https://grafana.com/)
 - [IANA WebSocket Close Code Number Registry](https://www.iana.org/assignments/websocket/websocket.xml#close-code-number)
@@ -18,14 +22,20 @@ description: A collection of articles, videos, and WebSocket solutions you might
 - [IANA WebSocket Opcode Registry](https://www.iana.org/assignments/websocket/websocket.xml#opcode)
 - [IANA WebSocket Protocol Registries](https://www.iana.org/assignments/websocket/websocket.xml)
 - [IANA WebSocket Subprotocol Name Registry](https://www.iana.org/assignments/websocket/websocket.xml#subprotocol-name)
-- IETF HTTP Working Group, [HTTP Documentation, Core Specifications](https://httpwg.org/specs/)
+- IETF HTTP Working Group,
+  [HTTP Documentation, Core Specifications](https://httpwg.org/specs/)
 - IRC logs, [18.06.2018](https://logs.botbot.me/freenode/nodejs/2018-06-18)
-- Jeroen de Kok, [How to implement a random exponential backoff algorithm in Javascript](https://advancedweb.hu/how-to-implement-an-exponential-backoff-retry-strategy-in-javascript/)
-- Jesse James Garrett, [Ajax: A New Approach to Web Applications](https://adaptivepath.org/ideas/ajax-new-approach-web-applications/)
-- Kayla Matthews, [MQTT: A Conceptual Deep-Dive](https://www.ably.io/blog/mqtt-protocol)
+- Jeroen de Kok,
+  [How to implement a random exponential backoff algorithm in Javascript](https://advancedweb.hu/how-to-implement-an-exponential-backoff-retry-strategy-in-javascript/)
+- Jesse James Garrett,
+  [Ajax: A New Approach to Web Applications](https://adaptivepath.org/ideas/ajax-new-approach-web-applications/)
+- Kayla Matthews,
+  [MQTT: A Conceptual Deep-Dive](https://www.ably.io/blog/mqtt-protocol)
 - [Long Polling — Concepts and Considerations](https://www.ably.io/blog/longpolling-concepts-pros-cons)
-- Matthew O'Riordan, [Google — polling like it's the 90s](https://www.ably.io/blog/google-polling-like-its-the-90s)
-- Michael Gariffo, [AWS suffers third outage of the month](https://www.zdnet.com/article/aws-suffers-third-outage-of-the-month/)
+- Matthew O'Riordan,
+  [Google — polling like it's the 90s](https://www.ably.io/blog/google-polling-like-its-the-90s)
+- Michael Gariffo,
+  [AWS suffers third outage of the month](https://www.zdnet.com/article/aws-suffers-third-outage-of-the-month/)
 - [OSI model](https://en.wikipedia.org/wiki/OSI_model)
 - [Prometheus](https://prometheus.io/)
 - [Redis](https://redis.io/)
@@ -48,7 +58,8 @@ description: A collection of articles, videos, and WebSocket solutions you might
 - [The Original HTTP as defined in 1991](https://www.w3.org/Protocols/HTTP/AsImplemented.html)
 - [The Simple Text Oriented Messaging Protocol (STOMP)](https://stomp.github.io/)
 - [The websocket-extensions framework](https://github.com/faye/websocket-extensions-node)
-- Tsviatko Yovtchev, [Delta Compression: A practical guide to diff algorithms and delta file formats](https://www.ably.io/blog/delta-compression-for-json-rest-apis/)
+- Tsviatko Yovtchev,
+  [Delta Compression: A practical guide to diff algorithms and delta file formats](https://www.ably.io/blog/delta-compression-for-json-rest-apis/)
 - [W3C mailing lists, TCPConnection feedback](https://lists.w3.org/Archives/Public/public-webapps/2008JulSep/0251.html)
 - [WebSocket Load Balancing Guide](https://ably.com/topic/when-and-how-to-load-balance-websockets-at-scale)
 - [Websocket Pubsub open source projects on GitHub](https://github.com/topics/websocket-pubsub)

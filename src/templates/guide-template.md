@@ -1,32 +1,33 @@
 ---
-title: "{Guide Title}"
-description: "{Brief description for SEO - 150-160 characters}"
+title: '{Guide Title}'
+description: '{Brief description for SEO - 150-160 characters}'
 author: "Matt O'Riordan"
-authorRole: "Co-founder & CEO, Ably"
-date: {YYYY-MM-DD}
-lastModified: {YYYY-MM-DD}
-category: "guide"
-tags: 
+authorRole: 'Co-founder & CEO, Ably'
+date: { YYYY-MM-DD }
+lastModified: { YYYY-MM-DD }
+category: 'guide'
+tags:
   - websocket
-  - {additional-tag}
+  - { additional-tag }
 seo:
-  title: "{SEO optimized title - max 60 characters}"
-  description: "{SEO meta description - 150-160 characters}"
-  keywords: 
+  title: '{SEO optimized title - max 60 characters}'
+  description: '{SEO meta description - 150-160 characters}'
+  keywords:
     - websocket
-    - {keyword1}
-    - {keyword2}
-  canonicalUrl: "/guides/{url-slug}/"
-  ogImage: "/images/og/{guide-name}.png"
+    - { keyword1 }
+    - { keyword2 }
+  canonicalUrl: '/guides/{url-slug}/'
+  ogImage: '/images/og/{guide-name}.png'
 toc: true
 sidebar:
-  order: {number}
-  label: "{Sidebar Label}"
+  order: { number }
+  label: '{Sidebar Label}'
 ---
 
-# {Guide Title}
+## {Guide Title}
 
-{Introduction paragraph that clearly states what this guide covers and who it's for.}
+{Introduction paragraph that clearly states what this guide covers and who it's
+for.}
 
 ## Prerequisites
 

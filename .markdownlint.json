@@ -39,7 +39,8 @@
       "sup",
       "sub",
       "AuthorBio",
-      "SEOMetadata"
+      "SEOMetadata",
+      "CardGrid"
     ]
   },
   "MD034": false,

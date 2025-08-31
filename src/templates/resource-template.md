@@ -1,32 +1,32 @@
 ---
-title: "{Resource Title}"
-description: "{Brief description of the resource - 150-160 characters}"
+title: '{Resource Title}'
+description: '{Brief description of the resource - 150-160 characters}'
 author: "Matt O'Riordan"
-authorRole: "Co-founder & CEO, Ably"
-date: {YYYY-MM-DD}
-lastModified: {YYYY-MM-DD}
-category: "resource"
-resourceType: "{library|tool|specification|article}"
-tags: 
+authorRole: 'Co-founder & CEO, Ably'
+date: { YYYY-MM-DD }
+lastModified: { YYYY-MM-DD }
+category: 'resource'
+resourceType: '{library|tool|specification|article}'
+tags:
   - websocket
-  - {resource-type}
-  - {additional-tag}
+  - { resource-type }
+  - { additional-tag }
 seo:
-  title: "{Resource Title} - WebSocket Resources"
-  description: "{SEO meta description - 150-160 characters}"
-  keywords: 
+  title: '{Resource Title} - WebSocket Resources'
+  description: '{SEO meta description - 150-160 characters}'
+  keywords:
     - websocket {resource-type}
-    - {keyword1}
-    - {keyword2}
-  canonicalUrl: "/resources/{url-slug}/"
-  ogImage: "/images/og/{resource-name}.png"
+    - { keyword1 }
+    - { keyword2 }
+  canonicalUrl: '/resources/{url-slug}/'
+  ogImage: '/images/og/{resource-name}.png'
 toc: false
 sidebar:
-  order: {number}
-  label: "{Resource Name}"
+  order: { number }
+  label: '{Resource Name}'
 ---
 
-# {Resource Title}
+## {Resource Title}
 
 {Brief introduction explaining what this resource is and why it's valuable.}
 
