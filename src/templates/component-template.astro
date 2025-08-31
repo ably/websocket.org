@@ -1,0 +1,73 @@
+---
+// Component: {ComponentName}
+// Purpose: {Brief description of what this component does}
+// Usage: <{ComponentName} prop1="value" prop2={variable} />
+
+export interface Props {
+  // Required props
+  propName: string;
+  
+  // Optional props with defaults
+  optionalProp?: boolean;
+  className?: string;
+}
+
+// Destructure props with defaults
+const {
+  propName,
+  optionalProp = false,
+  className = '',
+} = Astro.props;
+
+// Component logic here
+const processedData = propName.toLowerCase();
+---
+
+<div class={`component-name ${className}`}>
+  <!-- Component HTML structure -->
+  <div class="component-name__header">
+    <h3>{propName}</h3>
+  </div>
+  
+  <div class="component-name__content">
+    {optionalProp && (
+      <p>Optional content shown conditionally</p>
+    )}
+    
+    <slot />
+  </div>
+</div>
+
+<style>
+  /* Component-specific styles using BEM naming */
+  .component-name {
+    /* Base styles */
+  }
+  
+  .component-name__header {
+    /* Header styles */
+  }
+  
+  .component-name__content {
+    /* Content styles */
+  }
+  
+  /* Responsive styles */
+  @media (max-width: 640px) {
+    .component-name {
+      /* Mobile styles */
+    }
+  }
+</style>
+
+<script>
+  // Client-side JavaScript if needed
+  // This runs in the browser
+  
+  // Example: Add interactivity
+  document.querySelectorAll('.component-name').forEach((element) => {
+    element.addEventListener('click', (e) => {
+      // Handle click
+    });
+  });
+</script>

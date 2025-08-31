@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run markdown linting on staged markdown files
+staged_files=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(md|mdx)$')
+
+if [ -n "$staged_files" ]; then
+  echo "Running markdown linter on staged files..."
+  npx markdownlint $staged_files
+  
+  if [ $? -ne 0 ]; then
+    echo "❌ Markdown linting failed. Please fix the issues above."
+    echo "You can run 'npx markdownlint --fix <file>' to auto-fix some issues."
+    exit 1
+  fi
+fi
+
+echo "✅ Pre-commit checks passed"
