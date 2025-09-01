@@ -40,7 +40,11 @@
       "sub",
       "AuthorBio",
       "SEOMetadata",
-      "CardGrid"
+      "CardGrid",
+      "Card",
+      "LinkCard",
+      "Tabs",
+      "TabItem"
     ]
   },
   "MD034": false,

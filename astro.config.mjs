@@ -13,25 +13,64 @@ export default defineConfig({
 				{
 					label: 'Guides',
 					items: [
-						// Each item here is one entry in the navigation menu.
-						{ label: 'The Road to WebSockets', link: '/guides/road-to-websockets/' },
-						{ label: 'WebSocket Protocol', link: '/guides/websocket-protocol/' },
-						{ label: 'Building a WebSocket App', link: '/guides/building-a-websocket-app/' },
-						{ label: 'WebSockets at Scale', link: '/guides/websockets-at-scale/' },
-						{ label: 'The Future of WebSockets', link: '/guides/future-of-websockets/' },
+						{
+							label: 'Core Concepts',
+							items: [
+								{ label: 'The Road to WebSockets', link: '/guides/road-to-websockets/' },
+								{ label: 'WebSocket Protocol', link: '/guides/websocket-protocol/' },
+								{ label: 'The Future of WebSockets', link: '/guides/future-of-websockets/' },
+							],
+						},
+						{
+							label: 'Implementation',
+							items: [
+								{ label: 'Building a WebSocket App', link: '/guides/building-a-websocket-app/' },
+								{ label: 'WebSockets at Scale', link: '/guides/websockets-at-scale/' },
+							],
+						},
+						{
+							label: 'Security',
+							items: [
+								{ label: 'Security Hardening', link: '/guides/security/' },
+							],
+						},
+						{
+							label: 'Testing',
+							items: [
+								{ label: 'Autobahn TestSuite', link: '/guides/testing/autobahn/' },
+							],
+						},
 					],
 				},
 				{
 					label: 'Reference',
-					autogenerate: { directory: 'reference' },
+					items: [
+						{
+							label: 'API Reference',
+							items: [
+								{ label: 'WebSocket API', link: '/reference/websocket-api/' },
+								{ label: 'Close Codes', link: '/reference/close-codes/' },
+							],
+						},
+						{
+							label: 'Standards',
+							items: [
+								{ label: 'Standards Tracker', link: '/standards/' },
+							],
+						},
+					],
 				},
 				{
 					label: 'Tools',
-					autogenerate: { directory: 'tools' },
+					items: [
+						{ label: 'Echo Server', link: '/tools/websocket-echo-server/' },
+					],
 				},
 				{
-					label: 'Resource',
-					autogenerate: { directory: 'resources' },
+					label: 'Resources',
+					items: [
+						{ label: 'WebSocket Resources', link: '/resources/websocket-resources/' },
+					],
 				},
 			],
 			editLink: {

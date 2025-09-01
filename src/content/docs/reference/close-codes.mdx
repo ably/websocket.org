@@ -1,0 +1,646 @@
+---
+title: WebSocket Close Codes Reference
+description:
+  Complete reference for WebSocket close codes including standard codes,
+  reserved ranges, troubleshooting guides, and implementation examples in
+  multiple languages
+keywords:
+  [
+    websocket close codes,
+    websocket error codes,
+    websocket 1000,
+    websocket 1001,
+    websocket 1006,
+    websocket connection closed,
+    websocket error handling,
+  ]
+sidebar:
+  order: 2
+  label: Close Codes
+author: Matthew O'Riordan
+role: Co-founder & CEO, Ably
+date: 2025-09-01
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+WebSocket connections can close for various reasons, each identified by a
+specific close code. Understanding these codes is crucial for debugging
+connection issues and implementing robust error handling in your WebSocket
+applications.
+
+## Quick Reference Table
+
+### Standard Close Codes (1000-1015)
+
+| Code | Name                 | Description                             | When to Use                          |
+| ---- | -------------------- | --------------------------------------- | ------------------------------------ |
+| 1000 | Normal Closure       | Connection fulfilled its purpose        | Standard graceful shutdown           |
+| 1001 | Going Away           | Server/browser is shutting down         | Server maintenance, page navigation  |
+| 1002 | Protocol Error       | Protocol violation detected             | Invalid frame, bad data format       |
+| 1003 | Unsupported Data     | Received incompatible data type         | Wrong message format received        |
+| 1004 | Reserved             | Reserved for future use                 | Do not use                           |
+| 1005 | No Status Received   | Expected status code was absent         | Internal use only (cannot send)      |
+| 1006 | Abnormal Closure     | Connection lost unexpectedly            | Internal use only (cannot send)      |
+| 1007 | Invalid Payload Data | Message data doesn't match type         | Malformed UTF-8, invalid JSON        |
+| 1008 | Policy Violation     | Generic policy violation                | Rate limiting, message size exceeded |
+| 1009 | Message Too Big      | Message exceeds size limits             | Payload too large                    |
+| 1010 | Mandatory Extension  | Required extension not supported        | Extension negotiation failed         |
+| 1011 | Internal Error       | Server encountered unexpected error     | Server-side exception                |
+| 1012 | Service Restart      | Server is restarting                    | Planned restart                      |
+| 1013 | Try Again Later      | Temporary server overload               | Server temporarily unavailable       |
+| 1014 | Bad Gateway          | Gateway/proxy received invalid response | Proxy server issues                  |
+| 1015 | TLS Handshake        | TLS/SSL handshake failure               | Internal use only (cannot send)      |
+
+### Reserved Code Ranges
+
+| Range     | Purpose              | Usage                                |
+| --------- | -------------------- | ------------------------------------ |
+| 0-999     | Reserved             | Not used, invalid if received        |
+| 1000-2999 | WebSocket Protocol   | Standard codes and future extensions |
+| 3000-3999 | Libraries/Frameworks | Framework-specific codes             |
+| 4000-4999 | Private Use          | Application-specific codes           |
+
+## Detailed Code Explanations
+
+### 1000: Normal Closure
+
+The connection successfully completed its purpose and is closing normally.
+
+**Common Scenarios:**
+
+- User logs out
+- Chat session ends
+- File transfer completes
+- Client explicitly closes connection
+
+**Troubleshooting:**
+
+- This is the expected code for graceful shutdowns
+- No action needed unless unexpected
+
+<Tabs>
+<TabItem label="JavaScript">
+```javascript
+// Client-side closing
+ws.close(1000, "Work complete");
+
+// Handling normal closure
+ws.onclose = (event) => {
+  if (event.code === 1000) {
+    console.log("Connection closed normally");
+  }
+};
+
+```
+
+</TabItem>
+<TabItem label="Node.js">
+```javascript
+// Server-side closing
+ws.close(1000, "Session ended");
+
+// Handling closure
+ws.on('close', (code, reason) => {
+  if (code === 1000) {
+    console.log(`Normal closure: ${reason}`);
+  }
+});
+```
+
+</TabItem>
+<TabItem label="Python">
+```python
+# Closing connection
+await websocket.close(code=1000, reason="Complete")
+
+## Handling closure
+
+try:
+    await websocket.recv()
+except websockets.ConnectionClosedOK:
+    print("Connection closed normally")
+
+```
+
+</TabItem>
+<TabItem label="Go">
+```go
+// Sending close frame
+err := conn.WriteMessage(
+    websocket.CloseMessage,
+    websocket.FormatCloseMessage(1000, "Done"),
+)
+
+// Handling close
+_, _, err := conn.ReadMessage()
+if websocket.IsCloseError(err, 1000) {
+    log.Println("Normal closure")
+}
+```
+
+</TabItem>
+</Tabs>
+
+## 1001: Going Away
+
+The endpoint is going away, either due to server shutdown or browser navigation.
+
+**Common Scenarios:**
+
+- Server scheduled maintenance
+- Browser tab closing
+- Page navigation
+- Application shutdown
+
+**Troubleshooting:**
+
+- Implement reconnection logic with backoff
+- Save application state before closure
+- Notify users of maintenance windows
+
+<Tabs>
+<TabItem label="JavaScript">
+```javascript
+// Browser navigation detection
+window.addEventListener('beforeunload', () => {
+  ws.close(1001, "Page unloading");
+});
+
+// Reconnection logic
+ws.onclose = (event) => {
+  if (event.code === 1001) {
+    setTimeout(() => {
+      reconnect();
+    }, 5000);
+  }
+};
+
+```
+
+</TabItem>
+<TabItem label="Node.js">
+```javascript
+// Graceful server shutdown
+process.on('SIGTERM', () => {
+  wss.clients.forEach(client => {
+    client.close(1001, "Server shutting down");
+  });
+  server.close();
+});
+```
+
+</TabItem>
+</Tabs>
+
+## 1002: Protocol Error
+
+A WebSocket protocol violation was detected.
+
+**Common Scenarios:**
+
+- Invalid frame structure
+- Incorrect masking
+- Bad opcode
+- Protocol version mismatch
+
+**Troubleshooting:**
+
+- Verify WebSocket library versions
+- Check for proxy interference
+- Validate frame construction
+- Ensure proper protocol implementation
+
+## 1003: Unsupported Data
+
+The endpoint received data it cannot accept.
+
+**Common Scenarios:**
+
+- Binary data sent to text-only endpoint
+- Text data sent to binary-only endpoint
+- Unsupported message format
+
+**Implementation:**
+
+```javascript
+ws.onmessage = (event) => {
+  if (event.data instanceof Blob && !supportsBinary) {
+    ws.close(1003, 'Binary data not supported');
+  }
+};
+```
+
+## 1006: Abnormal Closure
+
+Connection was closed abnormally without a close frame.
+
+**Common Scenarios:**
+
+- Network failure
+- Client crash
+- Proxy timeout
+- Firewall intervention
+
+**Important:** This code cannot be sent in a close frame; it's only for the
+receiving endpoint to indicate abnormal closure.
+
+**Troubleshooting:**
+
+- Implement heartbeat/ping-pong mechanism
+- Add connection timeout detection
+- Use exponential backoff for reconnection
+
+```javascript
+// Detecting abnormal closure
+ws.onclose = (event) => {
+  if (event.code === 1006) {
+    console.error('Connection lost unexpectedly');
+    // Implement reconnection strategy
+    reconnectWithBackoff();
+  }
+};
+
+// Heartbeat mechanism to prevent 1006
+const heartbeat = setInterval(() => {
+  if (ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: 'ping' }));
+  }
+}, 30000);
+```
+
+## 1007: Invalid Payload Data
+
+The message data doesn't match the declared type.
+
+**Common Scenarios:**
+
+- Invalid UTF-8 in text message
+- Malformed JSON
+- Schema validation failure
+- Encoding errors
+
+**Prevention:**
+
+```javascript
+// Validate before sending
+function sendMessage(data) {
+  try {
+    const json = JSON.stringify(data);
+    // Validate UTF-8 encoding
+    if (!isValidUTF8(json)) {
+      throw new Error('Invalid UTF-8');
+    }
+    ws.send(json);
+  } catch (error) {
+    console.error('Invalid payload:', error);
+  }
+}
+```
+
+## 1008: Policy Violation
+
+Generic status for policy violations when no other code applies.
+
+**Common Scenarios:**
+
+- Rate limiting exceeded
+- Authentication failure
+- Authorization denied
+- Terms of service violation
+
+**Implementation:**
+
+```javascript
+// Server-side rate limiting
+const connectionCounts = new Map();
+
+wss.on('connection', (ws, req) => {
+  const ip = req.socket.remoteAddress;
+  const count = connectionCounts.get(ip) || 0;
+
+  if (count >= MAX_CONNECTIONS_PER_IP) {
+    ws.close(1008, 'Connection limit exceeded');
+    return;
+  }
+
+  connectionCounts.set(ip, count + 1);
+});
+```
+
+## 1009: Message Too Big
+
+Message exceeds the maximum size the endpoint can handle.
+
+**Common Scenarios:**
+
+- File upload too large
+- Batch message exceeds limit
+- Accumulated frame size too large
+
+**Prevention:**
+
+```javascript
+// Check message size before sending
+const MAX_MESSAGE_SIZE = 1024 * 1024; // 1MB
+
+function sendLargeData(data) {
+  const message = JSON.stringify(data);
+
+  if (message.length > MAX_MESSAGE_SIZE) {
+    // Split into chunks
+    const chunks = chunkMessage(message, MAX_MESSAGE_SIZE);
+    chunks.forEach((chunk) => ws.send(chunk));
+  } else {
+    ws.send(message);
+  }
+}
+```
+
+## 1011: Internal Error
+
+The server encountered an unexpected condition preventing request fulfillment.
+
+**Common Scenarios:**
+
+- Unhandled server exception
+- Database connection failure
+- Critical service unavailable
+- Memory allocation failure
+
+**Server Implementation:**
+
+```javascript
+ws.on('message', async (data) => {
+  try {
+    await processMessage(data);
+  } catch (error) {
+    console.error('Internal error:', error);
+    ws.close(1011, 'Internal server error');
+  }
+});
+```
+
+## Application-Specific Codes (4000-4999)
+
+You can define custom close codes for application-specific scenarios:
+
+```javascript
+// Custom close codes
+const CustomCodes = {
+  SESSION_EXPIRED: 4001,
+  DUPLICATE_CONNECTION: 4002,
+  MAINTENANCE_MODE: 4003,
+  SUBSCRIPTION_EXPIRED: 4004,
+  BANNED_USER: 4005,
+};
+
+// Usage
+if (sessionExpired) {
+  ws.close(CustomCodes.SESSION_EXPIRED, 'Session expired');
+}
+
+// Handling custom codes
+ws.onclose = (event) => {
+  switch (event.code) {
+    case CustomCodes.SESSION_EXPIRED:
+      redirectToLogin();
+      break;
+    case CustomCodes.DUPLICATE_CONNECTION:
+      showDuplicateConnectionWarning();
+      break;
+    default:
+      handleStandardClose(event.code);
+  }
+};
+```
+
+## Best Practices
+
+### Error Handling Strategy
+
+```javascript
+class WebSocketManager {
+  constructor(url) {
+    this.url = url;
+    this.reconnectAttempts = 0;
+    this.maxReconnectAttempts = 5;
+    this.reconnectDelay = 1000;
+    this.connect();
+  }
+
+  connect() {
+    this.ws = new WebSocket(this.url);
+    this.setupEventHandlers();
+  }
+
+  setupEventHandlers() {
+    this.ws.onclose = (event) => {
+      console.log(`Connection closed: ${event.code} - ${event.reason}`);
+
+      // Handle specific close codes
+      switch (event.code) {
+        case 1000: // Normal closure
+          console.log('Connection completed successfully');
+          break;
+
+        case 1006: // Abnormal closure
+          this.reconnect();
+          break;
+
+        case 1008: // Policy violation
+          this.handlePolicyViolation(event.reason);
+          break;
+
+        case 1011: // Internal error
+          this.notifyError('Server error occurred');
+          this.reconnect();
+          break;
+
+        default:
+          if (event.code >= 4000 && event.code <= 4999) {
+            this.handleCustomCode(event.code, event.reason);
+          } else {
+            this.reconnect();
+          }
+      }
+    };
+  }
+
+  reconnect() {
+    if (this.reconnectAttempts >= this.maxReconnectAttempts) {
+      console.error('Max reconnection attempts reached');
+      this.notifyError('Connection failed permanently');
+      return;
+    }
+
+    const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts);
+    console.log(`Reconnecting in ${delay}ms...`);
+
+    setTimeout(() => {
+      this.reconnectAttempts++;
+      this.connect();
+    }, delay);
+  }
+
+  handlePolicyViolation(reason) {
+    if (reason.includes('rate limit')) {
+      this.notifyError('Too many requests. Please slow down.');
+      setTimeout(() => this.reconnect(), 60000); // Wait 1 minute
+    } else if (reason.includes('authentication')) {
+      this.redirectToLogin();
+    }
+  }
+
+  handleCustomCode(code, reason) {
+    // Handle application-specific codes
+    console.log(`Custom close code ${code}: ${reason}`);
+  }
+
+  notifyError(message) {
+    // Notify UI of error
+    console.error(message);
+  }
+
+  redirectToLogin() {
+    window.location.href = '/login';
+  }
+}
+```
+
+### Logging and Monitoring
+
+```javascript
+// Comprehensive close event logging
+function logCloseEvent(event) {
+  const logEntry = {
+    timestamp: new Date().toISOString(),
+    code: event.code,
+    reason: event.reason || 'No reason provided',
+    wasClean: event.wasClean,
+    readyState: event.target.readyState,
+    url: event.target.url,
+    // Additional context
+    userAgent: navigator.userAgent,
+    connectionDuration: Date.now() - connectionStartTime,
+    messagesExchanged: messageCount,
+  };
+
+  // Send to monitoring service
+  sendToMonitoring(logEntry);
+
+  // Local logging
+  console.table(logEntry);
+}
+
+ws.onclose = logCloseEvent;
+```
+
+## Testing Close Codes
+
+### Unit Testing Example
+
+```javascript
+// Jest test example
+describe('WebSocket Close Handling', () => {
+  let ws;
+  let mockServer;
+
+  beforeEach(() => {
+    mockServer = new WS.Server({ port: 8080 });
+    ws = new WebSocket('ws://localhost:8080');
+  });
+
+  afterEach(() => {
+    ws.close();
+    mockServer.close();
+  });
+
+  test('handles normal closure (1000)', (done) => {
+    ws.onopen = () => {
+      ws.close(1000, 'Test complete');
+    };
+
+    ws.onclose = (event) => {
+      expect(event.code).toBe(1000);
+      expect(event.reason).toBe('Test complete');
+      done();
+    };
+  });
+
+  test('handles message too big (1009)', (done) => {
+    mockServer.on('connection', (socket) => {
+      socket.close(1009, 'Message too large');
+    });
+
+    ws.onclose = (event) => {
+      expect(event.code).toBe(1009);
+      done();
+    };
+  });
+});
+```
+
+## Common Issues and Solutions
+
+### Issue: Frequent 1006 Errors
+
+**Symptoms:** Connection drops without proper close frame
+
+**Solutions:**
+
+1. Implement heartbeat mechanism
+2. Check proxy/firewall timeout settings
+3. Verify network stability
+4. Add connection state monitoring
+
+### Issue: 1002 Protocol Errors
+
+**Symptoms:** Immediate disconnection after connection
+
+**Solutions:**
+
+1. Verify WebSocket library compatibility
+2. Check for proxy/CDN interference
+3. Ensure proper Sec-WebSocket headers
+4. Validate frame construction
+
+### Issue: Rate Limiting (1008)
+
+**Symptoms:** Connections rejected with policy violation
+
+**Solutions:**
+
+1. Implement client-side throttling
+2. Use exponential backoff
+3. Batch messages when possible
+4. Monitor connection frequency
+
+## Browser Compatibility
+
+| Close Code | Chrome     | Firefox    | Safari     | Edge       |
+| ---------- | ---------- | ---------- | ---------- | ---------- |
+| 1000-1003  | ✅ Full    | ✅ Full    | ✅ Full    | ✅ Full    |
+| 1004-1007  | ✅ Full    | ✅ Full    | ✅ Full    | ✅ Full    |
+| 1008-1011  | ✅ Full    | ✅ Full    | ✅ Full    | ✅ Full    |
+| 1012-1015  | ⚠️ Partial | ⚠️ Partial | ⚠️ Partial | ⚠️ Partial |
+| 4000-4999  | ✅ Full    | ✅ Full    | ✅ Full    | ✅ Full    |
+
+**Note:** Codes 1005, 1006, and 1015 cannot be sent by applications; they're
+only set by the browser/runtime.
+
+## Security Considerations
+
+1. **Don't leak sensitive information** in close reasons
+2. **Validate close codes** from untrusted clients
+3. **Rate limit** connection attempts after certain close codes
+4. **Log suspicious patterns** of close codes for security monitoring
+5. **Use custom codes** for application-specific security events
+
+## Further Reading
+
+- [RFC 6455 Section 7.4: Status Codes](https://tools.ietf.org/html/rfc6455#section-7.4)
+- [WebSocket API Specification](https://websockets.spec.whatwg.org/)
+- [IANA WebSocket Close Code Registry](https://www.iana.org/assignments/websocket/websocket.xml#close-code-number)
+- [WebSocket Protocol Guide](/guides/protocol)
+- [WebSocket Security Best Practices](/guides/security)
