@@ -34,7 +34,25 @@ transfer data back and forth in conceptual units referred to as messages, which,
 as we describe shortly, can consist of one or more frames. Once the WebSocket
 connection has served its purpose, it can be terminated via a closing handshake.
 
-![High-level overview of a WebSocket connection](../../../assets/guides/websocket-overview.png)
+```text
+        ┌──────────┐                    ┌──────────┐
+        │  Client  │                    │  Server  │
+        └────┬─────┘                    └────┬─────┘
+             │                               │
+             │      Initial HTTP             │
+             │       handshake               │
+             ├──────────────────────────────►│
+             │◄──────────────────────────────┤
+             │                               │
+             │      WebSockets               │
+             │      full-duplex              │
+             │      persistent               │
+             │◄─────────────────────────────►│
+             │                               │
+             │         Close                 │
+             ├──────────────────────────────►│
+             │◄──────────────────────────────┤
+```
 
 ## URI schemes and syntax
 
@@ -53,7 +71,16 @@ The rest of the WebSocket URI follows a generic syntax, similar to HTTP. It
 consists of several components: host, port, path, and query, as highlighted in
 the example below.
 
-![WebSocket URI components](../../../assets/guides/websocket-uri.png)
+```text
+wss://example.com:443/websocket/demo?foo=bar
+└─┘   └──────────┘ └─┘ └────────────┘ └─────┘
+ │         │        │        │           │
+ │         │        │        │           └── Query
+ │         │        │        └───────────── Path
+ │         │        └────────────────────── Port
+ │         └─────────────────────────────── Host
+ └───────────────────────────────────────── Scheme
+```
 
 It's worth mentioning that:
 
@@ -65,13 +92,40 @@ It's worth mentioning that:
 ## Opening handshake
 
 The process of establishing a WebSocket connection is known as the opening
-handshake, and consists of an HTTP/1.1 request/response exchange between the
-client and the server. The client issues a WebSocket handshake request, which is
-just a specially formatted HTTP GET request. The server, if it supports the
-WebSocket protocol and is willing to establish a connection with the client,
-responds with a WebSocket handshake response.
+handshake. While originally designed for HTTP/1.1, WebSockets can now be
+established over HTTP/1.1, HTTP/2, and HTTP/3, each with different mechanisms.
 
-![WebSocket Opening Handshake](../../../assets/guides/websocket-handshake.png)
+### HTTP/1.1 Upgrade Handshake
+
+The traditional WebSocket handshake consists of an HTTP/1.1 request/response
+exchange between the client and the server. The client issues a WebSocket
+handshake request, which is a specially formatted HTTP GET request. The server,
+if it supports the WebSocket protocol and is willing to establish a connection
+with the client, responds with a WebSocket handshake response.
+
+```text
+   ┌──────────┐                              ┌──────────┐
+   │  Client  │                              │  Server  │
+   └──────┬───┘                              └──────┬───┘
+         │                                          │
+         │  GET /chat HTTP/1.1                      │
+         │  Host: example.com                       │
+         │  Upgrade: websocket                      │
+         │  Connection: Upgrade                     │
+         │  Sec-WebSocket-Key: [base64]             │
+         │  Sec-WebSocket-Version: 13               │
+         ├─────────────────────────────────────────►│
+         │                                          │
+         │  HTTP/1.1 101 Switching Protocols        │
+         │  Upgrade: websocket                      │
+         │  Connection: Upgrade                     │
+         │  Sec-WebSocket-Accept: [hash]            │
+         │◄─────────────────────────────────────────┤
+         │                                          │
+         │       WebSocket Connection               │
+         │◄────────────────────────────────────────►│
+         │                                          │
+```
 
 ### Client handshake request
 
@@ -131,6 +185,137 @@ If the client requested a subprotocol, the server includes the
 client requested extensions, the server may include the
 `Sec-WebSocket-Extensions` header with the extensions it has agreed to use.
 
+### HTTP/2 WebSocket Bootstrapping (RFC 8441)
+
+[RFC 8441](https://datatracker.ietf.org/doc/html/rfc8441) introduces WebSocket
+support over HTTP/2 using the Extended CONNECT method. This mechanism allows
+WebSocket connections to be multiplexed over a single HTTP/2 connection.
+
+#### Extended CONNECT Method
+
+HTTP/2 uses a different approach than HTTP/1.1's Upgrade mechanism:
+
+1. The server advertises support via `SETTINGS_ENABLE_CONNECT_PROTOCOL = 1`
+2. The client sends an Extended CONNECT request with `:protocol = websocket`
+3. The server responds with a 200 status if successful
+
+```text
+   ┌──────────┐                              ┌──────────┐
+   │  Client  │                              │  Server  │
+   └──────┬───┘                              └──────┬───┘
+         │                                          │
+         │  SETTINGS                                │
+         │  SETTINGS_ENABLE_CONNECT_PROTOCOL = 1    │
+         │◄─────────────────────────────────────────┤
+         │                                          │
+         │  HEADERS                                 │
+         │  :method = CONNECT                       │
+         │  :protocol = websocket                   │
+         │  :scheme = https                         │
+         │  :path = /chat                           │
+         │  :authority = example.com                │
+         │  sec-websocket-version = 13              │
+         │  sec-websocket-key = [base64]            │
+         ├─────────────────────────────────────────►│
+         │                                          │
+         │  HEADERS                                 │
+         │  :status = 200                           │
+         │  sec-websocket-accept = [hash]           │
+         │◄─────────────────────────────────────────┤
+         │                                          │
+         │   WebSocket over HTTP/2 Stream           │
+         │◄────────────────────────────────────────►│
+         │                                          │
+```
+
+#### Implementation Example
+
+```javascript
+// Node.js with HTTP/2 support
+const http2 = require('http2');
+
+// Client-side HTTP/2 WebSocket connection
+const client = http2.connect('https://example.com');
+const req = client.request({
+  ':method': 'CONNECT',
+  ':protocol': 'websocket',
+  ':path': '/chat',
+  'sec-websocket-version': '13',
+  'sec-websocket-key': generateKey(),
+});
+```
+
+Key benefits of HTTP/2 WebSockets:
+
+- **Stream multiplexing**: Multiple WebSocket connections over one TCP
+  connection
+- **Header compression**: Reduced overhead with HPACK
+- **No HOL blocking between streams**: Each stream is independent
+- **Better proxy traversal**: Works better with HTTP/2-aware proxies
+
+### HTTP/3 WebSocket Bootstrapping (RFC 9220)
+
+[RFC 9220](https://datatracker.ietf.org/doc/html/rfc9220) defines how WebSockets
+work over HTTP/3 and QUIC, providing even better performance and reliability.
+
+#### QUIC Transport Benefits
+
+HTTP/3 WebSockets leverage QUIC's advantages:
+
+```text
+   ┌──────────┐                              ┌──────────┐
+   │  Client  │                              │  Server  │
+   └──────┬───┘                              └──────┬───┘
+         │                                          │
+         │  SETTINGS (QUIC)                         │
+         │  SETTINGS_ENABLE_WEBTRANSPORT = 1        │
+         │  SETTINGS_H3_DATAGRAM = 1                │
+         │◄─────────────────────────────────────────┤
+         │                                          │
+         │  Extended CONNECT (Stream 4)             │
+         │  :method = CONNECT                       │
+         │  :protocol = websocket                   │
+         │  :scheme = https                         │
+         │  :path = /chat                           │
+         │  :authority = example.com                │
+         ├─────────────────────────────────────────►│
+         │                                          │
+         │  200 OK (Stream 4)                       │
+         │  sec-websocket-accept = [hash]           │
+         │◄─────────────────────────────────────────┤
+         │                                          │
+         │   WebSocket over QUIC Stream             │
+         │◄────────────────────────────────────────►│
+         │                                          │
+```
+
+#### Stream Independence
+
+QUIC provides true stream independence, eliminating TCP head-of-line blocking:
+
+```text
+QUIC Connection (UDP)
+├── Stream 0: Control Stream
+├── Stream 4: WebSocket Connection 1
+├── Stream 8: WebSocket Connection 2
+└── Stream 12: WebSocket Connection 3
+
+Each stream:
+- Independent flow control
+- No blocking between streams
+- Parallel processing
+- 0-RTT connection resumption
+```
+
+#### Connection Coalescing
+
+HTTP/3 allows connection coalescing for WebSockets:
+
+- Multiple origins can share one QUIC connection
+- Reduced connection overhead
+- Better resource utilization
+- Faster establishment with 0-RTT
+
 ## Data framing
 
 Once the WebSocket connection is established, the client and server can send
@@ -142,27 +327,103 @@ of one or more frames. There are different types of frames:
 - Control frames - used for protocol-level signaling, such as pings, pongs, and
   close frames
 
-### WebSocket frame structure
+### WebSocket frame structure - Deep Dive
 
-The base framing protocol breaks down a frame into the following components:
+The WebSocket frame structure is designed for efficiency and flexibility. Here's
+a detailed breakdown:
 
-![WebSocket Frame Structure](../../../assets/guides/websocket-frame.png)
+```text
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-------+-+-------------+-------------------------------+
+|F|R|R|R| opcode|M| Payload len |    Extended payload length    |
+|I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
+|N|V|V|V|       |S|             |   (if payload len==126/127)   |
+| |1|2|3|       |K|             |                               |
++-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
+|     Extended payload length continued, if payload len == 127  |
++ - - - - - - - - - - - - - - - +-------------------------------+
+|                               |Masking-key, if MASK set to 1  |
++-------------------------------+-------------------------------+
+| Masking-key (continued)       |          Payload Data         |
++-------------------------------- - - - - - - - - - - - - - - - +
+:                     Payload Data continued ...                :
++ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+|                     Payload Data continued ...                |
++---------------------------------------------------------------+
+```
 
-- `FIN` bit - indicates whether this is the final fragment in a message (1) or
-  not (0).
-- `RSV1`, `RSV2`, `RSV3` bits - reserved for extensions; must be 0 unless an
-  extension is negotiated.
-- `Opcode` (4 bits) - indicates the type of frame:
-  - 0x0: continuation frame
-  - 0x1: text frame
-  - 0x2: binary frame
-  - 0x8: connection close
-  - 0x9: ping
-  - 0xA: pong
-- `MASK` bit - indicates whether the payload data is masked (1) or not (0).
-- `Payload length` - the length of the payload data.
-- `Masking key` (optional, 32 bits) - included only if the MASK bit is set to 1.
-- `Payload data` - the actual data.
+#### Frame Components Explained
+
+#### FIN bit (1 bit)
+
+- `1`: Final fragment in a message
+- `0`: More fragments follow
+
+#### RSV1, RSV2, RSV3 bits (1 bit each)
+
+- Reserved for WebSocket extensions
+- `RSV1`: Used by permessage-deflate compression extension
+- `RSV2, RSV3`: Reserved for future use
+- Must be 0 if no extension using them is negotiated
+
+**Opcode (4 bits)** Defines the interpretation of the payload data:
+
+| Opcode  | Meaning      | Description                        |
+| ------- | ------------ | ---------------------------------- |
+| 0x0     | Continuation | Continuation of fragmented message |
+| 0x1     | Text         | UTF-8 text data                    |
+| 0x2     | Binary       | Binary data                        |
+| 0x3-0x7 | Reserved     | Reserved for future data frames    |
+| 0x8     | Close        | Connection close                   |
+| 0x9     | Ping         | Ping frame                         |
+| 0xA     | Pong         | Pong frame                         |
+| 0xB-0xF | Reserved     | Reserved for future control frames |
+
+#### MASK bit (1 bit)
+
+- `1`: Payload is masked (required for client-to-server)
+- `0`: Payload is unmasked (server-to-client)
+
+**Payload Length Encoding** The payload length is encoded in a variable-length
+format:
+
+- **0-125**: The payload length is the 7-bit value
+- **126**: The following 16 bits are the payload length (max 65,535 bytes)
+- **127**: The following 64 bits are the payload length (max 2^63-1 bytes)
+
+```javascript
+// Payload length encoding example
+function encodePayloadLength(length) {
+  if (length <= 125) {
+    return [length];
+  } else if (length <= 65535) {
+    return [126, (length >> 8) & 0xff, length & 0xff];
+  } else {
+    // For lengths > 65535, use 64-bit encoding
+    return [127 /* 8 bytes of length */];
+  }
+}
+```
+
+#### Masking Key (0 or 4 bytes)
+
+- Present only if MASK bit is 1
+- 32-bit random value used to XOR the payload
+- Security measure to prevent cache poisoning attacks
+
+#### Masking Algorithm
+
+```javascript
+// Masking/unmasking payload data
+function maskPayload(payload, maskingKey) {
+  const masked = new Uint8Array(payload.length);
+  for (let i = 0; i < payload.length; i++) {
+    masked[i] = payload[i] ^ maskingKey[i % 4];
+  }
+  return masked;
+}
+```
 
 ## Message fragmentation
 
@@ -199,7 +460,26 @@ close frame in response. After sending a close frame, the peer should not send
 any more data frames. After both sides have exchanged close frames, the TCP
 connection is closed.
 
-![WebSocket Closing Handshake](../../../assets/guides/websocket-close.png)
+```text
+   ┌──────────┐                              ┌──────────┐
+   │  Client  │                              │  Server  │
+   └──────┬───┘                              └──────┬───┘
+         │                                          │
+         │        WebSocket Connection              │
+         │◄────────────────────────────────────────►│
+         │                                          │
+         │  Close Frame (opcode 0x8)                │
+         │  Status Code: 1000                       │
+         │  Reason: "Normal Closure"                │
+         ├─────────────────────────────────────────►│
+         │                                          │
+         │  Close Frame (opcode 0x8)                │
+         │  Status Code: 1000                       │
+         │◄─────────────────────────────────────────┤
+         │                                          │
+         │        TCP Connection Closed             │
+         X──────────────────────────────────────────X
+```
 
 A close frame may contain a status code and a reason for closing in its payload.
 The status code is a 16-bit unsigned integer. Some of the most common status
@@ -218,11 +498,130 @@ The WebSocket protocol can be extended through the use of extensions. Extensions
 allow for additional capabilities or modifications to the base WebSocket
 protocol. Extensions are negotiated during the opening handshake.
 
-Some common extensions include:
+### Compression Extension (RFC 7692) - Security Considerations
 
-- **Compression extensions** - reduce the size of messages to save bandwidth.
+[RFC 7692](https://datatracker.ietf.org/doc/html/rfc7692) defines the
+permessage-deflate extension for WebSocket compression. While compression can
+significantly reduce bandwidth, it comes with important security implications.
+
+#### How Compression Works
+
+The permessage-deflate extension uses the DEFLATE algorithm to compress
+messages:
+
+```http
+GET /chat HTTP/1.1
+Host: example.com
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Extensions: permessage-deflate; client_max_window_bits
+```
+
+Server response:
+
+```http
+HTTP/1.1 101 Switching Protocols
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Extensions: permessage-deflate; server_max_window_bits=15
+```
+
+#### ⚠️ CRIME/BREACH Vulnerability Warnings
+
+**CRITICAL SECURITY WARNING**: Compression can make your application vulnerable
+to CRIME (Compression Ratio Info-leak Made Easy) and BREACH (Browser
+Reconnaissance and Exfiltration via Adaptive Compression of Hypertext) attacks.
+
+**How the Attack Works:**
+
+1. Attacker injects controlled data alongside secret data
+2. Observes compressed message sizes
+3. Deduces secret content based on compression ratios
+
+```javascript
+// VULNERABLE: Mixing secrets with user input
+const message = {
+  authToken: secretToken, // Secret
+  userMessage: userInput, // Attacker-controlled
+};
+ws.send(JSON.stringify(message)); // Compressed together = vulnerable
+```
+
+#### When to Disable Compression
+
+Disable compression when:
+
+- **Mixing secrets with user input** in the same message
+- **Transmitting authentication tokens** or session IDs
+- **Sending sensitive personal data** alongside public data
+- **High-security applications** where timing attacks are a concern
+
+```javascript
+// Safe approach 1: Disable compression for sensitive data
+const ws = new WebSocket('wss://example.com', {
+  perMessageDeflate: false, // Disable compression entirely
+});
+
+// Safe approach 2: Separate sensitive and public data
+ws.send(JSON.stringify({ type: 'auth', token: secretToken })); // No compression
+ws.send(JSON.stringify({ type: 'message', data: publicData })); // Can compress
+```
+
+#### Safe Compression Patterns
+
+**DO:**
+
+- Compress only public, non-sensitive data
+- Use separate connections for sensitive vs. public data
+- Apply compression selectively per message type
+- Rate-limit to prevent timing analysis
+
+**DON'T:**
+
+- Mix secrets with attacker-controlled data
+- Compress authentication headers or tokens
+- Use compression for small messages (overhead > benefit)
+- Ignore compression ratios in logs
+
+#### Implementation Example with Security
+
+```javascript
+class SecureWebSocket {
+  constructor(url) {
+    this.ws = new WebSocket(url);
+    this.compressionEnabled = true;
+  }
+
+  send(data, options = {}) {
+    const { sensitive = false } = options;
+
+    if (sensitive) {
+      // Disable compression for sensitive data
+      this.ws.send(data, { compress: false });
+    } else {
+      // Safe to compress public data
+      this.ws.send(data, { compress: this.compressionEnabled });
+    }
+  }
+
+  sendAuth(token) {
+    // Never compress authentication data
+    this.send(JSON.stringify({ auth: token }), { sensitive: true });
+  }
+
+  sendPublicMessage(message) {
+    // Safe to compress public messages
+    this.send(JSON.stringify({ message }), { sensitive: false });
+  }
+}
+```
+
+### Other Extensions
+
 - **Multiplexing extension** - allows multiple logical WebSocket connections to
-  be multiplexed over a single transport connection.
+  be multiplexed over a single transport connection (experimental)
+- **Custom extensions** - applications can define their own extensions using the
+  RSV bits and extension negotiation mechanism
 
 ## Subprotocols
 
