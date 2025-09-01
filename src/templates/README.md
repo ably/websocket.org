@@ -82,7 +82,7 @@ Common variables to replace:
 ## Best Practices
 
 1. **Always include complete frontmatter** for SEO
-2. **Use Matt O'Riordan as default author** unless guest post
+2. **Use Matthew O'Riordan as default author** unless guest post
 3. **Test all code examples** before publishing
 4. **Include "Common Gotchas"** section in guides
 5. **Link to related content** at the end

@@ -3,7 +3,7 @@ title: WebSocket Resources
 description:
   A comprehensive collection of WebSocket specifications, documentation,
   libraries, and tools for developers.
-author: "Matt O'Riordan"
+author: "Matthew O'Riordan"
 authorRole: 'Co-founder & CEO, Ably'
 date: 2025-09-01
 keywords:

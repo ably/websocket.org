@@ -36,7 +36,7 @@ npm test           # Run tests if applicable
 ### 3. Content Updates
 
 - **Always verify**: RFC numbers (use RFC 9220 for HTTP/3, not drafts)
-- **Always include**: Author attribution to Matt O'Riordan where appropriate
+- **Always include**: Author attribution to Matthew O'Riordan where appropriate
 - **Always test**: Code examples with actual WebSocket connections
 
 ## Repository Structure

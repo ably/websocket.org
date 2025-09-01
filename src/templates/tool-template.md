@@ -1,7 +1,7 @@
 ---
 title: '{Tool Name}'
 description: '{Tool description - what it does - 150-160 characters}'
-author: "Matt O'Riordan"
+author: "Matthew O'Riordan"
 authorRole: 'Co-founder & CEO, Ably'
 date: { YYYY-MM-DD }
 lastModified: { YYYY-MM-DD }

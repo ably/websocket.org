@@ -3,7 +3,7 @@ title: WebSocket API Reference
 description:
   Complete WebSocket API reference guide with events, methods, properties, and
   practical implementation patterns for building real-time applications
-author: "Matt O'Riordan"
+author: "Matthew O'Riordan"
 authorRole: 'Co-founder & CEO, Ably'
 date: 2025-08-31
 category: 'reference'
