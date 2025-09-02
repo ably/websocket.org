@@ -1,13 +1,252 @@
 ---
 title: C# and .NET WebSocket Implementation
-description:
-  Complete guide to WebSocket clients and servers in C#, .NET, and ASP.NET Core
+description: Learn how to implement WebSockets with production-ready code examples, best practices, and real-world patterns. Complete guide to WebSocket clients and servers in C#/.NET using ClientWebSocket, ASP.NET Core, SignalR, Unity, performance optimization, security, testing, and production deployment strategies.
 sidebar:
   order: 6
+author: Matthew O'Riordan
+date: '2024-09-02'
+category: guide
+seo:
+  keywords:
+    - websocket
+    - tutorial
+    - guide
+    - how-to
+    - implementation
+    - csharp
+    - dotnet
+    - real-time
+    - websocket implementation
+    - aspnet core websocket
+    - signalr
+    - clientwebsocket
+    - unity websocket
+tags:
+  - websocket
+  - csharp
+  - dotnet
+  - aspnet
+  - websocket-csharp
+  - programming
+  - tutorial
+  - implementation
+  - guide
+  - how-to
 ---
+# C# and .NET WebSocket Implementation Guide
 
-This guide covers WebSocket implementation in C# and .NET, including ASP.NET
-Core, SignalR, and Unity patterns.
+C# and .NET provide one of the most comprehensive and mature ecosystems for WebSocket development, offering everything from low-level `ClientWebSocket` APIs to high-level frameworks like SignalR. This guide covers the full spectrum of WebSocket implementation in the .NET ecosystem, from simple client-server connections to enterprise-scale real-time applications.
+
+The .NET platform's approach to WebSocket development emphasizes developer productivity, type safety, and performance. The combination of C#'s powerful language features, the extensive .NET Base Class Library, and the rich ecosystem of third-party packages creates an environment where developers can focus on business logic rather than low-level protocol implementation details.
+
+## Why Choose C# and .NET for WebSocket Development?
+
+The .NET ecosystem offers compelling advantages for WebSocket development that make it a top choice for enterprise and scalable applications:
+
+**Comprehensive Framework Support**: From the built-in `ClientWebSocket` class to ASP.NET Core's sophisticated WebSocket middleware, .NET provides extensive native support for WebSocket protocols without requiring external dependencies.
+
+**Enterprise-Grade Performance**: .NET's just-in-time compilation, garbage collection optimization, and runtime performance make it capable of handling thousands of concurrent WebSocket connections efficiently.
+
+**Rich Ecosystem**: SignalR for high-level real-time communication, ASP.NET Core for web applications, and Unity integration for game development provide solutions for every use case.
+
+**Cross-Platform Compatibility**: With .NET Core/.NET 5+, your WebSocket applications run on Windows, Linux, macOS, and in containers with consistent performance characteristics.
+
+**Excellent Async Programming Support**: C#'s async/await pattern provides intuitive, efficient handling of WebSocket operations, making it easier to write scalable applications that can handle thousands of concurrent connections without complex threading logic.
+
+**Strong Type System**: C#'s static typing helps catch WebSocket protocol errors and serialization issues at compile time, reducing runtime errors and improving overall application reliability. The type system also provides excellent IntelliSense support, making development faster and less error-prone.
+
+**Mature Tooling Ecosystem**: The .NET ecosystem includes excellent debugging tools, performance profilers, and monitoring solutions that are essential for diagnosing and optimizing WebSocket applications in production environments. Visual Studio and Visual Studio Code provide sophisticated debugging capabilities for real-time applications.
+
+**Strong Typing and Tooling**: C#'s static typing system prevents many runtime errors, while Visual Studio and other IDEs provide excellent debugging, profiling, and development experiences.
+
+**Security and Reliability**: Built-in security features, extensive logging capabilities, and proven stability make .NET ideal for mission-critical real-time applications.
+
+**Scalability Options**: From simple in-memory solutions to Redis backplanes and Azure Service Bus, .NET offers multiple paths to scale WebSocket applications horizontally.
+
+## Setting Up Your .NET WebSocket Project
+
+Let's establish a comprehensive project structure that demonstrates both client and server implementations across different .NET scenarios.
+
+### Project Structure and Setup
+
+Create a solution with multiple projects to demonstrate different WebSocket implementation patterns:
+
+```bash
+# Create solution and projects
+dotnet new sln -n WebSocketGuide
+cd WebSocketGuide
+
+# Core library for shared models and interfaces
+dotnet new classlib -n WebSocketGuide.Core
+
+# ASP.NET Core WebSocket server
+dotnet new web -n WebSocketGuide.Server
+
+# Console client application
+dotnet new console -n WebSocketGuide.Client
+
+# SignalR demo
+dotnet new web -n WebSocketGuide.SignalR
+
+# Unity client (create manually)
+mkdir WebSocketGuide.Unity
+
+# Test projects
+dotnet new xunit -n WebSocketGuide.Tests
+
+# Add projects to solution
+dotnet sln add **/*.csproj
+```
+
+### Core Library Setup
+
+In `WebSocketGuide.Core/WebSocketGuide.Core.csproj`:
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+  </ItemGroup>
+</Project>
+```
+
+### Server Project Setup
+
+In `WebSocketGuide.Server/WebSocketGuide.Server.csproj`:
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../WebSocketGuide.Core/WebSocketGuide.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+    <PackageReference Include="StackExchange.Redis" Version="2.7.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="5.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="prometheus-net.AspNetCore" Version="8.0.1" />
+  </ItemGroup>
+</Project>
+```
+
+### Configuration System
+
+Create a robust configuration system in `WebSocketGuide.Core/Configuration/WebSocketOptions.cs`:
+
+```csharp
+using Microsoft.Extensions.Options;
+using System.ComponentModel.DataAnnotations;
+
+namespace WebSocketGuide.Core.Configuration;
+
+public class WebSocketOptions : IValidateOptions<WebSocketOptions>
+{
+    public const string SectionName = "WebSocket";
+
+    [Range(1, 100000)]
+    public int MaxConnections { get; set; } = 10000;
+
+    [Range(1024, 1024 * 1024)]  // 1KB to 1MB
+    public int ReceiveBufferSize { get; set; } = 4 * 1024;
+
+    [Range(1, 300)]  // 1 to 300 seconds
+    public int KeepAliveIntervalSeconds { get; set; } = 30;
+
+    [Range(1, 3600)]  // 1 second to 1 hour
+    public int CloseTimeoutSeconds { get; set; } = 30;
+
+    [Range(1024, 10 * 1024 * 1024)]  // 1KB to 10MB
+    public long MaxMessageSize { get; set; } = 1024 * 1024; // 1MB
+
+    public bool EnableCompression { get; set; } = true;
+
+    public string[] AllowedOrigins { get; set; } = { "*" };
+
+    public bool RequireAuthentication { get; set; } = false;
+
+    public string AuthenticationScheme { get; set; } = "Bearer";
+
+    public RateLimitOptions RateLimit { get; set; } = new();
+
+    public RedisOptions? Redis { get; set; }
+
+    public ValidateOptionsResult Validate(string? name, WebSocketOptions options)
+    {
+        var failures = new List<string>();
+
+        if (options.MaxConnections <= 0)
+            failures.Add("MaxConnections must be greater than 0");
+
+        if (options.ReceiveBufferSize < 1024)
+            failures.Add("ReceiveBufferSize must be at least 1024 bytes");
+
+        if (options.MaxMessageSize <= 0)
+            failures.Add("MaxMessageSize must be greater than 0");
+
+        if (failures.Count > 0)
+            return ValidateOptionsResult.Fail(failures);
+
+        return ValidateOptionsResult.Success;
+    }
+}
+
+public class RateLimitOptions
+{
+    public bool Enabled { get; set; } = true;
+
+    [Range(1, 10000)]
+    public int RequestsPerMinute { get; set; } = 60;
+
+    [Range(1, 1000)]
+    public int BurstSize { get; set; } = 10;
+
+    public TimeSpan WindowSize { get; set; } = TimeSpan.FromMinutes(1);
+}
+
+public class RedisOptions
+{
+    [Required]
+    public string ConnectionString { get; set; } = string.Empty;
+
+    public string KeyPrefix { get; set; } = "websocket:";
+
+    public int Database { get; set; } = 0;
+
+    public TimeSpan CommandTimeout { get; set; } = TimeSpan.FromSeconds(5);
+
+    public TimeSpan ConnectTimeout { get; set; } = TimeSpan.FromSeconds(5);
+}
+
+public class MonitoringOptions
+{
+    public bool EnableMetrics { get; set; } = true;
+    public bool EnableHealthChecks { get; set; } = true;
+    public bool EnableTracing { get; set; } = false;
+    public string MetricsEndpoint { get; set; } = "/metrics";
+    public string HealthEndpoint { get; set; } = "/health";
+}
+```
+
+This guide covers WebSocket implementation in C# and .NET, including ASP.NET Core, SignalR, and Unity patterns.
 
 ## .NET Client Implementation
 
@@ -1426,129 +1665,779 @@ public class UnityWebSocketClient : MonoBehaviour
 }
 ```
 
-## Testing
+## Comprehensive Testing Strategies
 
-### xUnit Testing
+### xUnit Integration Tests
 
-Test WebSocket functionality with xUnit:
+Implement comprehensive WebSocket testing with xUnit and ASP.NET Core Test Server:
 
 ```csharp
-using Xunit;
-using System;
-using System.Net.WebSockets;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System.Net.WebSockets;
+using System.Text;
+using System.Text.Json;
+using Xunit;
+using Xunit.Abstractions;
 
-public class WebSocketTests : IAsyncLifetime
+namespace WebSocketGuide.Tests.Integration;
+
+public class WebSocketIntegrationTests : IAsyncLifetime
 {
-    private TestServer _server;
-    private ClientWebSocket _client;
+    private readonly TestServer _server;
+    private readonly HttpClient _httpClient;
+    private readonly ITestOutputHelper _output;
 
-    public async Task InitializeAsync()
+    public WebSocketIntegrationTests(ITestOutputHelper output)
     {
-        _server = new TestServer(new WebHostBuilder()
-            .UseStartup<Startup>());
-        _client = new ClientWebSocket();
-    }
+        _output = output;
+        
+        var builder = new WebHostBuilder()
+            .ConfigureServices(services =>
+            {
+                services.AddLogging(builder => builder.AddXUnit(_output));
+                services.AddSingleton<WebSocketConnectionManager>();
+                services.AddTransient<WebSocketHandler>();
+            })
+            .Configure(app =>
+            {
+                app.UseWebSockets();
+                app.UseRouting();
+                app.UseEndpoints(endpoints =>
+                {
+                    endpoints.Map("/ws", async context =>
+                    {
+                        if (context.WebSockets.IsWebSocketRequest)
+                        {
+                            using var webSocket = await context.WebSockets.AcceptWebSocketAsync();
+                            var handler = context.RequestServices.GetRequiredService<WebSocketHandler>();
+                            await handler.HandleAsync(context, webSocket);
+                        }
+                        else
+                        {
+                            context.Response.StatusCode = 400;
+                        }
+                    });
+                });
+            });
 
-    public async Task DisposeAsync()
-    {
-        _client?.Dispose();
-        _server?.Dispose();
+        _server = new TestServer(builder);
+        _httpClient = _server.CreateClient();
     }
 
     [Fact]
-    public async Task CanConnect()
+    public async Task WebSocket_CanEstablishConnection()
     {
         // Arrange
-        var uri = new Uri(_server.BaseAddress, "/ws");
+        var webSocketClient = _server.CreateWebSocketClient();
+        var uri = new Uri(_server.BaseAddress.Replace("http", "ws") + "ws");
 
         // Act
-        await _client.ConnectAsync(uri, CancellationToken.None);
+        var webSocket = await webSocketClient.ConnectAsync(uri, CancellationToken.None);
 
         // Assert
-        Assert.Equal(WebSocketState.Open, _client.State);
+        Assert.Equal(WebSocketState.Open, webSocket.State);
+
+        await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Test completed", CancellationToken.None);
     }
 
     [Fact]
-    public async Task CanSendAndReceiveMessage()
+    public async Task WebSocket_CanSendAndReceiveTextMessage()
     {
         // Arrange
-        await ConnectAsync();
-        var message = "Hello, WebSocket!";
+        var webSocketClient = _server.CreateWebSocketClient();
+        var uri = new Uri(_server.BaseAddress.Replace("http", "ws") + "ws");
+        var webSocket = await webSocketClient.ConnectAsync(uri, CancellationToken.None);
 
-        // Act
-        await SendMessageAsync(message);
-        var received = await ReceiveMessageAsync();
-
-        // Assert
-        Assert.Contains(message, received);
-    }
-
-    [Fact]
-    public async Task HandlesReconnection()
-    {
-        // Arrange
-        var client = new ReconnectingWebSocketClient("ws://localhost:5000/ws");
-        var reconnected = false;
-
-        client.Connected += (sender, args) =>
+        var testMessage = new
         {
-            if (reconnected) return;
-            reconnected = true;
+            type = "test",
+            content = "Hello, WebSocket!"
         };
+        var messageJson = JsonSerializer.Serialize(testMessage);
 
         // Act
-        await client.ConnectAsync();
-        await client.DisconnectAsync();
-        await Task.Delay(2000); // Wait for reconnection
+        await SendTextMessageAsync(webSocket, messageJson);
+        var receivedMessage = await ReceiveTextMessageAsync(webSocket);
 
         // Assert
-        Assert.True(reconnected);
+        Assert.Contains("Hello, WebSocket!", receivedMessage);
+
+        await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Test completed", CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task WebSocket_HandlesBinaryMessages()
+    {
+        // Arrange
+        var webSocketClient = _server.CreateWebSocketClient();
+        var uri = new Uri(_server.BaseAddress.Replace("http", "ws") + "ws");
+        var webSocket = await webSocketClient.ConnectAsync(uri, CancellationToken.None);
+
+        var binaryData = Encoding.UTF8.GetBytes("Binary test data");
+
+        // Act
+        await SendBinaryMessageAsync(webSocket, binaryData);
+        var receivedData = await ReceiveBinaryMessageAsync(webSocket);
+
+        // Assert
+        Assert.Equal(binaryData, receivedData);
+
+        await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Test completed", CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task WebSocket_HandlesMultipleConcurrentConnections()
+    {
+        // Arrange
+        const int connectionCount = 5;
+        var tasks = new List<Task>();
+        var webSocketClient = _server.CreateWebSocketClient();
+
+        // Act
+        for (int i = 0; i < connectionCount; i++)
+        {
+            var connectionId = i;
+            tasks.Add(Task.Run(async () =>
+            {
+                var uri = new Uri(_server.BaseAddress.Replace("http", "ws") + "ws");
+                var webSocket = await webSocketClient.ConnectAsync(uri, CancellationToken.None);
+
+                await SendTextMessageAsync(webSocket, $"Message from connection {connectionId}");
+                var response = await ReceiveTextMessageAsync(webSocket);
+
+                Assert.Contains($"{connectionId}", response);
+
+                await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Test completed", CancellationToken.None);
+            }));
+        }
+
+        await Task.WhenAll(tasks);
+
+        // Assert - all tasks completed successfully
+        Assert.All(tasks, task => Assert.True(task.IsCompletedSuccessfully));
     }
 
     [Theory]
-    [InlineData("text message")]
-    [InlineData("{\"type\":\"json\",\"data\":123}")]
-    public async Task ProcessesDifferentMessageTypes(string message)
+    [InlineData(10)]
+    [InlineData(100)]
+    [InlineData(1000)]
+    public async Task WebSocket_HandlesMessageBatches(int messageCount)
     {
         // Arrange
-        await ConnectAsync();
+        var webSocketClient = _server.CreateWebSocketClient();
+        var uri = new Uri(_server.BaseAddress.Replace("http", "ws") + "ws");
+        var webSocket = await webSocketClient.ConnectAsync(uri, CancellationToken.None);
+
+        var messages = Enumerable.Range(0, messageCount)
+            .Select(i => $"Message {i}")
+            .ToList();
 
         // Act
-        await SendMessageAsync(message);
-        var received = await ReceiveMessageAsync();
+        var sendTasks = messages.Select(msg => SendTextMessageAsync(webSocket, msg));
+        await Task.WhenAll(sendTasks);
+
+        var receivedMessages = new List<string>();
+        for (int i = 0; i < messageCount; i++)
+        {
+            var received = await ReceiveTextMessageAsync(webSocket);
+            receivedMessages.Add(received);
+        }
 
         // Assert
-        Assert.NotNull(received);
+        Assert.Equal(messageCount, receivedMessages.Count);
+
+        await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Test completed", CancellationToken.None);
     }
 
-    private async Task ConnectAsync()
+    [Fact]
+    public async Task WebSocket_HandlesConnectionClose()
     {
-        var uri = new Uri(_server.BaseAddress, "/ws");
-        await _client.ConnectAsync(uri, CancellationToken.None);
+        // Arrange
+        var webSocketClient = _server.CreateWebSocketClient();
+        var uri = new Uri(_server.BaseAddress.Replace("http", "ws") + "ws");
+        var webSocket = await webSocketClient.ConnectAsync(uri, CancellationToken.None);
+
+        // Act
+        await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Intentional close", CancellationToken.None);
+
+        // Assert
+        Assert.Equal(WebSocketState.Closed, webSocket.State);
     }
 
-    private async Task SendMessageAsync(string message)
+    private static async Task SendTextMessageAsync(WebSocket webSocket, string message)
     {
-        var bytes = Encoding.UTF8.GetBytes(message);
-        await _client.SendAsync(
-            new ArraySegment<byte>(bytes),
+        var buffer = Encoding.UTF8.GetBytes(message);
+        await webSocket.SendAsync(
+            new ArraySegment<byte>(buffer),
             WebSocketMessageType.Text,
             true,
             CancellationToken.None
         );
     }
 
-    private async Task<string> ReceiveMessageAsync()
+    private static async Task SendBinaryMessageAsync(WebSocket webSocket, byte[] data)
     {
-        var buffer = new ArraySegment<byte>(new byte[4096]);
-        var result = await _client.ReceiveAsync(buffer, CancellationToken.None);
-        return Encoding.UTF8.GetString(buffer.Array, 0, result.Count);
+        await webSocket.SendAsync(
+            new ArraySegment<byte>(data),
+            WebSocketMessageType.Binary,
+            true,
+            CancellationToken.None
+        );
+    }
+
+    private static async Task<string> ReceiveTextMessageAsync(WebSocket webSocket)
+    {
+        var buffer = new byte[4096];
+        var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+        return Encoding.UTF8.GetString(buffer, 0, result.Count);
+    }
+
+    private static async Task<byte[]> ReceiveBinaryMessageAsync(WebSocket webSocket)
+    {
+        var buffer = new byte[4096];
+        var result = await webSocket.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+        return buffer.Take(result.Count).ToArray();
+    }
+
+    public Task InitializeAsync() => Task.CompletedTask;
+
+    public async Task DisposeAsync()
+    {
+        _httpClient?.Dispose();
+        _server?.Dispose();
     }
 }
+```
+
+### Performance and Load Testing
+
+Create comprehensive performance tests:
+
+```csharp
+using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
+using System.Diagnostics;
+using Xunit;
+using Xunit.Abstractions;
+
+namespace WebSocketGuide.Tests.Performance;
+
+public class WebSocketPerformanceTests
+{
+    private readonly ITestOutputHelper _output;
+    private readonly ILogger<WebSocketPerformanceTests> _logger;
+
+    public WebSocketPerformanceTests(ITestOutputHelper output)
+    {
+        _output = output;
+        _logger = new XUnitLogger<WebSocketPerformanceTests>(output);
+    }
+
+    [Fact]
+    public async Task WebSocket_PerformanceTest_MultipleConnections()
+    {
+        // Arrange
+        const int connectionCount = 100;
+        const int messagesPerConnection = 10;
+        const int timeoutMs = 30000;
+
+        var connectionTasks = new List<Task<ConnectionResult>>();
+        var stopwatch = Stopwatch.StartNew();
+
+        // Act
+        for (int i = 0; i < connectionCount; i++)
+        {
+            var connectionId = i;
+            connectionTasks.Add(CreateConnectionAndSendMessages(connectionId, messagesPerConnection));
+        }
+
+        var results = await Task.WhenAll(connectionTasks);
+        stopwatch.Stop();
+
+        // Assert and Report
+        var successfulConnections = results.Count(r => r.Success);
+        var totalMessages = results.Sum(r => r.MessagesSent);
+        var averageLatency = results.Where(r => r.Success).Average(r => r.AverageLatencyMs);
+
+        _output.WriteLine($"Performance Test Results:");
+        _output.WriteLine($"  Connections: {successfulConnections}/{connectionCount}");
+        _output.WriteLine($"  Total Messages: {totalMessages}");
+        _output.WriteLine($"  Total Time: {stopwatch.ElapsedMilliseconds}ms");
+        _output.WriteLine($"  Messages/Second: {totalMessages / (stopwatch.ElapsedMilliseconds / 1000.0):F2}");
+        _output.WriteLine($"  Average Latency: {averageLatency:F2}ms");
+
+        Assert.True(successfulConnections >= connectionCount * 0.95, "At least 95% of connections should succeed");
+        Assert.True(averageLatency < 100, "Average latency should be less than 100ms");
+    }
+
+    [Fact]
+    public async Task WebSocket_ThroughputTest_SingleConnection()
+    {
+        // Arrange
+        const int messageCount = 1000;
+        var client = new ReconnectingWebSocketClient("ws://localhost:5000/ws");
+        var messages = Enumerable.Range(0, messageCount)
+            .Select(i => $"Performance test message {i} - {DateTime.UtcNow:O}")
+            .ToList();
+
+        var receivedMessages = new ConcurrentQueue<string>();
+        var receivedCount = 0;
+
+        client.MessageReceived += (sender, message) =>
+        {
+            receivedMessages.Enqueue(message);
+            Interlocked.Increment(ref receivedCount);
+        };
+
+        // Act
+        await client.ConnectAsync();
+        var stopwatch = Stopwatch.StartNew();
+
+        var sendTasks = messages.Select(async msg =>
+        {
+            await client.SendAsync(msg);
+        });
+
+        await Task.WhenAll(sendTasks);
+
+        // Wait for all messages to be received
+        var timeout = TimeSpan.FromSeconds(30);
+        var start = DateTime.UtcNow;
+        while (receivedCount < messageCount && DateTime.UtcNow - start < timeout)
+        {
+            await Task.Delay(10);
+        }
+
+        stopwatch.Stop();
+
+        // Assert and Report
+        _output.WriteLine($"Throughput Test Results:");
+        _output.WriteLine($"  Messages Sent: {messageCount}");
+        _output.WriteLine($"  Messages Received: {receivedCount}");
+        _output.WriteLine($"  Time Elapsed: {stopwatch.ElapsedMilliseconds}ms");
+        _output.WriteLine($"  Throughput: {messageCount / (stopwatch.ElapsedMilliseconds / 1000.0):F2} messages/second");
+
+        Assert.Equal(messageCount, receivedCount);
+        await client.DisconnectAsync();
+    }
+
+    [Fact]
+    public async Task WebSocket_MemoryUsageTest()
+    {
+        // Arrange
+        const int connectionCount = 50;
+        var initialMemory = GC.GetTotalMemory(true);
+        var clients = new List<ReconnectingWebSocketClient>();
+
+        try
+        {
+            // Act - Create connections
+            for (int i = 0; i < connectionCount; i++)
+            {
+                var client = new ReconnectingWebSocketClient("ws://localhost:5000/ws");
+                clients.Add(client);
+                await client.ConnectAsync();
+            }
+
+            var afterConnectionMemory = GC.GetTotalMemory(false);
+            var memoryPerConnection = (afterConnectionMemory - initialMemory) / connectionCount;
+
+            // Send messages
+            var tasks = clients.Select(async (client, index) =>
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    await client.SendAsync($"Memory test message {i} from client {index}");
+                    await Task.Delay(10);
+                }
+            });
+
+            await Task.WhenAll(tasks);
+
+            var afterMessagesMemory = GC.GetTotalMemory(false);
+
+            // Assert and Report
+            _output.WriteLine($"Memory Usage Test Results:");
+            _output.WriteLine($"  Initial Memory: {initialMemory / 1024:N0} KB");
+            _output.WriteLine($"  After Connections: {afterConnectionMemory / 1024:N0} KB");
+            _output.WriteLine($"  After Messages: {afterMessagesMemory / 1024:N0} KB");
+            _output.WriteLine($"  Memory per Connection: {memoryPerConnection / 1024:N0} KB");
+
+            Assert.True(memoryPerConnection < 50 * 1024, "Memory per connection should be less than 50KB");
+        }
+        finally
+        {
+            // Cleanup
+            foreach (var client in clients)
+            {
+                await client.DisconnectAsync();
+                client.Dispose();
+            }
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+        }
+    }
+
+    private async Task<ConnectionResult> CreateConnectionAndSendMessages(int connectionId, int messageCount)
+    {
+        var result = new ConnectionResult { ConnectionId = connectionId };
+        var latencies = new List<double>();
+
+        try
+        {
+            var client = new ReconnectingWebSocketClient("ws://localhost:5000/ws");
+            await client.ConnectAsync();
+
+            for (int i = 0; i < messageCount; i++)
+            {
+                var stopwatch = Stopwatch.StartNew();
+                await client.SendAsync($"Message {i} from connection {connectionId}");
+                
+                // Simple echo response timing (in real scenario, you'd wait for response)
+                await Task.Delay(1); // Simulate network latency
+                stopwatch.Stop();
+
+                latencies.Add(stopwatch.Elapsed.TotalMilliseconds);
+                result.MessagesSent++;
+            }
+
+            await client.DisconnectAsync();
+            client.Dispose();
+
+            result.Success = true;
+            result.AverageLatencyMs = latencies.Average();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Connection {ConnectionId} failed", connectionId);
+            result.Success = false;
+            result.Error = ex.Message;
+        }
+
+        return result;
+    }
+
+    private class ConnectionResult
+    {
+        public int ConnectionId { get; set; }
+        public bool Success { get; set; }
+        public int MessagesSent { get; set; }
+        public double AverageLatencyMs { get; set; }
+        public string? Error { get; set; }
+    }
+}
+
+public class XUnitLogger<T> : ILogger<T>
+{
+    private readonly ITestOutputHelper _output;
+
+    public XUnitLogger(ITestOutputHelper output)
+    {
+        _output = output;
+    }
+
+    public IDisposable BeginScope<TState>(TState state) => null!;
+    public bool IsEnabled(LogLevel logLevel) => true;
+
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+    {
+        _output.WriteLine($"[{logLevel}] {formatter(state, exception)}");
+    }
+}
+```
+
+## Production Deployment and Monitoring
+
+### Docker Configuration
+
+Create a production-ready Docker setup:
+
+```dockerfile
+# Build stage
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copy project files
+COPY ["WebSocketGuide.Server/WebSocketGuide.Server.csproj", "WebSocketGuide.Server/"]
+COPY ["WebSocketGuide.Core/WebSocketGuide.Core.csproj", "WebSocketGuide.Core/"]
+
+# Restore dependencies
+RUN dotnet restore "WebSocketGuide.Server/WebSocketGuide.Server.csproj"
+
+# Copy source code
+COPY . .
+
+# Build application
+WORKDIR "/src/WebSocketGuide.Server"
+RUN dotnet build "WebSocketGuide.Server.csproj" -c Release -o /app/build
+
+# Publish stage
+FROM build AS publish
+RUN dotnet publish "WebSocketGuide.Server.csproj" -c Release -o /app/publish
+
+# Runtime stage
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+
+# Create non-root user
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+# Install curl for health checks
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy published app
+COPY --from=publish /app/publish .
+
+# Set ownership
+RUN chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER appuser
+
+# Configure ASP.NET Core
+ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8080/health || exit 1
+
+EXPOSE 8080
+
+ENTRYPOINT ["dotnet", "WebSocketGuide.Server.dll"]
+```
+
+### Kubernetes Deployment
+
+Deploy with proper scaling and monitoring:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: websocket-server
+  labels:
+    app: websocket-server
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: websocket-server
+  template:
+    metadata:
+      labels:
+        app: websocket-server
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: websocket-server
+        image: your-registry/websocket-server:latest
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Production"
+        - name: WebSocket__MaxConnections
+          value: "10000"
+        - name: WebSocket__Redis__ConnectionString
+          valueFrom:
+            secretKeyRef:
+              name: websocket-secrets
+              key: redis-connection-string
+        - name: Logging__LogLevel__Default
+          value: "Information"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: config
+          mountPath: /app/config
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: websocket-config
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - websocket-server
+              topologyKey: kubernetes.io/hostname
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: websocket-service
+  labels:
+    app: websocket-server
+spec:
+  type: ClusterIP
+  selector:
+    app: websocket-server
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  sessionAffinity: ClientIP  # Important for WebSocket connections
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: websocket-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: websocket-server
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Pods
+    pods:
+      metric:
+        name: websocket_active_connections
+      target:
+        type: AverageValue
+        averageValue: "1000"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: websocket-config
+data:
+  appsettings.Production.json: |
+    {
+      "Logging": {
+        "LogLevel": {
+          "Default": "Information",
+          "Microsoft": "Warning",
+          "Microsoft.Hosting.Lifetime": "Information"
+        }
+      },
+      "WebSocket": {
+        "MaxConnections": 10000,
+        "ReceiveBufferSize": 4096,
+        "KeepAliveIntervalSeconds": 30,
+        "EnableCompression": true,
+        "RateLimit": {
+          "Enabled": true,
+          "RequestsPerMinute": 120,
+          "BurstSize": 20
+        }
+      },
+      "Monitoring": {
+        "EnableMetrics": true,
+        "EnableHealthChecks": true,
+        "MetricsEndpoint": "/metrics",
+        "HealthEndpoint": "/health"
+      }
+    }
+```
+
+### Azure Service Fabric Configuration
+
+For enterprise deployments on Azure Service Fabric:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<ApplicationManifest ApplicationTypeName="WebSocketGuideType"
+                     ApplicationTypeVersion="1.0.0"
+                     xmlns="http://schemas.microsoft.com/2011/01/fabric"
+                     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Parameters>
+    <Parameter Name="WebSocketServer_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="WebSocketServer_MaxConnections" DefaultValue="10000" />
+    <Parameter Name="Redis_ConnectionString" DefaultValue="" />
+  </Parameters>
+
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="WebSocketServerPkg" ServiceManifestVersion="1.0.0" />
+    <ConfigOverrides>
+      <ConfigOverride Name="Config">
+        <Settings>
+          <Section Name="WebSocket">
+            <Parameter Name="MaxConnections" Value="[WebSocketServer_MaxConnections]" />
+          </Section>
+          <Section Name="Redis">
+            <Parameter Name="ConnectionString" Value="[Redis_ConnectionString]" />
+          </Section>
+        </Settings>
+      </ConfigOverride>
+    </ConfigOverrides>
+    <Policies>
+      <EndpointBindingPolicy EndpointRef="ServiceEndpoint" CertificateRef="WebSocketServerCert"/>
+    </Policies>
+  </ServiceManifestImport>
+
+  <DefaultServices>
+    <Service Name="WebSocketServer" ServicePackageActivationMode="ExclusiveProcess">
+      <StatelessService ServiceTypeName="WebSocketServerType" InstanceCount="[WebSocketServer_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+  </DefaultServices>
+
+  <Certificates>
+    <EndpointCertificate Name="WebSocketServerCert" X509FindType="FindByThumbprint" X509FindValue="[WebSocketServerCertThumbprint]" />
+  </Certificates>
+</ApplicationManifest>
 ```
 
 ## Best Practices
@@ -1586,8 +2475,79 @@ public class WebSocketTests : IAsyncLifetime
 
 ### Monitoring
 
+- Track connection metrics (open/close/error rates)
+- Monitor message throughput and latency
+- Log slow message processing
+- Implement health checks
+- Use distributed tracing for debugging
+
+## Troubleshooting Common Issues
+
+### Connection Problems
+
+**Issue**: WebSocket connections are being refused or timing out
+**Solution**: Check firewall settings, proxy configurations, and ensure your server is properly configured to accept WebSocket upgrades. Verify the Origin header is in your allowed origins list.
+
+**Issue**: Connections drop frequently in production
+**Solution**: Implement proper heartbeat/ping mechanisms, check load balancer configuration for sticky sessions, and ensure your connection timeout settings are appropriate.
+
+**Issue**: Memory leaks with long-running connections
+**Solution**: Properly implement IDisposable patterns, use weak event subscriptions where appropriate, and monitor memory usage with diagnostic tools like PerfView or Application Insights.
+
+### Performance Issues
+
+**Issue**: High CPU usage with many concurrent connections
+**Solution**: Profile your message handling code, consider using channels for message processing, and ensure you're not blocking async operations.
+
+**Issue**: Message delivery delays under load
+**Solution**: Implement message queuing, consider batching small messages, and optimize your JSON serialization with source generators.
+
+**Issue**: SignalR group operations are slow
+**Solution**: Use Redis backplane for scale-out scenarios, optimize group membership operations, and consider message filtering strategies.
+
+### Authentication and Authorization Issues
+
+**Issue**: JWT tokens expiring during long-lived connections
+**Solution**: Implement token refresh mechanisms, use shorter-lived access tokens with refresh tokens, or implement connection re-authentication flows.
+
+**Issue**: CORS errors in browser clients
+**Solution**: Configure CORS properly in your ASP.NET Core application, ensure your allowed origins include the correct protocols and ports.
+
+## Conclusion
+
+C# and .NET provide a comprehensive, mature, and powerful platform for WebSocket development. From the low-level `ClientWebSocket` API that gives you complete control over the connection lifecycle, to high-level frameworks like SignalR that abstract away the complexity of real-time communication, the .NET ecosystem has solutions for every use case.
+
+Key takeaways from this guide:
+
+- **Choose the Right Approach**: Use `ClientWebSocket` for maximum control, ASP.NET Core WebSocket middleware for custom server implementations, and SignalR for rapid development of real-time applications.
+
+- **Implement Robust Error Handling**: WebSocket connections are inherently unreliable due to network conditions. Implement comprehensive reconnection strategies, circuit breakers, and graceful degradation.
+
+- **Design for Scale**: Consider connection pooling, message batching, Redis backplanes for SignalR, and horizontal scaling strategies from the beginning.
+
+- **Prioritize Security**: Always use WSS in production, implement proper authentication and authorization, validate all inputs, and follow security best practices.
+
+- **Monitor and Observe**: Implement comprehensive monitoring, health checks, and distributed tracing to understand your WebSocket application's behavior in production.
+
+- **Test Thoroughly**: Use the testing patterns demonstrated in this guide to ensure your WebSocket implementation works correctly under load and handles edge cases gracefully.
+
+The .NET ecosystem's strong typing, excellent tooling, cross-platform capabilities, and enterprise-grade features make it an excellent choice for building robust, scalable, and maintainable WebSocket applications. Whether you're building a simple chat application, a real-time collaborative tool, or a high-frequency trading platform, .NET has the tools and frameworks you need to succeed.
+
+With the patterns, practices, and code examples provided in this guide, you have everything needed to implement production-ready WebSocket applications that can handle thousands of concurrent connections while maintaining excellent performance, security, and reliability.
+
+### Monitoring
+
 - Track connection metrics
 - Monitor message throughput
 - Log performance metrics
 - Implement health checks
 - Use distributed tracing for debugging
+
+
+## The .NET Advantage for Enterprise WebSocket Solutions
+
+The .NET ecosystem's approach to WebSocket development reflects Microsoft's broader strategy of providing comprehensive, enterprise-ready solutions. This isn't just about providing WebSocket APIs - it's about integrating WebSocket capabilities throughout the entire platform. From Azure SignalR Service for managed WebSocket infrastructure to Visual Studio's sophisticated debugging capabilities for WebSocket connections, the entire toolchain is optimized for productive development.
+
+The evolution from .NET Framework to .NET Core and now .NET 6+ represents a fundamental shift in how Microsoft approaches web development. The platform is now truly cross-platform, high-performance, and cloud-native. For WebSocket applications, this means being able to develop on any operating system, deploy to any cloud provider, and achieve performance that rivals or exceeds traditional compiled languages. The performance improvements in recent .NET versions have been particularly impressive for I/O-bound operations like WebSocket communication.
+
+Integration with the broader Microsoft ecosystem provides unique advantages for enterprise WebSocket applications. Azure Active Directory integration simplifies authentication, Application Insights provides comprehensive monitoring, and Azure DevOps enables sophisticated CI/CD pipelines. For organizations already invested in the Microsoft ecosystem, these integrations reduce development time and operational complexity significantly. The ability to use the same identity provider, monitoring solution, and deployment pipeline for both traditional web applications and WebSocket services simplifies the overall architecture.

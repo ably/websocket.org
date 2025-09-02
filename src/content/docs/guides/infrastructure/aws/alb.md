@@ -1,40 +1,31 @@
 ---
 title: AWS Application Load Balancer WebSocket Configuration
-description:
-  Complete guide to configuring AWS ALB for WebSocket applications with
-  CloudFormation, CDK, sticky sessions, and cost optimization
-author: "Matthew O'Riordan"
-authorRole: 'Co-founder & CEO, Ably'
-publishedDate: 2025-09-01
-updatedDate: 2025-09-01
+description: Complete guide to configuring AWS ALB for WebSocket applications with CloudFormation, CDK, sticky sessions, and cost optimization
+author: Matthew O'Riordan
+authorRole: Co-founder & CEO, Ably
+publishedDate: 2025-09-01T00:00:00.000Z
+updatedDate: 2025-09-01T00:00:00.000Z
 category: infrastructure
 tags:
-  [
-    aws,
-    alb,
-    websocket,
-    load-balancer,
-    cloudformation,
-    infrastructure,
-    monitoring,
-  ]
+  - aws
+  - alb
+  - websocket
+  - load-balancer
+  - cloudformation
+  - infrastructure
+  - monitoring
 seo:
   title: 'AWS ALB WebSocket Configuration: Production Setup Guide'
-  description:
-    'Configure AWS Application Load Balancer for WebSocket applications with
-    sticky sessions, health checks, CloudFormation templates, monitoring, and
-    cost optimization.'
+  description: Configure AWS Application Load Balancer for WebSocket applications with sticky sessions, health checks, CloudFormation templates, monitoring, and cost optimization.
   keywords:
-    [
-      'aws alb websocket',
-      'application load balancer websocket',
-      'aws websocket configuration',
-      'alb sticky sessions',
-      'cloudformation websocket',
-      'aws websocket cost',
-    ]
+    - aws alb websocket
+    - application load balancer websocket
+    - aws websocket configuration
+    - alb sticky sessions
+    - cloudformation websocket
+    - aws websocket cost
+date: '2024-09-02'
 ---
-
 AWS Application Load Balancer (ALB) provides native WebSocket support with
 automatic connection upgrades, making it an excellent choice for WebSocket
 applications in AWS. This guide covers production configuration, monitoring, and

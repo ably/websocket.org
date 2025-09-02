@@ -1,32 +1,33 @@
 ---
 title: Nginx WebSocket Configuration Guide
-description:
-  Production-ready Nginx configuration for WebSocket proxying, load balancing,
-  SSL/TLS termination, and optimization
-author: "Matthew O'Riordan"
-authorRole: 'Co-founder & CEO, Ably'
-publishedDate: 2025-09-01
-updatedDate: 2025-09-01
+description: Production-ready Nginx configuration for WebSocket proxying, load balancing, SSL/TLS termination, and optimization This comprehensive guide covers everything...
+author: Matthew O'Riordan
+authorRole: Co-founder & CEO, Ably
+publishedDate: 2025-09-01T00:00:00.000Z
+updatedDate: 2025-09-01T00:00:00.000Z
 category: infrastructure
 tags:
-  [nginx, websocket, infrastructure, proxy, load-balancing, ssl, http2, http3]
+  - nginx
+  - websocket
+  - infrastructure
+  - proxy
+  - load-balancing
+  - ssl
+  - http2
+  - http3
 seo:
   title: 'Nginx WebSocket Configuration: Complete Production Guide'
-  description:
-    'Learn how to configure Nginx for WebSocket applications with SSL/TLS, load
-    balancing, HTTP/2, HTTP/3, monitoring, and performance optimization.'
+  description: Learn how to configure Nginx for WebSocket applications with SSL/TLS, load balancing, HTTP/2, HTTP/3, monitoring, and performance optimization.
   keywords:
-    [
-      'nginx websocket',
-      'websocket proxy',
-      'nginx configuration',
-      'websocket load balancing',
-      'nginx ssl websocket',
-      'http2 websocket',
-      'http3 websocket',
-    ]
+    - nginx websocket
+    - websocket proxy
+    - nginx configuration
+    - websocket load balancing
+    - nginx ssl websocket
+    - http2 websocket
+    - http3 websocket
+date: '2024-09-02'
 ---
-
 Nginx is one of the most popular web servers and reverse proxies for WebSocket
 applications. This comprehensive guide covers production-ready configurations
 for WebSocket proxying, load balancing, SSL/TLS termination, and advanced
@@ -713,18 +714,16 @@ wscat -c wss://ws.example.com/ws
 
 ## Best Practices
 
-1. **Use SSL/TLS**: Always use WSS (WebSocket Secure) in production
-2. **Implement rate limiting**: Protect against abuse and DDoS attacks
-3. **Monitor connections**: Track active connections and performance metrics
-4. **Set appropriate timeouts**: Balance between connection stability and
-   resource usage
-5. **Use connection pooling**: Maintain keepalive connections to backend servers
-6. **Implement health checks**: Ensure backend availability
-7. **Log strategically**: Balance between debugging capability and performance
-8. **Optimize buffer sizes**: Adjust based on your message sizes and patterns
-9. **Plan for scaling**: Use load balancing and session persistence
-   appropriately
-10. **Regular updates**: Keep Nginx and SSL certificates up to date
+1. **Use SSL/TLS**: Always use WSS (WebSocket Secure) in production environments to protect data transmission and ensure connection integrity
+2. **Implement rate limiting**: Protect against abuse and DDoS attacks by carefully configuring connection and request limits based on your expected traffic patterns
+3. **Monitor connections**: Track active connections and performance metrics using comprehensive logging and monitoring tools to maintain optimal service quality
+4. **Set appropriate timeouts**: Balance between connection stability and resource usage by configuring timeouts that accommodate your application's specific communication patterns
+5. **Use connection pooling**: Maintain keepalive connections to backend servers to reduce connection overhead and improve response times
+6. **Implement health checks**: Ensure backend availability through regular health monitoring and automatic failover mechanisms
+7. **Log strategically**: Balance between debugging capability and performance by implementing structured logging that captures essential information without overwhelming your log storage systems
+8. **Optimize buffer sizes**: Adjust based on your message sizes and patterns to minimize memory usage while ensuring efficient data transmission
+9. **Plan for scaling**: Use load balancing and session persistence appropriately, considering both horizontal scaling requirements and the stateful nature of WebSocket connections
+10. **Regular updates**: Keep Nginx and SSL certificates up to date to maintain security standards and benefit from performance improvements and bug fixes
 
 ## Additional Resources
 

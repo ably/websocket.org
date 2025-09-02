@@ -1,12 +1,29 @@
 ---
-title: WebSockets at Scale
-description:
-  Overview of the numerous engineering decisions and technical trade-offs
-  involved in building a system at scale. Specifically, a system that is capable
-  of handling thousands or even millions of concurrent end-user devices as they
-  connect, consume, and send messages over WebSockets.
+title: WebSockets at Scale - Production Architecture and Best Practices
+description: Overview of the numerous engineering decisions and technical trade-offs involved in building a system at scale. Specifically, a system that is capable of handling thousands or even millions of concurrent end-user devices as they connect, consume, and send messages over WebSockets.
+author: Matthew O'Riordan
+date: '2024-09-02'
+category: guide
+seo:
+  keywords:
+    - websocket
+    - tutorial
+    - guide
+    - how-to
+    - websockets
+    - scale
+    - production
+    - real-time
+    - websocket implementation
+tags:
+  - websocket
+  - guide
+  - tutorial
+  - how-to
+  - scaling
+  - performance
+  - architecture
 ---
-
 This chapter covers the main aspects to consider when you set out to build a
 system at scale. By this, I mean a system to handle thousands or even millions
 of concurrent end-user devices as they connect, consume, and send messages over
@@ -77,6 +94,52 @@ the workload to?
 is the process of distributing incoming network traffic (WebSocket connections
 in our case) across a group of backend servers (usually called a server farm).
 When you scale horizontally, your load balancing strategy is fundamental.
+
+Here's an example of implementing a simple round-robin load balancer in Node.js:
+
+```javascript
+// Simple round-robin load balancer for WebSocket connections
+class WebSocketLoadBalancer {
+    constructor(servers) {
+        this.servers = servers;
+        this.currentIndex = 0;
+    }
+    
+    getNextServer() {
+        const server = this.servers[this.currentIndex];
+        this.currentIndex = (this.currentIndex + 1) % this.servers.length;
+        return server;
+    }
+    
+    connectClient(clientSocket) {
+        const targetServer = this.getNextServer();
+        
+        // Proxy the WebSocket connection to the selected server
+        const serverSocket = new WebSocket(targetServer);
+        
+        clientSocket.on('message', (data) => {
+            if (serverSocket.readyState === WebSocket.OPEN) {
+                serverSocket.send(data);
+            }
+        });
+        
+        serverSocket.on('message', (data) => {
+            if (clientSocket.readyState === WebSocket.OPEN) {
+                clientSocket.send(data);
+            }
+        });
+        
+        return targetServer;
+    }
+}
+
+// Usage
+const balancer = new WebSocketLoadBalancer([
+    'ws://server1.example.com',
+    'ws://server2.example.com',
+    'ws://server3.example.com'
+]);
+```
 
 A load balancer — which can be a physical device, a virtualized instance running
 on specialized hardware, or a software process — acts as a "traffic cop".
@@ -208,6 +271,84 @@ subscribing to relevant channels.
 ![The pub/sub pattern](../../../assets/guides/websockets-pubsub-pattern.png)
 _Figure 5.3: The pub/sub pattern_
 
+Here's a practical implementation of the pub/sub pattern with Redis and WebSockets:
+
+```javascript
+// Server-side pub/sub implementation using Redis
+const WebSocket = require('ws');
+const redis = require('redis');
+
+class PubSubWebSocketServer {
+    constructor(port) {
+        this.wss = new WebSocket.Server({ port });
+        this.publisher = redis.createClient();
+        this.subscriber = redis.createClient();
+        this.channels = new Map(); // Map of channel -> Set of clients
+        
+        this.setupWebSocketServer();
+        this.setupRedisSubscriber();
+    }
+    
+    setupWebSocketServer() {
+        this.wss.on('connection', (ws) => {
+            ws.on('message', (data) => {
+                const message = JSON.parse(data);
+                
+                switch (message.type) {
+                    case 'subscribe':
+                        this.subscribeClient(ws, message.channel);
+                        break;
+                    case 'publish':
+                        this.publishMessage(message.channel, message.data);
+                        break;
+                    case 'unsubscribe':
+                        this.unsubscribeClient(ws, message.channel);
+                        break;
+                }
+            });
+            
+            ws.on('close', () => {
+                this.removeClient(ws);
+            });
+        });
+    }
+    
+    subscribeClient(ws, channel) {
+        if (!this.channels.has(channel)) {
+            this.channels.set(channel, new Set());
+            this.subscriber.subscribe(channel);
+        }
+        this.channels.get(channel).add(ws);
+    }
+    
+    publishMessage(channel, data) {
+        // Publish to Redis for distribution across multiple servers
+        this.publisher.publish(channel, JSON.stringify(data));
+    }
+    
+    setupRedisSubscriber() {
+        this.subscriber.on('message', (channel, message) => {
+            const clients = this.channels.get(channel);
+            if (clients) {
+                const data = JSON.stringify({
+                    channel,
+                    data: JSON.parse(message)
+                });
+                
+                clients.forEach(ws => {
+                    if (ws.readyState === WebSocket.OPEN) {
+                        ws.send(data);
+                    }
+                });
+            }
+        });
+    }
+}
+
+// Usage
+const server = new PubSubWebSocketServer(8080);
+```
+
 The pub/sub pattern's decoupled nature means your apps can theoretically scale
 to limitless subscribers. A significant advantage of adopting the pub/sub
 pattern is that you often have only one component that has to deal with scaling
@@ -263,6 +404,152 @@ Most WebSocket solutions have fallback support baked in. For example, Socket.IO,
 one of the most popular open-source WebSocket libraries out there, will opaquely
 try to establish a WebSocket connection if possible, and will fall back to HTTP
 long polling if not.
+
+Here's an example implementation of a WebSocket client with automatic fallback:
+
+```javascript
+// WebSocket client with automatic fallback to Server-Sent Events
+class ResilientConnection {
+    constructor(url) {
+        this.url = url;
+        this.connection = null;
+        this.connectionType = null;
+        this.reconnectAttempts = 0;
+        this.maxReconnectAttempts = 5;
+        this.reconnectDelay = 1000;
+        
+        this.connect();
+    }
+    
+    connect() {
+        // Try WebSocket first
+        this.tryWebSocket()
+            .catch(() => {
+                console.log('WebSocket failed, trying SSE...');
+                return this.trySSE();
+            })
+            .catch(() => {
+                console.log('SSE failed, falling back to long polling...');
+                return this.tryLongPolling();
+            })
+            .catch(() => {
+                console.error('All connection methods failed');
+                this.scheduleReconnect();
+            });
+    }
+    
+    tryWebSocket() {
+        return new Promise((resolve, reject) => {
+            try {
+                const ws = new WebSocket(this.url.replace('http', 'ws'));
+                
+                ws.onopen = () => {
+                    this.connection = ws;
+                    this.connectionType = 'websocket';
+                    this.reconnectAttempts = 0;
+                    console.log('Connected via WebSocket');
+                    resolve();
+                };
+                
+                ws.onerror = () => reject(new Error('WebSocket failed'));
+                
+                ws.onmessage = (event) => {
+                    this.handleMessage(event.data);
+                };
+                
+                ws.onclose = () => {
+                    this.handleDisconnect();
+                };
+                
+                // Timeout after 5 seconds
+                setTimeout(() => {
+                    if (ws.readyState !== WebSocket.OPEN) {
+                        ws.close();
+                        reject(new Error('WebSocket timeout'));
+                    }
+                }, 5000);
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
+    
+    trySSE() {
+        return new Promise((resolve, reject) => {
+            try {
+                const eventSource = new EventSource(this.url + '/sse');
+                
+                eventSource.onopen = () => {
+                    this.connection = eventSource;
+                    this.connectionType = 'sse';
+                    this.reconnectAttempts = 0;
+                    console.log('Connected via Server-Sent Events');
+                    resolve();
+                };
+                
+                eventSource.onerror = () => {
+                    eventSource.close();
+                    reject(new Error('SSE failed'));
+                };
+                
+                eventSource.onmessage = (event) => {
+                    this.handleMessage(event.data);
+                };
+            } catch (e) {
+                reject(e);
+            }
+        });
+    }
+    
+    tryLongPolling() {
+        // Implement HTTP long polling as final fallback
+        this.connectionType = 'long-polling';
+        console.log('Using long polling fallback');
+        
+        const poll = async () => {
+            try {
+                const response = await fetch(this.url + '/poll', {
+                    method: 'GET',
+                    headers: { 'X-Connection-Type': 'long-poll' }
+                });
+                
+                if (response.ok) {
+                    const data = await response.text();
+                    this.handleMessage(data);
+                    poll(); // Continue polling
+                }
+            } catch (error) {
+                this.handleDisconnect();
+            }
+        };
+        
+        poll();
+        return Promise.resolve();
+    }
+    
+    scheduleReconnect() {
+        if (this.reconnectAttempts < this.maxReconnectAttempts) {
+            this.reconnectAttempts++;
+            const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts);
+            console.log(`Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts})`);
+            setTimeout(() => this.connect(), delay);
+        }
+    }
+    
+    handleMessage(data) {
+        // Process incoming messages
+        console.log('Received:', data);
+    }
+    
+    handleDisconnect() {
+        console.log(`${this.connectionType} disconnected`);
+        this.scheduleReconnect();
+    }
+}
+
+// Usage
+const connection = new ResilientConnection('https://api.example.com');
+```
 
 Another example is SockJS, which supports a large number of streaming and
 polling fallbacks, including xhr-polling (long-polling using cross-domain XHR)

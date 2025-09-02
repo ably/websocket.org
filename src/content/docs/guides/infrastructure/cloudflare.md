@@ -1,32 +1,31 @@
 ---
 title: Cloudflare WebSocket Configuration Guide
-description:
-  Configure Cloudflare CDN, Workers, and Durable Objects for WebSocket
-  applications with DDoS protection and global distribution
-author: "Matthew O'Riordan"
-authorRole: 'Co-founder & CEO, Ably'
-publishedDate: 2025-09-01
-updatedDate: 2025-09-01
+description: Configure Cloudflare CDN, Workers, and Durable Objects for WebSocket applications with DDoS protection and global distribution
+author: Matthew O'Riordan
+authorRole: Co-founder & CEO, Ably
+publishedDate: 2025-09-01T00:00:00.000Z
+updatedDate: 2025-09-01T00:00:00.000Z
 category: infrastructure
 tags:
-  [cloudflare, websocket, cdn, workers, durable-objects, ddos, edge-computing]
+  - cloudflare
+  - websocket
+  - cdn
+  - workers
+  - durable-objects
+  - ddos
+  - edge-computing
 seo:
   title: 'Cloudflare WebSocket Configuration: CDN, Workers & Durable Objects'
-  description:
-    'Complete guide to using Cloudflare for WebSocket applications including CDN
-    proxy setup, Workers implementation, Durable Objects patterns, and DDoS
-    protection.'
+  description: Complete guide to using Cloudflare for WebSocket applications including CDN proxy setup, Workers implementation, Durable Objects patterns, and DDoS protection.
   keywords:
-    [
-      'cloudflare websocket',
-      'cloudflare workers websocket',
-      'durable objects websocket',
-      'cloudflare cdn websocket',
-      'websocket ddos protection',
-      'edge websocket',
-    ]
+    - cloudflare websocket
+    - cloudflare workers websocket
+    - durable objects websocket
+    - cloudflare cdn websocket
+    - websocket ddos protection
+    - edge websocket
+date: '2024-09-02'
 ---
-
 Cloudflare provides multiple ways to handle WebSocket connections: through their
 CDN proxy service, Workers for edge computing, and Durable Objects for stateful
 WebSocket applications. This guide covers all three approaches with production

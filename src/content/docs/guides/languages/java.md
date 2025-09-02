@@ -1,14 +1,248 @@
 ---
 title: Java WebSocket Implementation
-description:
-  Complete guide to WebSocket clients and servers in Java with Spring, Jakarta
-  EE, and native
+description: Learn how to implement WebSockets with production-ready code examples, best practices, and real-world patterns. Complete guide to WebSocket clients and servers in Java using Spring Boot, Jakarta EE, native Java, and Android patterns with security, performance optimization, and testing strategies.
 sidebar:
   order: 5
+author: Matthew O'Riordan
+date: '2024-09-02'
+category: guide
+seo:
+  keywords:
+    - websocket
+    - tutorial
+    - guide
+    - how-to
+    - java
+    - implementation
+    - real-time
+    - websocket implementation
+    - spring boot websocket
+    - jakarta ee websocket
+    - java websocket client
+    - java websocket server
+tags:
+  - websocket
+  - java
+  - spring
+  - websocket-java
+  - jakarta
+  - programming
+  - tutorial
+  - implementation
+  - guide
+  - how-to
 ---
+# Java WebSocket Implementation Guide
 
-This guide covers WebSocket implementation in Java, including Spring Boot,
-Jakarta EE, native Java, and Android patterns.
+WebSockets have revolutionized real-time communication in Java applications, enabling bi-directional, low-latency communication between clients and servers. This comprehensive guide covers everything you need to know about implementing WebSockets in Java, from basic client-server connections to enterprise-grade solutions.
+
+Java's approach to WebSocket development reflects the language's enterprise heritage, emphasizing robust error handling, comprehensive logging, and integration with established architectural patterns. The ecosystem provides multiple levels of abstraction, from low-level socket management to high-level framework integration, allowing developers to choose the appropriate balance between control and convenience based on their specific requirements.
+
+The maturity of Java's WebSocket implementations means that common challenges like connection management, message serialization, and scaling have well-established solutions. This maturity is particularly valuable in enterprise environments where reliability, maintainability, and integration with existing systems are more important than cutting-edge features or minimal resource usage.
+
+## Why Choose Java for WebSocket Development?
+
+Java offers several compelling advantages for WebSocket development:
+
+**Enterprise-Ready Ecosystem**: Java's mature ecosystem includes robust frameworks like Spring Boot and Jakarta EE, providing enterprise-grade features out of the box including security, scalability, and monitoring.
+
+**Platform Independence**: Java's "write once, run anywhere" philosophy ensures your WebSocket applications work across different operating systems and environments.
+
+**Strong Typing and IDE Support**: Java's static typing system catches errors at compile time, while excellent IDE support provides intelligent code completion and refactoring capabilities.
+
+**Excellent Performance**: The JVM's optimization capabilities and garbage collection make Java WebSocket applications performant and stable under high load.
+
+**Rich Library Ecosystem**: From Java-WebSocket for simple implementations to sophisticated frameworks like Spring WebSocket and Jakarta WebSocket API, Java offers solutions for every use case.
+
+**Enterprise Integration**: Seamless integration with existing Java enterprise applications, databases, and middleware systems.
+
+The combination of these advantages makes Java particularly well-suited for large-scale, mission-critical WebSocket applications. The language's emphasis on backward compatibility means that WebSocket applications built today will continue to work with future Java versions, providing long-term stability for enterprise deployments. Additionally, Java's extensive monitoring and profiling tools make it easier to diagnose performance issues and optimize WebSocket applications in production environments.
+
+## Setting Up Your Java WebSocket Project
+
+Let's start by setting up a comprehensive Java WebSocket project structure that can handle both client and server implementations.
+
+Project setup in Java WebSocket development requires careful consideration of dependencies and build configuration. The choice between Maven and Gradle often depends on existing organizational preferences, but both build systems provide excellent support for managing WebSocket library dependencies and handling the complexities of multi-module projects that separate client and server concerns.
+
+### Maven Project Setup
+
+Create a new Maven project with the following `pom.xml` configuration:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.example</groupId>
+    <artifactId>websocket-java-guide</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+    
+    <properties>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        
+        <spring.boot.version>3.2.0</spring.boot.version>
+        <jakarta.websocket.version>2.1.1</jakarta.websocket.version>
+        <java-websocket.version>1.5.4</java-websocket.version>
+        <gson.version>2.10.1</gson.version>
+        <slf4j.version>2.0.9</slf4j.version>
+        <logback.version>1.4.11</logback.version>
+        <junit.version>5.10.0</junit.version>
+        <mockito.version>5.6.0</mockito.version>
+        <testcontainers.version>1.19.1</testcontainers.version>
+    </properties>
+    
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    
+    <dependencies>
+        <!-- Spring Boot WebSocket -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+        
+        <!-- Jakarta WebSocket API -->
+        <dependency>
+            <groupId>jakarta.websocket</groupId>
+            <artifactId>jakarta.websocket-api</artifactId>
+            <version>${jakarta.websocket.version}</version>
+        </dependency>
+        
+        <!-- Jakarta WebSocket Client Implementation -->
+        <dependency>
+            <groupId>org.glassfish.tyrus</groupId>
+            <artifactId>tyrus-client</artifactId>
+            <version>2.1.4</version>
+        </dependency>
+        
+        <!-- Java-WebSocket Library -->
+        <dependency>
+            <groupId>org.java-websocket</groupId>
+            <artifactId>Java-WebSocket</artifactId>
+            <version>${java-websocket.version}</version>
+        </dependency>
+        
+        <!-- JSON Processing -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
+        </dependency>
+        
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito.version}</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <!-- TestContainers for integration testing -->
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${testcontainers.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.1</version>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+```
+
+### Gradle Project Setup (Alternative)
+
+For Gradle users, create a `build.gradle` file:
+
+```gradle
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.0'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.example'
+version = '1.0.0'
+java.sourceCompatibility = JavaVersion.VERSION_17
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    implementation 'org.java-websocket:Java-WebSocket:1.5.4'
+    implementation 'jakarta.websocket:jakarta.websocket-api:2.1.1'
+    implementation 'org.glassfish.tyrus:tyrus-client:2.1.4'
+    implementation 'com.google.code.gson:gson:2.10.1'
+    
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'org.mockito:mockito-core:5.6.0'
+    testImplementation 'org.testcontainers:junit-jupiter:1.19.1'
+}
+
+test {
+    useJUnitPlatform()
+}
+```
+
+This guide covers WebSocket implementation in Java, including Spring Boot, Jakarta EE, native Java, and Android patterns.
 
 ## Java Client Implementation
 
@@ -1227,43 +1461,735 @@ public class WebSocketClientTest {
 }
 ```
 
+## Performance Optimization
+
+Performance optimization in Java WebSocket applications involves multiple layers, from JVM tuning to application-level optimizations. Java's mature ecosystem provides sophisticated tools for profiling and monitoring WebSocket applications, making it easier to identify bottlenecks and optimize performance systematically.
+
+The JVM's just-in-time compilation means that WebSocket applications typically exhibit improved performance over time as the JIT compiler optimizes frequently executed code paths. This characteristic makes Java particularly well-suited for long-running WebSocket servers where the initial startup cost is amortized over extended periods of operation.
+
+### Connection Pooling
+
+Managing multiple WebSocket connections efficiently is crucial for high-performance applications. Connection pooling in Java WebSocket applications involves not just managing the connections themselves, but also optimizing thread usage, memory allocation patterns, and resource cleanup to maintain optimal performance under varying load conditions:
+
+```java
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+
+public class WebSocketConnectionPool {
+    private final ConcurrentHashMap<String, WebSocketConnection> activeConnections;
+    private final BlockingQueue<String> availableConnections;
+    private final ExecutorService executorService;
+    private final int maxConnections;
+    private final String serverUrl;
+    
+    public WebSocketConnectionPool(String serverUrl, int maxConnections) {
+        this.serverUrl = serverUrl;
+        this.maxConnections = maxConnections;
+        this.activeConnections = new ConcurrentHashMap<>();
+        this.availableConnections = new LinkedBlockingQueue<>();
+        this.executorService = Executors.newCachedThreadPool();
+        
+        initializePool();
+    }
+    
+    private void initializePool() {
+        for (int i = 0; i < maxConnections; i++) {
+            String connectionId = createConnection();
+            availableConnections.offer(connectionId);
+        }
+    }
+    
+    private String createConnection() {
+        String connectionId = UUID.randomUUID().toString();
+        
+        try {
+            WebSocketConnection connection = new WebSocketConnection(serverUrl);
+            connection.connect();
+            activeConnections.put(connectionId, connection);
+            return connectionId;
+        } catch (Exception e) {
+            logger.error("Failed to create WebSocket connection: {}", e.getMessage());
+            return null;
+        }
+    }
+    
+    public WebSocketConnection borrowConnection() throws InterruptedException {
+        String connectionId = availableConnections.poll(5, TimeUnit.SECONDS);
+        if (connectionId == null) {
+            throw new RuntimeException("No available connections in pool");
+        }
+        
+        WebSocketConnection connection = activeConnections.get(connectionId);
+        if (connection == null || !connection.isConnected()) {
+            // Connection is stale, create a new one
+            activeConnections.remove(connectionId);
+            connectionId = createConnection();
+            if (connectionId == null) {
+                throw new RuntimeException("Failed to create replacement connection");
+            }
+            connection = activeConnections.get(connectionId);
+        }
+        
+        return connection;
+    }
+    
+    public void returnConnection(String connectionId) {
+        if (activeConnections.containsKey(connectionId)) {
+            availableConnections.offer(connectionId);
+        }
+    }
+    
+    public void close() {
+        availableConnections.clear();
+        activeConnections.values().forEach(WebSocketConnection::close);
+        activeConnections.clear();
+        executorService.shutdown();
+    }
+}
+```
+
+### Message Batching and Compression
+
+Optimize message throughput with batching and compression:
+
+```java
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.io.ByteArrayOutputStream;
+import java.util.zip.GZIPOutputStream;
+import java.util.List;
+import java.util.ArrayList;
+
+public class BatchingWebSocketClient extends WebSocketClient {
+    private final ConcurrentLinkedQueue<String> messageQueue = new ConcurrentLinkedQueue<>();
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private final int batchSize;
+    private final long batchInterval;
+    
+    public BatchingWebSocketClient(URI serverUri, int batchSize, long batchIntervalMs) {
+        super(serverUri);
+        this.batchSize = batchSize;
+        this.batchInterval = batchIntervalMs;
+        
+        // Schedule batch processing
+        scheduler.scheduleAtFixedRate(this::processBatch, 
+            batchInterval, batchInterval, TimeUnit.MILLISECONDS);
+    }
+    
+    @Override
+    public void onOpen(ServerHandshake handshake) {
+        System.out.println("Connected with batching enabled");
+    }
+    
+    public void sendMessageBatched(String message) {
+        messageQueue.offer(message);
+        
+        // If queue is full, process immediately
+        if (messageQueue.size() >= batchSize) {
+            processBatch();
+        }
+    }
+    
+    private void processBatch() {
+        List<String> batch = new ArrayList<>();
+        String message;
+        
+        // Collect messages for batch
+        while (batch.size() < batchSize && (message = messageQueue.poll()) != null) {
+            batch.add(message);
+        }
+        
+        if (batch.isEmpty()) {
+            return;
+        }
+        
+        try {
+            // Create batch message
+            BatchMessage batchMessage = new BatchMessage(batch);
+            String json = gson.toJson(batchMessage);
+            
+            // Compress if beneficial
+            byte[] compressed = compress(json);
+            if (compressed.length < json.getBytes().length) {
+                // Send compressed binary message
+                sendBinary(compressed);
+            } else {
+                // Send uncompressed text message
+                send(json);
+            }
+            
+        } catch (Exception e) {
+            System.err.println("Failed to send batch: " + e.getMessage());
+            // Re-queue messages for retry
+            batch.forEach(messageQueue::offer);
+        }
+    }
+    
+    private byte[] compress(String data) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (GZIPOutputStream gzip = new GZIPOutputStream(baos)) {
+            gzip.write(data.getBytes("UTF-8"));
+        }
+        return baos.toByteArray();
+    }
+    
+    private static class BatchMessage {
+        private final List<String> messages;
+        private final long timestamp;
+        private final boolean compressed;
+        
+        public BatchMessage(List<String> messages) {
+            this.messages = messages;
+            this.timestamp = System.currentTimeMillis();
+            this.compressed = false;
+        }
+        
+        // Getters...
+    }
+    
+    public void shutdown() {
+        processBatch(); // Process remaining messages
+        scheduler.shutdown();
+        try {
+            if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                scheduler.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            scheduler.shutdownNow();
+        }
+    }
+}
+```
+
+## Error Handling and Reconnection Strategies
+
+Robust error handling is essential for production WebSocket applications:
+
+```java
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.function.Supplier;
+
+public class RobustWebSocketClient extends ReconnectingWebSocketClient {
+    private final CircuitBreaker circuitBreaker;
+    private final RetryPolicy retryPolicy;
+    private final MetricsCollector metricsCollector;
+    
+    public RobustWebSocketClient(URI serverUri) {
+        super(serverUri);
+        this.circuitBreaker = new CircuitBreaker();
+        this.retryPolicy = new ExponentialBackoffRetry();
+        this.metricsCollector = new MetricsCollector();
+    }
+    
+    @Override
+    protected void onErrorOccurred(Exception ex) {
+        metricsCollector.recordError(ex);
+        circuitBreaker.recordFailure();
+        
+        if (ex instanceof ConnectException) {
+            handleConnectionError(ex);
+        } else if (ex instanceof SocketTimeoutException) {
+            handleTimeoutError(ex);
+        } else if (ex instanceof SecurityException) {
+            handleSecurityError(ex);
+        } else {
+            handleGenericError(ex);
+        }
+    }
+    
+    private void handleConnectionError(Exception ex) {
+        logger.warn("Connection error: {}", ex.getMessage());
+        if (circuitBreaker.canAttemptRequest()) {
+            scheduleReconnectWithBackoff();
+        } else {
+            logger.error("Circuit breaker open, not attempting reconnection");
+            notifyErrorHandlers(new CircuitBreakerOpenException());
+        }
+    }
+    
+    private void handleTimeoutError(Exception ex) {
+        logger.warn("Timeout error: {}", ex.getMessage());
+        metricsCollector.recordTimeout();
+        
+        // Implement timeout-specific recovery
+        if (getConsecutiveTimeouts() < 3) {
+            increaseTimeout();
+            scheduleReconnect();
+        } else {
+            // Switch to different server or fail fast
+            handleFatalError(ex);
+        }
+    }
+    
+    private void handleSecurityError(Exception ex) {
+        logger.error("Security error: {}", ex.getMessage());
+        metricsCollector.recordSecurityError();
+        
+        // Security errors usually require user intervention
+        notifyErrorHandlers(new AuthenticationException(ex));
+    }
+    
+    private void handleGenericError(Exception ex) {
+        logger.error("Generic error: {}", ex.getMessage(), ex);
+        
+        if (isRecoverableError(ex)) {
+            scheduleReconnectWithBackoff();
+        } else {
+            handleFatalError(ex);
+        }
+    }
+    
+    private boolean isRecoverableError(Exception ex) {
+        return !(ex instanceof SecurityException || 
+                ex instanceof IllegalArgumentException ||
+                ex instanceof OutOfMemoryError);
+    }
+    
+    public CompletableFuture<Void> sendWithRetry(String message) {
+        return CompletableFuture.supplyAsync(() -> {
+            return retryPolicy.execute(() -> {
+                if (!circuitBreaker.canAttemptRequest()) {
+                    throw new CircuitBreakerOpenException();
+                }
+                
+                try {
+                    send(message);
+                    circuitBreaker.recordSuccess();
+                    return null;
+                } catch (Exception e) {
+                    circuitBreaker.recordFailure();
+                    throw new CompletionException(e);
+                }
+            });
+        });
+    }
+}
+
+class CircuitBreaker {
+    private volatile State state = State.CLOSED;
+    private volatile long lastFailureTime;
+    private volatile int failureCount;
+    private final int failureThreshold = 5;
+    private final long timeout = 60000; // 1 minute
+    
+    enum State { CLOSED, OPEN, HALF_OPEN }
+    
+    public boolean canAttemptRequest() {
+        if (state == State.CLOSED) {
+            return true;
+        }
+        
+        if (state == State.OPEN) {
+            if (System.currentTimeMillis() - lastFailureTime >= timeout) {
+                state = State.HALF_OPEN;
+                return true;
+            }
+            return false;
+        }
+        
+        return true; // HALF_OPEN
+    }
+    
+    public void recordSuccess() {
+        failureCount = 0;
+        state = State.CLOSED;
+    }
+    
+    public void recordFailure() {
+        failureCount++;
+        lastFailureTime = System.currentTimeMillis();
+        
+        if (failureCount >= failureThreshold) {
+            state = State.OPEN;
+        }
+    }
+}
+```
+
+## Security Best Practices
+
+Security in Java WebSocket applications requires a comprehensive approach that addresses authentication, authorization, data validation, and transport security. Java's enterprise-focused ecosystem provides robust security frameworks that can be seamlessly integrated with WebSocket applications, leveraging existing authentication systems and authorization policies.
+
+The stateful nature of WebSocket connections introduces unique security challenges compared to traditional HTTP requests. Unlike stateless HTTP requests where authentication can be verified per request, WebSocket connections require ongoing validation of user permissions throughout the connection lifecycle. Java's security frameworks provide sophisticated mechanisms for handling these challenges while maintaining high performance.
+
+### Authentication and Authorization
+
+Implement secure WebSocket connections with proper authentication. Java's integration with enterprise authentication systems like LDAP, OAuth 2.0, and SAML makes it possible to leverage existing identity management infrastructure for WebSocket applications:
+
+```java
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
+import java.security.KeyStore;
+import java.util.Map;
+
+public class SecureWebSocketClient extends WebSocketClient {
+    private final AuthenticationProvider authProvider;
+    private final String apiKey;
+    private final SSLContext sslContext;
+    
+    public SecureWebSocketClient(URI serverUri, AuthenticationProvider authProvider, String apiKey) {
+        super(serverUri);
+        this.authProvider = authProvider;
+        this.apiKey = apiKey;
+        this.sslContext = createSSLContext();
+        configureSSL();
+    }
+    
+    @Override
+    public void onOpen(ServerHandshake handshake) {
+        // Verify server certificate and handshake
+        if (!verifyServerHandshake(handshake)) {
+            close(CloseFrame.REFUSE, "Server verification failed");
+            return;
+        }
+        
+        // Send authentication message
+        authenticateConnection();
+    }
+    
+    private void authenticateConnection() {
+        try {
+            String token = authProvider.getAccessToken();
+            AuthenticationMessage authMsg = new AuthenticationMessage(
+                token, apiKey, System.currentTimeMillis()
+            );
+            
+            // Sign the message
+            String signature = signMessage(authMsg);
+            authMsg.setSignature(signature);
+            
+            send(gson.toJson(authMsg));
+            
+        } catch (Exception e) {
+            logger.error("Authentication failed: {}", e.getMessage());
+            close(CloseFrame.POLICY_VALIDATION, "Authentication failed");
+        }
+    }
+    
+    private boolean verifyServerHandshake(ServerHandshake handshake) {
+        // Verify server provides required security headers
+        Map<String, String> headers = handshake.getFieldValue("Sec-WebSocket-Accept") != null ? 
+            Map.of("Sec-WebSocket-Accept", handshake.getFieldValue("Sec-WebSocket-Accept")) : 
+            Map.of();
+        
+        // Additional security validations
+        return validateSecurityHeaders(headers) && 
+               validateProtocolVersion(handshake) &&
+               validateOrigin(handshake);
+    }
+    
+    private boolean validateSecurityHeaders(Map<String, String> headers) {
+        // Check for security headers like HSTS, CSP, etc.
+        return true; // Implement according to your security requirements
+    }
+    
+    @Override
+    public void onMessage(String message) {
+        try {
+            // Validate message structure and content
+            if (!validateMessage(message)) {
+                logger.warn("Invalid message received, ignoring");
+                return;
+            }
+            
+            // Decrypt if necessary
+            String decryptedMessage = decryptMessage(message);
+            
+            // Process validated and decrypted message
+            super.onMessage(decryptedMessage);
+            
+        } catch (Exception e) {
+            logger.error("Message processing failed: {}", e.getMessage());
+        }
+    }
+    
+    private boolean validateMessage(String message) {
+        // Implement message validation logic
+        if (message == null || message.length() > MAX_MESSAGE_SIZE) {
+            return false;
+        }
+        
+        // Check for malicious patterns
+        return !containsMaliciousPatterns(message);
+    }
+    
+    private SSLContext createSSLContext() {
+        try {
+            KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+            // Load your trusted certificates
+            
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(
+                TrustManagerFactory.getDefaultAlgorithm()
+            );
+            tmf.init(trustStore);
+            
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, tmf.getTrustManagers(), null);
+            
+            return sslContext;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create SSL context", e);
+        }
+    }
+    
+    private void configureSSL() {
+        setSocket(sslContext.getSocketFactory().createSocket());
+    }
+}
+
+class AuthenticationMessage {
+    private final String token;
+    private final String apiKey;
+    private final long timestamp;
+    private String signature;
+    
+    public AuthenticationMessage(String token, String apiKey, long timestamp) {
+        this.token = token;
+        this.apiKey = apiKey;
+        this.timestamp = timestamp;
+    }
+    
+    // Getters and setters...
+}
+```
+
+## Production Deployment Considerations
+
+### Docker Configuration
+
+Create a production-ready Docker setup:
+
+```dockerfile
+# Multi-stage build for Java WebSocket application
+FROM openjdk:17-jdk-alpine AS builder
+
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+
+RUN ./mvnw clean package -DskipTests
+
+FROM openjdk:17-jre-alpine AS runtime
+
+# Create non-root user
+RUN addgroup -g 1001 -S appgroup && \
+    adduser -u 1001 -S appuser -G appgroup
+
+# Install monitoring tools
+RUN apk add --no-cache curl netcat-openbsd
+
+WORKDIR /app
+
+# Copy application
+COPY --from=builder /app/target/websocket-java-guide*.jar app.jar
+COPY docker/application.properties .
+COPY docker/logback-spring.xml .
+
+# Set ownership
+RUN chown -R appuser:appgroup /app
+
+USER appuser
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8080/actuator/health || exit 1
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", \
+  "-XX:+UseG1GC", \
+  "-XX:MaxGCPauseMillis=100", \
+  "-XX:+UseStringDeduplication", \
+  "-Xms512m", \
+  "-Xmx2048m", \
+  "-Dspring.config.location=classpath:/application.properties,file:./application.properties", \
+  "-Dlogging.config=./logback-spring.xml", \
+  "-jar", "app.jar"]
+```
+
+### Kubernetes Deployment
+
+Deploy with proper scaling and monitoring:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: websocket-server
+  labels:
+    app: websocket-server
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: websocket-server
+  template:
+    metadata:
+      labels:
+        app: websocket-server
+    spec:
+      containers:
+      - name: websocket-server
+        image: your-registry/websocket-server:latest
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: "production"
+        - name: WEBSOCKET_MAX_CONNECTIONS
+          value: "10000"
+        - name: JVM_OPTS
+          value: "-Xms1g -Xmx2g -XX:+UseG1GC"
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /actuator/ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: config
+          mountPath: /app/config
+          readOnly: true
+      volumes:
+      - name: config
+        configMap:
+          name: websocket-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: websocket-service
+spec:
+  selector:
+    app: websocket-server
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
+  type: LoadBalancer
+  sessionAffinity: ClientIP  # Important for WebSocket connections
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: websocket-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: websocket-server
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+```
+
 ## Best Practices
 
 ### Connection Management
 
-- Implement automatic reconnection with exponential backoff
-- Use connection pooling for multiple WebSocket connections
-- Handle network changes gracefully (especially on mobile)
-- Implement heartbeat/ping-pong for connection health
+- **Implement automatic reconnection with exponential backoff**: Use intelligent retry mechanisms that don't overwhelm servers during outages
+- **Use connection pooling for multiple WebSocket connections**: Efficiently manage resources and reduce connection overhead
+- **Handle network changes gracefully**: Especially important for mobile applications where network conditions change frequently
+- **Implement heartbeat/ping-pong for connection health**: Detect dead connections early and maintain connection state
 
 ### Security
 
-- Always use WSS (WebSocket Secure) in production
-- Implement proper authentication before upgrading connection
-- Validate all incoming messages
-- Use rate limiting to prevent abuse
-- Implement CORS properly
+- **Always use WSS (WebSocket Secure) in production**: Encrypt all WebSocket communication to prevent eavesdropping and tampering
+- **Implement proper authentication before upgrading connection**: Verify client identity before allowing WebSocket upgrade
+- **Validate all incoming messages**: Never trust client input; implement server-side validation for all message types
+- **Use rate limiting to prevent abuse**: Protect against DoS attacks and excessive resource consumption
+- **Implement CORS properly**: Configure cross-origin policies to prevent unauthorized access from malicious websites
 
 ### Performance
 
-- Use binary messages for large data transfers
-- Implement message compression (permessage-deflate)
-- Batch small messages when possible
-- Use async message sending for better throughput
-- Configure appropriate buffer sizes
+- **Use binary messages for large data transfers**: Binary frames have less overhead than text frames for large payloads
+- **Implement message compression (permessage-deflate)**: Reduce bandwidth usage, especially for text-heavy applications
+- **Batch small messages when possible**: Reduce the overhead of sending many small messages
+- **Use async message sending for better throughput**: Avoid blocking the main thread while sending messages
+- **Configure appropriate buffer sizes**: Balance memory usage with performance based on your message patterns
 
 ### Error Handling
 
-- Implement comprehensive error handling
-- Log errors appropriately
-- Provide fallback mechanisms
-- Handle partial message failures
-- Implement circuit breaker pattern for failing services
+- **Implement comprehensive error handling**: Plan for all types of failures including network, protocol, and application errors
+- **Log errors appropriately**: Provide enough detail for debugging while avoiding sensitive information leakage
+- **Provide fallback mechanisms**: Implement graceful degradation when WebSocket connections fail
+- **Handle partial message failures**: Deal with incomplete or corrupted messages gracefully
+- **Implement circuit breaker pattern for failing services**: Prevent cascade failures in distributed systems
 
 ### Monitoring
 
-- Track connection metrics (open/close/error rates)
-- Monitor message throughput
-- Log slow message processing
-- Implement health checks
-- Use distributed tracing for debugging
+- **Track connection metrics (open/close/error rates)**: Monitor the health of your WebSocket infrastructure
+- **Monitor message throughput**: Understand usage patterns and capacity requirements
+- **Log slow message processing**: Identify performance bottlenecks in message handling
+- **Implement health checks**: Provide endpoints for load balancers and monitoring systems
+- **Use distributed tracing for debugging**: Correlate WebSocket events with other application activities
+
+## Troubleshooting Common Issues
+
+### Connection Problems
+
+**Issue**: Connections dropping frequently
+**Solution**: Implement proper heartbeat mechanism and check firewall/proxy configurations
+
+**Issue**: Unable to connect through corporate firewalls
+**Solution**: Use WSS on port 443 and implement fallback mechanisms like HTTP long-polling
+
+**Issue**: Memory leaks in long-running applications
+**Solution**: Properly clean up WebSocket connections and implement connection lifecycle management
+
+### Performance Issues
+
+**Issue**: High CPU usage with many connections
+**Solution**: Use NIO-based implementations and optimize message processing with thread pools
+
+**Issue**: Slow message delivery
+**Solution**: Implement message prioritization and consider using binary frames for large messages
+
+**Issue**: Connection limit exceeded
+**Solution**: Implement connection pooling and consider horizontal scaling strategies
+
+This comprehensive guide provides everything needed to implement robust, scalable, and secure WebSocket applications in Java. From basic client-server communication to enterprise-grade deployments, these patterns and practices will help you build production-ready real-time applications.
+
+
+## Java's Maturity Advantage in WebSocket Development
+
+Java's maturity as a platform brings unique advantages to WebSocket development that are often underappreciated. The Java Virtual Machine (JVM) has been optimized over decades, with sophisticated just-in-time compilation, garbage collection algorithms, and memory management strategies that have been battle-tested in some of the world's largest applications. This maturity translates directly into reliable, high-performance WebSocket implementations that can handle millions of concurrent connections.
+
+The standardization through JSR 356 means that Java WebSocket applications have a clear, well-defined API that promotes portability and maintainability. This standardization extends beyond just the API - it includes clear specifications for error handling, session management, and extension mechanisms. For enterprise applications where long-term support and stability are crucial, this standardization provides confidence that WebSocket applications built today will continue to work with future Java versions.
+
+The tooling ecosystem around Java is unmatched in its sophistication. Profilers can analyze WebSocket performance down to the method level, identifying bottlenecks with precision. Application Performance Monitoring (APM) tools provide deep insights into WebSocket behavior in production. IDE support for WebSocket development includes everything from code completion to automated refactoring, making development more efficient and less error-prone.

@@ -1,35 +1,31 @@
 ---
 title: WebSocket API Reference
-description:
-  Complete WebSocket API reference guide with events, methods, properties, and
-  practical implementation patterns for building real-time applications
-author: "Matthew O'Riordan"
-authorRole: 'Co-founder & CEO, Ably'
-date: 2025-08-31
-category: 'reference'
-tags: ['websocket', 'api', 'javascript', 'real-time', 'browser']
+description: Complete WebSocket API reference guide with events, methods, properties, and practical implementation patterns for building real-time applications
+author: Matthew O'Riordan
+authorRole: Co-founder & CEO, Ably
+date: 2025-08-31T00:00:00.000Z
+category: reference
+tags:
+  - websocket
+  - api
+  - javascript
+  - real-time
+  - browser
 seo:
-  title:
-    'WebSocket API Reference - Complete Guide with Examples | WebSocket.org'
-  description:
-    'Master the WebSocket API with our comprehensive reference. Learn about
-    events, methods, properties, error handling, reconnection strategies, and
-    real-world implementation patterns.'
+  title: WebSocket API Reference - Complete Guide with Examples | WebSocket.org
+  description: Master the WebSocket API with our comprehensive reference. Learn about events, methods, properties, error handling, reconnection strategies, and real-world implementation patterns.
   keywords:
-    [
-      'websocket api',
-      'websocket javascript',
-      'websocket events',
-      'websocket methods',
-      'websocket properties',
-      'real-time api',
-      'browser websocket',
-      'websocket reference',
-    ]
-  canonical: 'https://websocket.org/reference/websocket-api'
-  ogImage: '/images/websocket-api-reference.png'
+    - websocket api
+    - websocket javascript
+    - websocket events
+    - websocket methods
+    - websocket properties
+    - real-time api
+    - browser websocket
+    - websocket reference
+  canonical: https://websocket.org/reference/websocket-api
+  ogImage: /images/websocket-api-reference.png
 ---
-
 ## Quick Reference
 
 ### Creating a Connection

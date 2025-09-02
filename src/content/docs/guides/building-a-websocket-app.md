@@ -1,13 +1,32 @@
 ---
 title: Building a Web App with WebSockets
-description:
-  Detailed, step-by-step instructions on building a realtime web app with
-  WebSockets and Node.js - an interactive cursor position-sharing demo
+description: Detailed, step-by-step instructions on building a realtime web app with WebSockets and Node.js - an interactive cursor position-sharing demo
+author: Matthew O'Riordan
+date: '2024-09-02'
+category: guide
+seo:
+  keywords:
+    - websocket
+    - tutorial
+    - guide
+    - how-to
+    - building
+    - websockets
+    - javascript
+    - nodejs
+    - java
+    - real-time
+tags:
+  - websocket
+  - guide
+  - tutorial
+  - how-to
 ---
-
 This chapter provides detailed, step-by-step instructions on building a realtime
 web app with WebSockets and Node.js - an interactive cursor position-sharing
-demo.
+demo. Building a WebSocket application from scratch provides valuable insights into the underlying mechanics of real-time communication, helping developers understand the challenges and considerations involved in creating responsive, interactive web experiences.
+
+The cursor-sharing demo we'll build represents a common pattern in modern web applications: real-time collaborative features where multiple users can see each other's actions simultaneously. This type of functionality forms the foundation for more complex collaborative tools like shared whiteboards, collaborative document editing, multiplayer games, and real-time dashboards. Understanding how to implement basic position tracking and broadcasting provides the groundwork for more sophisticated real-time features.
 
 ## Running the Demo
 
@@ -20,6 +39,8 @@ demo.
 This demo includes two applications: a web app that we serve through
 [Snowpack](https://www.snowpack.dev/), and a Node.js web server. The NPM start
 task spins up both the API and the web server.
+
+The architecture follows a typical client-server model where the frontend handles user interactions and cursor position tracking, while the backend manages WebSocket connections and message broadcasting. Snowpack serves as our development server, providing fast builds and hot module replacement for a smooth development experience. The separation between the client application and the WebSocket server demonstrates how real-time functionality can be integrated into existing web applications without requiring a complete architectural overhaul.
 
 The demo should look as depicted below:
 
@@ -39,6 +60,8 @@ This is because the ws library offers no fallback transfer protocols if
 WebSockets are unavailable. If this is a requirement for your project, or you
 want to have a higher level of reliability of delivery for your messages, then
 you will need a library that offers multiple transfer protocols, such as SockJS.
+
+The limitation of native WebSocket implementations highlights an important consideration in real-world application development: not all environments support WebSockets equally. Corporate firewalls, proxy servers, and legacy network infrastructure can block WebSocket connections, while older browsers may lack WebSocket support entirely. This creates a significant reliability gap that can affect user experience in production environments. For applications that need to reach the widest possible audience or operate in restrictive network environments, implementing fallback mechanisms becomes essential rather than optional.
 
 ## SockJS — a JavaScript library to provide WebSocket-like communication
 
@@ -184,6 +207,10 @@ also need to provide a solution for sharing data between the nodes. Connection
 state needs to be stored out-of-process — this usually involves using something
 like [Redis](https://redis.io/), or a traditional database, to ensure that all
 the nodes have the same view of state.
+
+The persistent nature of WebSocket connections creates unique challenges that don't exist with traditional HTTP request-response patterns. Each WebSocket connection maintains state on the server, consuming memory and processing resources even when idle. This stateful nature means that load balancing becomes more complex - you can't simply round-robin requests across servers as you would with stateless HTTP traffic. Instead, you need sticky sessions or more sophisticated routing mechanisms to ensure that clients can maintain their connections and receive all relevant messages.
+
+Moreover, when scaling horizontally, the challenge of message broadcasting becomes exponentially more complex. In our simple cursor-sharing demo, broadcasting a cursor position to all connected clients is straightforward when they're all connected to the same server. However, when clients are distributed across multiple servers, you need a message bus or pub/sub system to ensure that messages from one server reach clients connected to other servers. This inter-server communication adds latency and complexity to your architecture, requiring careful design to maintain the real-time performance that WebSockets are meant to provide.
 
 In addition to having to share state using additional technology, broadcasting
 to all subscribed clients becomes difficult, because any given WebSocketServer
