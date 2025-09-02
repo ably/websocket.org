@@ -419,7 +419,6 @@ Rust provides an excellent platform for building robust, high-performance WebSoc
 
 The examples and patterns presented in this guide demonstrate fundamental concepts that can be extended for more complex use cases. Remember to always handle errors gracefully, implement reconnection logic for clients, and monitor your applications in production for optimal reliability. With Rust's guarantees and the patterns shown here, you can build WebSocket applications that are both performant and maintainable.
 
-
 ## Real-World Performance Considerations
 
 When deploying Rust WebSocket applications in production, the performance benefits become even more apparent under real-world conditions. The absence of garbage collection pauses means that your 99th percentile latencies remain consistently low, a critical factor for real-time applications where user experience degrades noticeably with even small delays. Rust's zero-cost abstractions ensure that high-level code patterns don't introduce hidden performance penalties, allowing developers to write expressive code without sacrificing efficiency.

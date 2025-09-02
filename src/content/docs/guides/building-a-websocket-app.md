@@ -61,7 +61,7 @@ WebSockets are unavailable. If this is a requirement for your project, or you
 want to have a higher level of reliability of delivery for your messages, then
 you will need a library that offers multiple transfer protocols, such as SockJS.
 
-The limitation of native WebSocket implementations highlights an important consideration in real-world application development: not all environments support WebSockets equally. Corporate firewalls, proxy servers, and legacy network infrastructure can block WebSocket connections, while older browsers may lack WebSocket support entirely. This creates a significant reliability gap that can affect user experience in production environments. For applications that need to reach the widest possible audience or operate in restrictive network environments, implementing fallback mechanisms becomes essential rather than optional.
+The limitation of native WebSocket implementations highlights an important consideration in real-world application development: not all environments support WebSockets equally. Corporate firewalls, proxy servers, and legacy network infrastructure can block WebSocket connections, while older browsers may lack WebSocket support entirely. This creates a significant reliability gap that can affect user experience in production environments. For applications that need to reach the widest possible audience or operate in restrictive network environments, implementing fallback mechanisms becomes essential rather than optional. For an analysis of current WebSocket support and whether you still need fallbacks in 2024, see [this detailed evaluation](https://ably.com/blog/websocket-compatibility).
 
 ## SockJS — a JavaScript library to provide WebSocket-like communication
 

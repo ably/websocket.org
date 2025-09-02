@@ -33,7 +33,6 @@ tags:
   - guide
   - how-to
 ---
-# C# and .NET WebSocket Implementation Guide
 
 C# and .NET provide one of the most comprehensive and mature ecosystems for WebSocket development, offering everything from low-level `ClientWebSocket` APIs to high-level frameworks like SignalR. This guide covers the full spectrum of WebSocket implementation in the .NET ecosystem, from simple client-server connections to enterprise-scale real-time applications.
 
@@ -2542,7 +2541,6 @@ With the patterns, practices, and code examples provided in this guide, you have
 - Log performance metrics
 - Implement health checks
 - Use distributed tracing for debugging
-
 
 ## The .NET Advantage for Enterprise WebSocket Solutions
 

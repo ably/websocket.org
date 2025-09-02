@@ -41,7 +41,33 @@ There are two main paths you can take to scale your server layer:
 - **Horizontal scaling**. Also known as scaling out, it involves adding more
   machines to the network, which share the processing workload.
 
-![Vertical and horizontal scaling](../../../assets/guides/vertical-vs-horizontal-scaling.png)
+```
+Vertical Scaling (Scale Up)          Horizontal Scaling (Scale Out)
+                                     
+    ┌─────────────┐                      ┌─────────────┐
+    │   Server    │                      │  Server 1   │
+    │             │                      │             │
+    │  CPU: 2→8   │                      │  CPU: 2     │
+    │  RAM: 8→32  │                      │  RAM: 8GB   │
+    │  Disk: ↑    │                      └─────────────┘
+    │             │                              +
+    │   MORE      │                      ┌─────────────┐
+    │   POWER     │                      │  Server 2   │
+    └─────────────┘                      │             │
+                                         │  CPU: 2     │
+    Single machine                       │  RAM: 8GB   │
+    with upgraded                       └─────────────┘
+    resources                                    +
+                                         ┌─────────────┐
+                                         │  Server 3   │
+                                         │             │
+                                         │  CPU: 2     │
+                                         │  RAM: 8GB   │
+                                         └─────────────┘
+                                         
+                                         Multiple machines
+                                         sharing workload
+```
 _Figure 5.1: Vertical and horizontal scaling_
 
 At first glance, vertical scaling seems attractive, as it's easier to implement
@@ -147,8 +173,35 @@ Sitting between clients and your backend server farm, the load balancer receives
 and then routes incoming connections to available servers capable of handling
 them.
 
-![Load balancing](../../../assets/guides/load-balancing.png) _Figure 5.2: Load
-balancing_
+```
+                        Load Balancing Architecture
+                        
+         Internet/Clients
+                │
+                │  Incoming WebSocket
+                │  Connections
+                ▼
+        ┌───────────────┐
+        │               │
+        │ Load Balancer │  ← Routes connections
+        │               │    based on algorithm
+        └───────┬───────┘    (round-robin, least
+                │            connections, etc.)
+     ┌──────────┼──────────┐
+     │          │          │
+     ▼          ▼          ▼
+┌─────────┐ ┌─────────┐ ┌─────────┐
+│ Server  │ │ Server  │ │ Server  │
+│    1    │ │    2    │ │    3    │
+│         │ │         │ │         │
+│ Active  │ │ Active  │ │ Active  │
+│ Conns:  │ │ Conns:  │ │ Conns:  │
+│  1,250  │ │  1,100  │ │  1,300  │
+└─────────┘ └─────────┘ └─────────┘
+     
+     Backend Server Farm
+```
+_Figure 5.2: Load balancing_
 
 Load balancers detect the health of backend resources and do not send traffic to
 servers that cannot deal with additional load. If a server goes down, the load
@@ -271,7 +324,7 @@ subscribing to relevant channels.
 ![The pub/sub pattern](../../../assets/guides/websockets-pubsub-pattern.png)
 _Figure 5.3: The pub/sub pattern_
 
-Here's a practical implementation of the pub/sub pattern with Redis and WebSockets:
+Here's a practical implementation of the pub/sub pattern with Redis and WebSockets (for a deeper dive into scaling pub/sub with WebSockets and Redis, see [this comprehensive guide](https://ably.com/blog/scaling-pub-sub-with-websockets-and-redis)):
 
 ```javascript
 // Server-side pub/sub implementation using Redis
@@ -368,6 +421,7 @@ Here are some other benefits you gain by using pub/sub:
 - **Ease of development & fast integration**. Pub/sub is agnostic to programming
   language and communication protocol, which enables disparate components of a
   system to be integrated faster compared to legacy alternatives.
+- **Data integrity**. Modern pub/sub platforms ensure message ordering and delivery guarantees. For a deep dive into how data integrity is maintained in production pub/sub systems, see [this technical analysis](https://ably.com/blog/data-integrity-in-ably-pub-sub).
 
 There are numerous projects built with WebSockets and pub/sub, and plenty of
 open-source libraries and commercial solutions combining these two elements, so

@@ -501,7 +501,6 @@ reflected by a variety of client and server options (both open-source and
 commercial), developer ecosystems, and myriad real-life implementations from
 providers like [Ably](https://ably.com/).
 
-
 ## The Browser Wars and JavaScript Renaissance
 
 The period from 2004 to 2009 marked a crucial transformation in web development that would ultimately pave the way for WebSockets. The browser wars between Internet Explorer, Firefox, and the newly arrived Google Chrome drove rapid innovation in JavaScript engines. Chrome's V8 engine, released in 2008, brought unprecedented JavaScript performance that made complex client-side applications feasible for the first time.

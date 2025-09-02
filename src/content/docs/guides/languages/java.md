@@ -32,7 +32,6 @@ tags:
   - guide
   - how-to
 ---
-# Java WebSocket Implementation Guide
 
 WebSockets have revolutionized real-time communication in Java applications, enabling bi-directional, low-latency communication between clients and servers. This comprehensive guide covers everything you need to know about implementing WebSockets in Java, from basic client-server connections to enterprise-grade solutions.
 
@@ -209,7 +208,7 @@ Create a new Maven project with the following `pom.xml` configuration:
 
 For Gradle users, create a `build.gradle` file:
 
-```gradle
+```groovy
 plugins {
     id 'java'
     id 'org.springframework.boot' version '3.2.0'
@@ -2184,7 +2183,6 @@ spec:
 **Solution**: Implement connection pooling and consider horizontal scaling strategies
 
 This comprehensive guide provides everything needed to implement robust, scalable, and secure WebSocket applications in Java. From basic client-server communication to enterprise-grade deployments, these patterns and practices will help you build production-ready real-time applications.
-
 
 ## Java's Maturity Advantage in WebSocket Development
 

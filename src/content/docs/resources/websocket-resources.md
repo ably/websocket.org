@@ -133,7 +133,10 @@ seo:
 - [uWebSockets.js](https://github.com/uNetworking/uWebSockets.js) -
   High-performance WebSocket server
 - [SockJS](https://github.com/sockjs/sockjs-client) - WebSocket emulation with
-  fallbacks
+  fallback
+
+For a comprehensive comparison of the best WebSocket libraries for Node.js, see [this detailed guide](https://ably.com/blog/websocket-libraries-for-node).
+
 - [Reconnecting WebSocket](https://github.com/joewalnes/reconnecting-websocket) -
   Automatic reconnection handling
 
@@ -228,6 +231,8 @@ seo:
   Security best practices
 - [Exponential Backoff in JavaScript](https://advancedweb.hu/exponential-backoff-javascript/) -
   Reconnection strategies
+- [Patterns for Building Realtime Features](https://ably.com/blog/patterns-for-building-realtime-features) -
+  Architectural patterns and best practices
 
 ### Architecture & Scaling
 
