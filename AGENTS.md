@@ -13,8 +13,22 @@ This is an Astro-based static site with strict quality standards.
 npm run lint        # Check for linting issues
 npm run lint:fix    # Auto-fix what's possible
 npm run format      # Format code
+npm run dev         # Test changes in dev server
 npm test           # Run tests if applicable
 ```
+
+### Testing Infrastructure Guides
+
+When creating or modifying infrastructure guides:
+
+1. **Run prettier on all files:**
+   `npx prettier --write "src/content/docs/guides/infrastructure/**/*.md"`
+2. **Run markdownlint:**
+   `npx markdownlint src/content/docs/guides/infrastructure/**/*.md --fix`
+3. **Verify navigation:** Check astro.config.mjs includes new guides in sidebar
+4. **Test in dev server:** Ensure all pages load correctly and navigation works
+5. **Check code blocks:** Verify all code examples have proper language
+   specifiers
 
 ## Known Issues & Solutions
 
