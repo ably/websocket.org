@@ -45,6 +45,19 @@ export default defineConfig({
                 { label: 'Kubernetes Ingress', link: '/guides/infrastructure/kubernetes/' },
               ],
             },
+            {
+              label: 'Languages',
+              collapsed: true,
+              items: [
+                { label: 'JavaScript & Node.js', link: '/guides/languages/javascript/' },
+                { label: 'Python', link: '/guides/languages/python/' },
+                { label: 'Go', link: '/guides/languages/go/' },
+                { label: 'Rust', link: '/guides/languages/rust/' },
+                { label: 'Java', link: '/guides/languages/java/' },
+                { label: 'C# & .NET', link: '/guides/languages/csharp/' },
+                { label: 'PHP', link: '/guides/languages/php/' },
+              ],
+            },
           ],
         },
         {
