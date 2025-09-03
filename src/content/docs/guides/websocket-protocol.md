@@ -1,6 +1,10 @@
 ---
 title: The Websocket Protocol
-description: Key considerations related to the WebSocket protocol. You'll find out how to establish a WebSocket connection and exchange messages, what kind of data can be sent over WebSockets, what types of extensions and subprotocols you can use to augment WebSockets
+description:
+  Key considerations related to the WebSocket protocol. You'll find out how to
+  establish a WebSocket connection and exchange messages, what kind of data can
+  be sent over WebSockets, what types of extensions and subprotocols you can use
+  to augment WebSockets
 author: Matthew O'Riordan
 date: '2024-09-02'
 category: guide
@@ -25,6 +29,7 @@ tags:
   - rfc6455
   - specification
 ---
+
 In December 2011, the Internet Engineering Task Force (IETF) standardized the
 WebSocket protocol through [RFC 6455](https://tools.ietf.org/html/rfc6455). In
 coordination with IETF, the Internet Assigned Numbers Authority (IANA) maintains
@@ -32,7 +37,7 @@ the
 [WebSocket Protocol Registries](https://www.iana.org/assignments/websocket/websocket.xml),
 which define many of the codes and parameter identifiers used by the protocol.
 
-This chapter covers key considerations related to the
+This article covers key considerations related to the
 [WebSocket protocol](https://ably.com/topic/websockets), as described in
 RFC 6455. You'll find out how to establish a WebSocket connection and exchange
 messages, what kind of data can be sent over WebSockets, what types of

@@ -1,6 +1,9 @@
 ---
 title: The Road to WebSockets
-description: A look at how web technologies evolved since the inception of the World Wide `Web``, culminating with the emergence of WebSockets, a vastly superior improvement on HTTP for building realtime web apps.
+description:
+  A look at how web technologies evolved since the inception of the World Wide
+  `Web``, culminating with the emergence of WebSockets, a vastly superior
+  improvement on HTTP for building realtime web apps.
 author: Matthew O'Riordan
 date: '2024-09-02'
 category: guide
@@ -22,6 +25,7 @@ tags:
   - tutorial
   - how-to
 ---
+
 > During the 1990s, the web rapidly grew into the dominant way to exchange
 > information. Increasing numbers of users became accustomed to the experience
 > of browsing the web, while browser providers constantly released new features
@@ -33,11 +37,29 @@ that time, the realtime web was difficult to achieve and slower than we're used
 to nowadays; it was delivered by hacking existing HTTP-based technologies that
 were not designed and optimized for realtime applications.
 
-The challenge was significant. Developers were essentially forcing a protocol designed for document retrieval to handle continuous, bidirectional communication. This fundamental mismatch created numerous problems: excessive server resource consumption, unpredictable latency, and complex implementation patterns that were prone to failure. Early pioneers in this space had to develop creative workarounds, often involving multiple concurrent HTTP connections, complex state management systems, and sophisticated client-side buffering mechanisms to create the illusion of real-time communication.
+The challenge was significant. Developers were essentially forcing a protocol
+designed for document retrieval to handle continuous, bidirectional
+communication. This fundamental mismatch created numerous problems: excessive
+server resource consumption, unpredictable latency, and complex implementation
+patterns that were prone to failure. Early pioneers in this space had to develop
+creative workarounds, often involving multiple concurrent HTTP connections,
+complex state management systems, and sophisticated client-side buffering
+mechanisms to create the illusion of real-time communication.
 
-These early attempts at real-time web functionality were characterized by high complexity and low reliability. Companies like Google, with their Gmail and Google Maps applications, invested heavily in overcoming these limitations, but the solutions remained fragile and resource-intensive. The technical debt accumulated from these workarounds often made applications harder to maintain and scale, creating a clear need for a purpose-built solution.
+These early attempts at real-time web functionality were characterized by high
+complexity and low reliability. Companies like Google, with their Gmail and
+Google Maps applications, invested heavily in overcoming these limitations, but
+the solutions remained fragile and resource-intensive. The technical debt
+accumulated from these workarounds often made applications harder to maintain
+and scale, creating a clear need for a purpose-built solution.
 
-It quickly became obvious that a better alternative was needed. The web development community began recognizing that the future of interactive applications required a protocol designed from the ground up for bidirectional, low-latency communication. In this first chapter, we'll look at how web technologies evolved, culminating with the emergence of [WebSockets](https://ably.com/topic/websockets), a vastly superior improvement on HTTP for building realtime web apps.
+It quickly became obvious that a better alternative was needed. The web
+development community began recognizing that the future of interactive
+applications required a protocol designed from the ground up for bidirectional,
+low-latency communication. In this article, we'll look at how web technologies
+evolved, culminating with the emergence of
+[WebSockets](https://ably.com/topic/websockets), a vastly superior improvement
+on HTTP for building realtime web apps.
 
 ## The World Wide Web is born
 
@@ -47,7 +69,14 @@ was to access information stored on different computers (and, on top of that,
 running different types of software). This prompted Berners-Lee to develop a
 project called "WorldWideWeb".
 
-The problem Berners-Lee faced was more than just technical inconvenience—it was a fundamental barrier to scientific collaboration and knowledge sharing. At CERN, researchers were using various incompatible computer systems, each with their own file formats, networking protocols, and information retrieval methods. This fragmentation meant that valuable research data and documentation were effectively siloed, making cross-team collaboration cumbersome and inefficient. The existing solutions, such as file transfer protocols and email attachments, were inadequate for the scale and complexity of modern scientific research.
+The problem Berners-Lee faced was more than just technical inconvenience—it was
+a fundamental barrier to scientific collaboration and knowledge sharing. At
+CERN, researchers were using various incompatible computer systems, each with
+their own file formats, networking protocols, and information retrieval methods.
+This fragmentation meant that valuable research data and documentation were
+effectively siloed, making cross-team collaboration cumbersome and inefficient.
+The existing solutions, such as file transfer protocols and email attachments,
+were inadequate for the scale and complexity of modern scientific research.
 
 The project proposed a "web" of hypertext documents, which could be viewed by
 browsers over the internet using a client-server architecture. The web had the
@@ -55,10 +84,20 @@ potential to connect the world in a way that was not previously possible, and
 made it much easier for people everywhere to get information, share, and
 communicate.
 
-The revolutionary aspect of Berners-Lee's vision was not just the technology itself, but the philosophical approach: universal accessibility. Unlike proprietary systems that required specific software or hardware, the web was designed to be platform-agnostic and vendor-neutral. This democratization of information access would prove to be one of the web's most transformative characteristics, enabling a level of global information sharing that had never before been possible in human history.
+The revolutionary aspect of Berners-Lee's vision was not just the technology
+itself, but the philosophical approach: universal accessibility. Unlike
+proprietary systems that required specific software or hardware, the web was
+designed to be platform-agnostic and vendor-neutral. This democratization of
+information access would prove to be one of the web's most transformative
+characteristics, enabling a level of global information sharing that had never
+before been possible in human history.
 
-Initially used at CERN, the web was soon made available to the
-world, with the first websites for everyday use starting to appear in 1993-1994. The transition from internal research tool to global phenomenon was remarkably rapid, driven by the decision to make the web royalty-free and open to all. This open approach contrasted sharply with other emerging network technologies of the time, many of which were proprietary and required licensing fees.
+Initially used at CERN, the web was soon made available to the world, with the
+first websites for everyday use starting to appear in 1993-1994. The transition
+from internal research tool to global phenomenon was remarkably rapid, driven by
+the decision to make the web royalty-free and open to all. This open approach
+contrasted sharply with other emerging network technologies of the time, many of
+which were proprietary and required licensing fees.
 
 Berners-Lee managed to create the web by combining two existing technologies:
 hypertext and the internet. In the process, he developed three core building
@@ -89,9 +128,22 @@ The hypertext-only response was extremely simple as well:
 There were no HTTP headers, status codes, URLs, or versioning, and the
 connection was terminated immediately after receiving the response.
 
-The simplicity of HTTP/0.9 was both its strength and its limitation. On one hand, the minimalist design made it easy to implement and understand, contributing to rapid adoption across different systems and platforms. The protocol could be implemented with basic networking knowledge, making it accessible to a wide range of developers and system administrators. This simplicity was crucial for the early growth of the web, as it lowered the barrier to entry for creating web servers and clients.
+The simplicity of HTTP/0.9 was both its strength and its limitation. On one
+hand, the minimalist design made it easy to implement and understand,
+contributing to rapid adoption across different systems and platforms. The
+protocol could be implemented with basic networking knowledge, making it
+accessible to a wide range of developers and system administrators. This
+simplicity was crucial for the early growth of the web, as it lowered the
+barrier to entry for creating web servers and clients.
 
-However, the lack of metadata and status information created significant challenges as web usage grew more sophisticated. Without status codes, clients couldn't distinguish between successful requests and various types of failures. The absence of headers meant no way to specify content types, encoding, or caching instructions. The immediate connection termination after each response made the protocol inefficient for serving multiple resources from the same server, as each request required a new TCP connection with its associated overhead.
+However, the lack of metadata and status information created significant
+challenges as web usage grew more sophisticated. Without status codes, clients
+couldn't distinguish between successful requests and various types of failures.
+The absence of headers meant no way to specify content types, encoding, or
+caching instructions. The immediate connection termination after each response
+made the protocol inefficient for serving multiple resources from the same
+server, as each request required a new TCP connection with its associated
+overhead.
 
 Since interest in the web was skyrocketing, and with HTTP/0.9 being severely
 limited, both browsers and servers quickly made the protocol more versatile by
@@ -136,22 +188,46 @@ Microsoft's Internet Explorer against Netscape's Navigator. Both companies
 wanted to have the best browser, so features and capabilities were inevitably
 added on a regular basis to their browsers.
 
-This competitive environment created a unique dynamic in web development history. Unlike many technological standards that emerge from careful committee processes, many web technologies were born from rapid innovation cycles driven by commercial competition. Browser vendors would implement experimental features, sometimes without formal standardization, leading to fragmentation but also rapid innovation. This period saw the introduction of features like frames, cookies, stylesheets, and dynamic content manipulation—many of which would later become fundamental web technologies.
+This competitive environment created a unique dynamic in web development
+history. Unlike many technological standards that emerge from careful committee
+processes, many web technologies were born from rapid innovation cycles driven
+by commercial competition. Browser vendors would implement experimental
+features, sometimes without formal standardization, leading to fragmentation but
+also rapid innovation. This period saw the introduction of features like frames,
+cookies, stylesheets, and dynamic content manipulation—many of which would later
+become fundamental web technologies.
 
-The intense competition also drove browser performance improvements and user experience innovations. Each browser vendor sought to differentiate their product through faster page loading, better rendering quality, and more sophisticated user interfaces. This competitive pressure accelerated web technology development in ways that might have taken decades under purely academic or standards-committee-driven approaches.
+The intense competition also drove browser performance improvements and user
+experience innovations. Each browser vendor sought to differentiate their
+product through faster page loading, better rendering quality, and more
+sophisticated user interfaces. This competitive pressure accelerated web
+technology development in ways that might have taken decades under purely
+academic or standards-committee-driven approaches.
 
-This competition for supremacy was a catalyst for fast technological breakthroughs. In 1995, Netscape hired Brendan
-Eich with the goal of embedding scripting capabilities into their Netscape
-Navigator browser. Thus, JavaScript was born. The first version of the language
-was simple, and you could only use it for a few things, such as basic validation
-of input fields before submitting an HTML form to the server.
+This competition for supremacy was a catalyst for fast technological
+breakthroughs. In 1995, Netscape hired Brendan Eich with the goal of embedding
+scripting capabilities into their Netscape Navigator browser. Thus, JavaScript
+was born. The first version of the language was simple, and you could only use
+it for a few things, such as basic validation of input fields before submitting
+an HTML form to the server.
 
-The creation of JavaScript represents one of the most significant moments in web history, though it happened under extraordinary time pressure. Eich famously created the first version of JavaScript in just ten days, working under the constraint that it needed to resemble Java syntactically (for marketing reasons) while being simple enough for web designers to use. The language incorporated influences from Scheme (functional programming concepts), Self (prototype-based object orientation), and Java (syntax and some semantics).
+The creation of JavaScript represents one of the most significant moments in web
+history, though it happened under extraordinary time pressure. Eich famously
+created the first version of JavaScript in just ten days, working under the
+constraint that it needed to resemble Java syntactically (for marketing reasons)
+while being simple enough for web designers to use. The language incorporated
+influences from Scheme (functional programming concepts), Self (prototype-based
+object orientation), and Java (syntax and some semantics).
 
-Limited as it was back then, JavaScript brought dynamic experiences to a web that had been fully
-static until that point. Progressively, JavaScript was enhanced, standardized,
-and adopted by all browsers, becoming one of the core technologies of the web as
-we know it today. The evolution of JavaScript from a simple form validation tool to a powerful programming language capable of building complex applications represents one of the most remarkable transformations in computing history, setting the stage for the interactive, dynamic web applications that would later necessitate technologies like WebSockets.
+Limited as it was back then, JavaScript brought dynamic experiences to a web
+that had been fully static until that point. Progressively, JavaScript was
+enhanced, standardized, and adopted by all browsers, becoming one of the core
+technologies of the web as we know it today. The evolution of JavaScript from a
+simple form validation tool to a powerful programming language capable of
+building complex applications represents one of the most remarkable
+transformations in computing history, setting the stage for the interactive,
+dynamic web applications that would later necessitate technologies like
+WebSockets.
 
 ## Hatching the realtime web
 
@@ -161,13 +237,30 @@ users were growing accustomed to the whole experience. Web technologies were
 constantly evolving, and soon, attempts were made to deliver realtime web apps
 with rich, interactive, and responsive end-user experiences.
 
-The transition from static websites to dynamic web applications represented a fundamental shift in how people interacted with the web. Early web applications like Hotmail, Yahoo Mail, and online banking systems demonstrated that the browser could serve as a platform for sophisticated applications, not just document viewing. This paradigm shift created new user expectations: people began expecting immediate feedback, dynamic updates, and interactive experiences similar to desktop applications.
+The transition from static websites to dynamic web applications represented a
+fundamental shift in how people interacted with the web. Early web applications
+like Hotmail, Yahoo Mail, and online banking systems demonstrated that the
+browser could serve as a platform for sophisticated applications, not just
+document viewing. This paradigm shift created new user expectations: people
+began expecting immediate feedback, dynamic updates, and interactive experiences
+similar to desktop applications.
 
-However, creating truly responsive web applications within the constraints of HTTP proved challenging. The stateless, request-response nature of HTTP meant that any user interaction requiring server-side processing resulted in a full page reload, creating a jarring user experience. Developers had to be creative in working around these limitations, leading to techniques like hidden iframes and complex form submission patterns to minimize the impact of page reloads.
+However, creating truly responsive web applications within the constraints of
+HTTP proved challenging. The stateless, request-response nature of HTTP meant
+that any user interaction requiring server-side processing resulted in a full
+page reload, creating a jarring user experience. Developers had to be creative
+in working around these limitations, leading to techniques like hidden iframes
+and complex form submission patterns to minimize the impact of page reloads.
 
-The demand for more interactive experiences was also driven by the increasing sophistication of desktop applications during this period. Users were accustomed to immediate responsiveness in applications like Microsoft Office, and they naturally expected similar behavior from web applications. This expectation gap drove innovation in web development techniques and ultimately contributed to the need for new communication protocols.
+The demand for more interactive experiences was also driven by the increasing
+sophistication of desktop applications during this period. Users were accustomed
+to immediate responsiveness in applications like Microsoft Office, and they
+naturally expected similar behavior from web applications. This expectation gap
+drove innovation in web development techniques and ultimately contributed to the
+need for new communication protocols.
 
-We will now look at the main HTTP-centric design models that emerged for developing realtime apps: AJAX and Comet.
+We will now look at the main HTTP-centric design models that emerged for
+developing realtime apps: AJAX and Comet.
 
 ## AJAX
 
@@ -215,16 +308,36 @@ building truly dynamic, asynchronous, realtime-like web applications that could
 communicate with the server silently in the background, without interrupting the
 user's browsing experience.
 
-The transformative impact of AJAX cannot be overstated. Before AJAX, every user interaction that required server-side processing meant a complete page refresh, destroying the user's context and creating a disjointed experience. AJAX fundamentally changed this by enabling partial page updates, where only the relevant portions of a webpage needed to be refreshed while maintaining the overall page state and user context.
+The transformative impact of AJAX cannot be overstated. Before AJAX, every user
+interaction that required server-side processing meant a complete page refresh,
+destroying the user's context and creating a disjointed experience. AJAX
+fundamentally changed this by enabling partial page updates, where only the
+relevant portions of a webpage needed to be refreshed while maintaining the
+overall page state and user context.
 
-This capability enabled entirely new categories of web applications. Suddenly, developers could create interfaces that felt responsive and fluid, similar to desktop applications. Features like autocomplete search suggestions, real-time form validation, dynamic content loading, and seamless user interfaces became possible. The technology also enabled more sophisticated user interactions, such as drag-and-drop functionality and in-place editing, which had previously been impossible or extremely cumbersome with traditional HTTP approaches.
+This capability enabled entirely new categories of web applications. Suddenly,
+developers could create interfaces that felt responsive and fluid, similar to
+desktop applications. Features like autocomplete search suggestions, real-time
+form validation, dynamic content loading, and seamless user interfaces became
+possible. The technology also enabled more sophisticated user interactions, such
+as drag-and-drop functionality and in-place editing, which had previously been
+impossible or extremely cumbersome with traditional HTTP approaches.
 
-Google was among the first to adopt the AJAX model
-in the mid-2000s, initially using it for Google Suggest, and its Gmail and
-Google Maps products. Google's implementation of AJAX in these applications demonstrated the technology's potential to mainstream audiences for the first time. Gmail, in particular, showed that web applications could rival desktop applications in terms of functionality and user experience. Google Maps revolutionized how people interacted with geographic data, enabling smooth panning and zooming without page reloads, fundamentally changing user expectations for web-based mapping applications.
+Google was among the first to adopt the AJAX model in the mid-2000s, initially
+using it for Google Suggest, and its Gmail and Google Maps products. Google's
+implementation of AJAX in these applications demonstrated the technology's
+potential to mainstream audiences for the first time. Gmail, in particular,
+showed that web applications could rival desktop applications in terms of
+functionality and user experience. Google Maps revolutionized how people
+interacted with geographic data, enabling smooth panning and zooming without
+page reloads, fundamentally changing user expectations for web-based mapping
+applications.
 
-This sparked widespread interest in AJAX, which quickly
-became popular and heavily used. The success of Google's AJAX-powered applications created a ripple effect throughout the web development community, inspiring countless developers and companies to explore similar approaches and pushing the boundaries of what was possible with web technologies.
+This sparked widespread interest in AJAX, which quickly became popular and
+heavily used. The success of Google's AJAX-powered applications created a ripple
+effect throughout the web development community, inspiring countless developers
+and companies to explore similar approaches and pushing the boundaries of what
+was possible with web technologies.
 
 ## Comet
 
@@ -503,14 +616,42 @@ providers like [Ably](https://ably.com/).
 
 ## The Browser Wars and JavaScript Renaissance
 
-The period from 2004 to 2009 marked a crucial transformation in web development that would ultimately pave the way for WebSockets. The browser wars between Internet Explorer, Firefox, and the newly arrived Google Chrome drove rapid innovation in JavaScript engines. Chrome's V8 engine, released in 2008, brought unprecedented JavaScript performance that made complex client-side applications feasible for the first time.
+The period from 2004 to 2009 marked a crucial transformation in web development
+that would ultimately pave the way for WebSockets. The browser wars between
+Internet Explorer, Firefox, and the newly arrived Google Chrome drove rapid
+innovation in JavaScript engines. Chrome's V8 engine, released in 2008, brought
+unprecedented JavaScript performance that made complex client-side applications
+feasible for the first time.
 
-This performance revolution coincided with the rise of Web 2.0 and social media platforms that demanded real-time updates. Facebook's chat, Twitter's live feed, and Google's collaborative tools all pushed the boundaries of what was possible with existing technologies. Developers were increasingly frustrated with the limitations of polling and long-polling techniques, which consumed excessive bandwidth and server resources while still failing to deliver truly instantaneous updates.
+This performance revolution coincided with the rise of Web 2.0 and social media
+platforms that demanded real-time updates. Facebook's chat, Twitter's live feed,
+and Google's collaborative tools all pushed the boundaries of what was possible
+with existing technologies. Developers were increasingly frustrated with the
+limitations of polling and long-polling techniques, which consumed excessive
+bandwidth and server resources while still failing to deliver truly
+instantaneous updates.
 
-The developer community's response to these challenges was remarkable. Libraries like jQuery simplified cross-browser compatibility issues, while frameworks like Prototype and MooTools pushed the boundaries of what JavaScript could do. This period of experimentation and innovation created a fertile ground for new standards. Developers were ready for a better solution, browsers were capable of supporting it, and the use cases were clear and compelling.
+The developer community's response to these challenges was remarkable. Libraries
+like jQuery simplified cross-browser compatibility issues, while frameworks like
+Prototype and MooTools pushed the boundaries of what JavaScript could do. This
+period of experimentation and innovation created a fertile ground for new
+standards. Developers were ready for a better solution, browsers were capable of
+supporting it, and the use cases were clear and compelling.
 
 ## The Perfect Storm for WebSocket Adoption
 
-Several factors converged to create the perfect environment for WebSocket adoption. Mobile devices were becoming increasingly prevalent, and their limited bandwidth and battery life made efficient real-time communication essential. The rise of HTML5 provided a standards-based platform for rich web applications. Cloud computing made it easier to deploy and scale real-time services. These technological shifts, combined with user expectations shaped by native mobile apps, created an urgent need for better real-time web technologies.
+Several factors converged to create the perfect environment for WebSocket
+adoption. Mobile devices were becoming increasingly prevalent, and their limited
+bandwidth and battery life made efficient real-time communication essential. The
+rise of HTML5 provided a standards-based platform for rich web applications.
+Cloud computing made it easier to deploy and scale real-time services. These
+technological shifts, combined with user expectations shaped by native mobile
+apps, created an urgent need for better real-time web technologies.
 
-The standardization process itself was remarkably smooth compared to many web standards. The WebSocket protocol was designed with clear goals: simplicity, efficiency, and compatibility with existing web infrastructure. The decision to use HTTP for the initial handshake was brilliant, allowing WebSockets to work with existing proxies and firewalls while still providing the benefits of a persistent connection. This pragmatic approach to design helped ensure rapid adoption across browsers and servers.
+The standardization process itself was remarkably smooth compared to many web
+standards. The WebSocket protocol was designed with clear goals: simplicity,
+efficiency, and compatibility with existing web infrastructure. The decision to
+use HTTP for the initial handshake was brilliant, allowing WebSockets to work
+with existing proxies and firewalls while still providing the benefits of a
+persistent connection. This pragmatic approach to design helped ensure rapid
+adoption across browsers and servers.
