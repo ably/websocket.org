@@ -1,0 +1,1665 @@
+---
+title: WebSocket Security Hardening Guide
+description:
+  Comprehensive guide to securing WebSocket connections including CSWSH
+  prevention, authentication strategies, TLS configuration, compression
+  vulnerabilities, rate limiting, and input validation
+keywords:
+  [
+    websocket security,
+    websocket authentication,
+    CSWSH,
+    websocket TLS,
+    websocket vulnerabilities,
+    websocket rate limiting,
+    websocket CSRF,
+  ]
+sidebar:
+  order: 7
+  label: Security
+author: Matthew O'Riordan
+role: Co-founder & CEO, Ably
+date: 2025-09-01
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+WebSocket connections face unique security challenges that differ from
+traditional HTTP requests. This comprehensive guide covers all aspects of
+securing WebSocket implementations, from preventing common attacks to
+implementing robust authentication and rate limiting.
+
+## Critical Security Checklist
+
+<Card title="🛡️ Essential Security Measures">
+
+Before deploying WebSocket applications to production, ensure you have:
+
+- ✅ **TLS/SSL encryption** (wss:// protocol only)
+- ✅ **Origin validation** to prevent CSWSH attacks
+- ✅ **Authentication** during handshake or immediately after
+- ✅ **Input validation** for all messages
+- ✅ **Rate limiting** per connection and globally
+- ✅ **Message size limits** to prevent DoS
+- ✅ **Timeout mechanisms** for idle connections
+- ✅ **Security headers** configured properly
+- ✅ **Logging and monitoring** for suspicious activity
+- ✅ **Regular security updates** for WebSocket libraries
+
+</Card>
+
+## Cross-Site WebSocket Hijacking (CSWSH)
+
+### Understanding CSWSH Attacks
+
+Cross-Site WebSocket Hijacking occurs when a malicious website establishes a
+WebSocket connection to your server using a victim's credentials (cookies).
+Unlike traditional CSRF, WebSocket connections can maintain persistent
+bidirectional communication.
+
+### Attack Vector Explanation
+
+```javascript
+// Malicious website's code
+const ws = new WebSocket('wss://vulnerable-site.com/socket');
+
+// This connection includes the user's cookies for vulnerable-site.com
+// allowing the attacker to impersonate the authenticated user
+
+ws.onopen = () => {
+  // Attacker can now send commands as the victim
+  ws.send(
+    JSON.stringify({
+      action: 'transfer_funds',
+      amount: 10000,
+      to: 'attacker@evil.com',
+    })
+  );
+};
+
+ws.onmessage = (event) => {
+  // Attacker receives the victim's private data
+  sendToAttackerServer(event.data);
+};
+```
+
+### Origin Validation Implementation
+
+<Tabs>
+<TabItem label="Node.js">
+```javascript
+const WebSocket = require('ws');
+const url = require('url');
+
+const wss = new WebSocket.Server({ port: 8080, verifyClient: (info, cb) => {
+const origin = info.origin || info.req.headers.origin; const allowedOrigins = [
+'https://example.com', 'https://app.example.com', 'http://localhost:3000' //
+Development only ];
+
+    if (allowedOrigins.includes(origin)) {
+      cb(true);
+    } else {
+      console.warn(`Rejected connection from origin: ${origin}`);
+      cb(false, 403, 'Forbidden');
+    }
+
+} });
+
+// Additional validation after connection wss.on('connection', (ws, req) => {
+const origin = req.headers.origin;
+
+// Double-check origin even after verifyClient if (!isOriginAllowed(origin)) {
+ws.close(1008, 'Origin not allowed'); return; }
+
+// Continue with authenticated connection setupAuthenticatedConnection(ws, req);
+});
+
+```
+</TabItem>
+<TabItem label="Python">
+```python
+from aiohttp import web
+import aiohttp_cors
+
+async def websocket_handler(request):
+    # Check origin header
+    origin = request.headers.get('Origin')
+    allowed_origins = {
+        'https://example.com',
+        'https://app.example.com'
+    }
+
+    if origin not in allowed_origins:
+        return web.Response(status=403, text='Forbidden')
+
+    ws = web.WebSocketResponse()
+    await ws.prepare(request)
+
+    # Additional security checks
+    if not await authenticate_user(request):
+        await ws.close(code=1008, message=b'Authentication failed')
+        return ws
+
+    async for msg in ws:
+        # Process messages
+        await process_message(msg)
+
+    return ws
+```
+
+</TabItem>
+<TabItem label="Go">
+```go
+import (
+    "net/http"
+    "github.com/gorilla/websocket"
+)
+
+var upgrader = websocket.Upgrader{ CheckOrigin: func(r \*http.Request) bool {
+origin := r.Header.Get("Origin") allowedOrigins := map[string]bool{
+"https://example.com": true, "https://app.example.com": true, }
+
+        if !allowedOrigins[origin] {
+            log.Printf("Rejected origin: %s", origin)
+            return false
+        }
+
+        return true
+    },
+
+}
+
+func handleWebSocket(w http.ResponseWriter, r \*http.Request) { // Additional
+CSRF token validation csrfToken := r.Header.Get("X-CSRF-Token") if
+!validateCSRFToken(csrfToken, r) { http.Error(w, "Invalid CSRF token",
+http.StatusForbidden) return }
+
+    conn, err := upgrader.Upgrade(w, r, nil)
+    if err != nil {
+        log.Print("upgrade failed: ", err)
+        return
+    }
+    defer conn.Close()
+
+    // Handle connection
+
+}
+
+```
+</TabItem>
+</Tabs>
+
+### CORS Considerations
+
+```javascript
+// Configure CORS headers for WebSocket endpoints
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  if (isWebSocketEndpoint(req.path)) {
+    // Strict origin checking for WebSocket endpoints
+    if (allowedOrigins.includes(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    } else {
+      // Don't set CORS headers for unauthorized origins
+      return res.status(403).end();
+    }
+  }
+
+  next();
+});
+```
+
+### Testing CSWSH Vulnerabilities
+
+```javascript
+// Test script to verify CSWSH protection
+async function testCSWSH() {
+  const testCases = [
+    { origin: 'https://evil.com', shouldFail: true },
+    { origin: 'https://example.com', shouldFail: false },
+    { origin: null, shouldFail: true },
+    { origin: 'file://', shouldFail: true },
+  ];
+
+  for (const test of testCases) {
+    try {
+      const ws = new WebSocket('wss://your-server.com/socket', {
+        headers: { Origin: test.origin },
+      });
+
+      await new Promise((resolve, reject) => {
+        ws.on('open', () => {
+          if (test.shouldFail) {
+            reject(
+              new Error(
+                `Connection should have failed for origin: ${test.origin}`
+              )
+            );
+          }
+          resolve();
+        });
+
+        ws.on('error', () => {
+          if (!test.shouldFail) {
+            reject(
+              new Error(
+                `Connection should have succeeded for origin: ${test.origin}`
+              )
+            );
+          }
+          resolve();
+        });
+      });
+    } catch (error) {
+      console.log(`Test case failed: ${error.message}`);
+    }
+  }
+}
+```
+
+## Authentication Strategies
+
+For a comprehensive overview of WebSocket authentication methods and best practices, see [this essential guide to WebSocket authentication](https://ably.com/blog/websocket-authentication).
+
+### JWT Token Authentication
+
+<Tabs>
+<TabItem label="Initial Handshake">
+```javascript
+// Client-side: Include JWT in connection URL
+const token = localStorage.getItem('jwt');
+const ws = new WebSocket(`wss://api.example.com/socket?token=${token}`);
+
+// Server-side: Validate during handshake const jwt = require('jsonwebtoken');
+
+const wss = new WebSocket.Server({ verifyClient: (info, cb) => { const token =
+getTokenFromURL(info.req.url);
+
+    if (!token) {
+      cb(false, 401, 'Unauthorized');
+      return;
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+      if (err) {
+        cb(false, 401, 'Unauthorized');
+      } else {
+        info.req.userId = decoded.userId;
+        cb(true);
+      }
+    });
+
+} });
+
+```
+</TabItem>
+<TabItem label="Post-Connection Auth">
+```javascript
+// Client-side: Send token after connection
+ws.onopen = () => {
+  ws.send(JSON.stringify({
+    type: 'auth',
+    token: localStorage.getItem('jwt')
+  }));
+};
+
+// Server-side: Authenticate after connection
+wss.on('connection', (ws, req) => {
+  let authenticated = false;
+  let authTimeout;
+
+  // Give client 5 seconds to authenticate
+  authTimeout = setTimeout(() => {
+    if (!authenticated) {
+      ws.close(1008, 'Authentication timeout');
+    }
+  }, 5000);
+
+  ws.on('message', async (data) => {
+    const message = JSON.parse(data);
+
+    if (!authenticated) {
+      if (message.type === 'auth') {
+        try {
+          const decoded = jwt.verify(message.token, process.env.JWT_SECRET);
+          authenticated = true;
+          ws.userId = decoded.userId;
+          clearTimeout(authTimeout);
+
+          ws.send(JSON.stringify({
+            type: 'auth_success',
+            userId: decoded.userId
+          }));
+        } catch (err) {
+          ws.close(1008, 'Authentication failed');
+        }
+      } else {
+        ws.close(1008, 'Must authenticate first');
+      }
+    } else {
+      // Handle authenticated messages
+      await handleAuthenticatedMessage(ws, message);
+    }
+  });
+});
+```
+
+</TabItem>
+</Tabs>
+
+### Token Refresh Patterns
+
+```javascript
+class SecureWebSocketClient {
+  constructor(url, getToken, refreshToken) {
+    this.url = url;
+    this.getToken = getToken;
+    this.refreshToken = refreshToken;
+    this.connect();
+  }
+
+  async connect() {
+    const token = await this.getToken();
+    this.ws = new WebSocket(`${this.url}?token=${token}`);
+
+    this.ws.onmessage = async (event) => {
+      const message = JSON.parse(event.data);
+
+      if (message.type === 'token_expired') {
+        // Refresh token and reconnect
+        const newToken = await this.refreshToken();
+        this.ws.close(1000);
+        this.connect();
+      } else {
+        this.handleMessage(message);
+      }
+    };
+
+    // Proactively refresh token before expiry
+    this.scheduleTokenRefresh();
+  }
+
+  scheduleTokenRefresh() {
+    const token = this.getToken();
+    const decoded = jwt.decode(token);
+    const expiresIn = decoded.exp * 1000 - Date.now();
+    const refreshTime = expiresIn - 60000; // Refresh 1 minute before expiry
+
+    setTimeout(async () => {
+      const newToken = await this.refreshToken();
+      this.ws.send(
+        JSON.stringify({
+          type: 'refresh_token',
+          token: newToken,
+        })
+      );
+      this.scheduleTokenRefresh();
+    }, refreshTime);
+  }
+}
+```
+
+### Cookie-Based Authentication
+
+```javascript
+// Server configuration for cookie authentication
+const session = require('express-session');
+const WebSocket = require('ws');
+
+// Configure session middleware
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: true, // HTTPS only
+      httpOnly: true,
+      sameSite: 'strict', // CSRF protection
+      maxAge: 86400000, // 24 hours
+    },
+  })
+);
+
+// WebSocket server with session parsing
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ noServer: true });
+
+server.on('upgrade', (request, socket, head) => {
+  // Parse session from cookie
+  session(request, {}, () => {
+    if (!request.session || !request.session.userId) {
+      socket.write('HTTP/1.1 401 Unauthorized\r\n\r\n');
+      socket.destroy();
+      return;
+    }
+
+    wss.handleUpgrade(request, socket, head, (ws) => {
+      ws.userId = request.session.userId;
+      wss.emit('connection', ws, request);
+    });
+  });
+});
+```
+
+### Custom Header Authentication
+
+```javascript
+// Note: Custom headers cannot be set in browser WebSocket API
+// This approach works for server-to-server or native applications
+
+// Server-side validation
+const wss = new WebSocket.Server({
+  verifyClient: (info, cb) => {
+    const apiKey = info.req.headers['x-api-key'];
+    const signature = info.req.headers['x-signature'];
+
+    if (!apiKey || !signature) {
+      cb(false, 401, 'Missing authentication headers');
+      return;
+    }
+
+    // Verify API key and signature
+    if (!verifyApiKey(apiKey) || !verifySignature(signature, info.req)) {
+      cb(false, 401, 'Invalid credentials');
+      return;
+    }
+
+    cb(true);
+  },
+});
+
+// Client-side (Node.js)
+const WebSocket = require('ws');
+const crypto = require('crypto');
+
+function createSecureConnection(url, apiKey, secret) {
+  const timestamp = Date.now();
+  const signature = crypto
+    .createHmac('sha256', secret)
+    .update(`${apiKey}:${timestamp}`)
+    .digest('hex');
+
+  const ws = new WebSocket(url, {
+    headers: {
+      'X-API-Key': apiKey,
+      'X-Signature': signature,
+      'X-Timestamp': timestamp,
+    },
+  });
+
+  return ws;
+}
+```
+
+## TLS/SSL Configuration
+
+### Cipher Suite Recommendations
+
+```nginx
+# Nginx configuration for WebSocket over TLS
+server {
+    listen 443 ssl http2;
+    server_name api.example.com;
+
+    # Modern TLS configuration
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+    ssl_prefer_server_ciphers off;
+
+    # OCSP stapling
+    ssl_stapling on;
+    ssl_stapling_verify on;
+
+    # Session resumption
+    ssl_session_timeout 1d;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_tickets off;
+
+    # HSTS
+    add_header Strict-Transport-Security "max-age=63072000" always;
+
+    location /ws {
+        proxy_pass http://websocket_backend;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # WebSocket timeouts
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+    }
+}
+```
+
+### Certificate Pinning
+
+```javascript
+// Client-side certificate pinning (Node.js)
+const tls = require('tls');
+const crypto = require('crypto');
+const WebSocket = require('ws');
+
+const expectedFingerprint = 'SHA256:XXXXXX...'; // Your cert fingerprint
+
+const ws = new WebSocket('wss://api.example.com/socket', {
+  checkServerIdentity: (hostname, cert) => {
+    const fingerprint = crypto
+      .createHash('sha256')
+      .update(cert.raw)
+      .digest('hex');
+
+    if (fingerprint !== expectedFingerprint) {
+      throw new Error('Certificate fingerprint mismatch');
+    }
+
+    // Additional hostname verification
+    return tls.checkServerIdentity(hostname, cert);
+  },
+});
+```
+
+### HSTS Implementation
+
+```javascript
+// Express middleware for HSTS
+app.use((req, res, next) => {
+  // Set HSTS header for 1 year, including subdomains
+  res.setHeader(
+    'Strict-Transport-Security',
+    'max-age=31536000; includeSubDomains; preload'
+  );
+  next();
+});
+
+// Redirect HTTP to HTTPS
+app.use((req, res, next) => {
+  if (!req.secure && process.env.NODE_ENV === 'production') {
+    return res.redirect(301, `https://${req.headers.host}${req.url}`);
+  }
+  next();
+});
+```
+
+### Mixed Content Prevention
+
+```html
+<!-- Content Security Policy to prevent mixed content -->
+<meta
+  http-equiv="Content-Security-Policy"
+  content="upgrade-insecure-requests;
+               connect-src wss: https:;
+               script-src 'self' 'unsafe-inline' https:;"
+/>
+
+<script>
+  // Ensure WebSocket connections use WSS
+  function createSecureWebSocket(url) {
+    // Force WSS protocol
+    const secureUrl = url.replace(/^ws:/, 'wss:');
+
+    // Verify we're not creating insecure connections
+    if (secureUrl.startsWith('ws:') && !secureUrl.startsWith('wss:')) {
+      throw new Error('Insecure WebSocket connection blocked');
+    }
+
+    return new WebSocket(secureUrl);
+  }
+</script>
+```
+
+## Compression Vulnerabilities
+
+### CRIME Attack Prevention
+
+```javascript
+// Disable compression for sensitive data
+const WebSocket = require('ws');
+
+const wss = new WebSocket.Server({
+  port: 8080,
+  perMessageDeflate: false, // Disable compression entirely
+});
+
+// Or selective compression
+const wss = new WebSocket.Server({
+  port: 8080,
+  perMessageDeflate: {
+    zlibDeflateOptions: {
+      level: zlib.Z_DEFAULT_COMPRESSION,
+    },
+    threshold: 1024, // Only compress messages > 1KB
+    serverNoContextTakeover: true,
+    clientNoContextTakeover: true,
+  },
+});
+
+// Message-level compression control
+function sendMessage(ws, data, sensitive = false) {
+  const message = JSON.stringify(data);
+
+  if (sensitive) {
+    // Send without compression for sensitive data
+    ws.send(message, { compress: false });
+  } else {
+    // Allow compression for non-sensitive data
+    ws.send(message, { compress: true });
+  }
+}
+```
+
+### BREACH Attack Mitigation
+
+```javascript
+// Randomize sensitive responses to prevent BREACH
+function protectAgainstBreach(data) {
+  return {
+    ...data,
+    // Add random padding to change response size
+    _padding: crypto
+      .randomBytes(Math.floor(Math.random() * 100))
+      .toString('hex'),
+    // Add random delay
+    _timestamp: Date.now() + Math.random() * 1000,
+  };
+}
+
+// Apply to sensitive data
+ws.on('message', (data) => {
+  const response = processMessage(data);
+
+  if (containsSensitiveData(response)) {
+    ws.send(JSON.stringify(protectAgainstBreach(response)));
+  } else {
+    ws.send(JSON.stringify(response));
+  }
+});
+```
+
+### Safe Compression Patterns
+
+```javascript
+class SecureWebSocketCompression {
+  constructor() {
+    this.sensitiveFields = new Set([
+      'password',
+      'token',
+      'apiKey',
+      'ssn',
+      'creditCard',
+      'secret',
+      'pin',
+    ]);
+  }
+
+  shouldCompress(message) {
+    // Don't compress if message contains sensitive fields
+    const data = JSON.parse(message);
+    return !this.containsSensitiveData(data);
+  }
+
+  containsSensitiveData(obj) {
+    for (const key in obj) {
+      if (this.sensitiveFields.has(key)) {
+        return true;
+      }
+      if (typeof obj[key] === 'object') {
+        if (this.containsSensitiveData(obj[key])) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  send(ws, data) {
+    const message = JSON.stringify(data);
+    const compress = this.shouldCompress(message);
+    ws.send(message, { compress });
+  }
+}
+```
+
+## Rate Limiting
+
+### Connection-Level Rate Limiting
+
+```javascript
+const RateLimiter = require('limiter').RateLimiter;
+
+class WebSocketRateLimiter {
+  constructor() {
+    this.limiters = new Map();
+    this.globalLimiter = new RateLimiter(1000, 'second'); // 1000 msgs/sec globally
+  }
+
+  createConnectionLimiter(ws) {
+    // 10 messages per second per connection
+    const limiter = new RateLimiter(10, 'second');
+    this.limiters.set(ws, limiter);
+
+    return limiter;
+  }
+
+  async checkLimit(ws) {
+    const limiter = this.limiters.get(ws);
+
+    if (!limiter) {
+      return false;
+    }
+
+    // Check connection limit
+    const connectionAllowed = await new Promise((resolve) => {
+      limiter.removeTokens(1, (err, remaining) => {
+        resolve(remaining >= 0);
+      });
+    });
+
+    if (!connectionAllowed) {
+      return false;
+    }
+
+    // Check global limit
+    const globalAllowed = await new Promise((resolve) => {
+      this.globalLimiter.removeTokens(1, (err, remaining) => {
+        resolve(remaining >= 0);
+      });
+    });
+
+    return globalAllowed;
+  }
+
+  cleanup(ws) {
+    this.limiters.delete(ws);
+  }
+}
+
+// Usage
+const rateLimiter = new WebSocketRateLimiter();
+
+wss.on('connection', (ws) => {
+  rateLimiter.createConnectionLimiter(ws);
+
+  ws.on('message', async (data) => {
+    if (!(await rateLimiter.checkLimit(ws))) {
+      ws.send(
+        JSON.stringify({
+          type: 'error',
+          message: 'Rate limit exceeded',
+        })
+      );
+
+      // Optional: Close connection for severe violations
+      if (ws.rateLimitViolations++ > 10) {
+        ws.close(1008, 'Rate limit exceeded');
+      }
+      return;
+    }
+
+    // Process message
+    await handleMessage(ws, data);
+  });
+
+  ws.on('close', () => {
+    rateLimiter.cleanup(ws);
+  });
+});
+```
+
+### IP-Based Rate Limiting
+
+```javascript
+const ipRateLimiter = new Map();
+
+function getClientIP(req) {
+  return (
+    req.headers['x-forwarded-for']?.split(',')[0] ||
+    req.connection.remoteAddress
+  );
+}
+
+const wss = new WebSocket.Server({
+  verifyClient: (info, cb) => {
+    const ip = getClientIP(info.req);
+
+    // Check IP rate limit
+    if (!checkIPRateLimit(ip)) {
+      cb(false, 429, 'Too Many Requests');
+      return;
+    }
+
+    cb(true);
+  },
+});
+
+function checkIPRateLimit(ip) {
+  const now = Date.now();
+  const limit = 10; // 10 connections per minute
+  const window = 60000; // 1 minute
+
+  if (!ipRateLimiter.has(ip)) {
+    ipRateLimiter.set(ip, []);
+  }
+
+  const attempts = ipRateLimiter.get(ip);
+
+  // Remove old attempts
+  const recentAttempts = attempts.filter((time) => now - time < window);
+
+  if (recentAttempts.length >= limit) {
+    return false;
+  }
+
+  recentAttempts.push(now);
+  ipRateLimiter.set(ip, recentAttempts);
+
+  return true;
+}
+```
+
+### Message Rate Throttling
+
+```javascript
+class MessageThrottler {
+  constructor(ws, options = {}) {
+    this.ws = ws;
+    this.maxBurst = options.maxBurst || 10;
+    this.refillRate = options.refillRate || 1; // tokens per second
+    this.tokens = this.maxBurst;
+    this.lastRefill = Date.now();
+
+    // Start refill timer
+    this.refillInterval = setInterval(() => {
+      this.refill();
+    }, 1000);
+  }
+
+  refill() {
+    const now = Date.now();
+    const timePassed = (now - this.lastRefill) / 1000;
+    const tokensToAdd = timePassed * this.refillRate;
+
+    this.tokens = Math.min(this.maxBurst, this.tokens + tokensToAdd);
+    this.lastRefill = now;
+  }
+
+  canSend() {
+    if (this.tokens >= 1) {
+      this.tokens--;
+      return true;
+    }
+    return false;
+  }
+
+  cleanup() {
+    clearInterval(this.refillInterval);
+  }
+}
+
+// Usage
+wss.on('connection', (ws) => {
+  const throttler = new MessageThrottler(ws, {
+    maxBurst: 10,
+    refillRate: 2,
+  });
+
+  ws.on('message', (data) => {
+    if (!throttler.canSend()) {
+      ws.send(
+        JSON.stringify({
+          type: 'error',
+          message: 'Message rate exceeded, please slow down',
+        })
+      );
+      return;
+    }
+
+    handleMessage(ws, data);
+  });
+
+  ws.on('close', () => {
+    throttler.cleanup();
+  });
+});
+```
+
+### DDoS Mitigation
+
+```javascript
+class DDoSProtection {
+  constructor() {
+    this.connections = new Map();
+    this.blacklist = new Set();
+    this.metrics = {
+      totalConnections: 0,
+      activeConnections: 0,
+      messagesPerSecond: 0,
+      bytesPerSecond: 0,
+    };
+
+    // Monitor metrics
+    setInterval(() => this.analyzeMetrics(), 1000);
+  }
+
+  onConnection(ws, req) {
+    const ip = getClientIP(req);
+
+    // Check blacklist
+    if (this.blacklist.has(ip)) {
+      ws.close(1008, 'Blocked');
+      return false;
+    }
+
+    // Track connection
+    if (!this.connections.has(ip)) {
+      this.connections.set(ip, new Set());
+    }
+
+    const ipConnections = this.connections.get(ip);
+
+    // Limit connections per IP
+    if (ipConnections.size >= 5) {
+      this.blacklist.add(ip);
+      ws.close(1008, 'Too many connections');
+      return false;
+    }
+
+    ipConnections.add(ws);
+    this.metrics.totalConnections++;
+    this.metrics.activeConnections++;
+
+    return true;
+  }
+
+  onMessage(ws, data) {
+    this.metrics.messagesPerSecond++;
+    this.metrics.bytesPerSecond += data.length;
+
+    // Detect anomalies
+    if (this.metrics.messagesPerSecond > 10000) {
+      this.enableEmergencyMode();
+    }
+  }
+
+  onClose(ws, req) {
+    const ip = getClientIP(req);
+    const ipConnections = this.connections.get(ip);
+
+    if (ipConnections) {
+      ipConnections.delete(ws);
+      if (ipConnections.size === 0) {
+        this.connections.delete(ip);
+      }
+    }
+
+    this.metrics.activeConnections--;
+  }
+
+  analyzeMetrics() {
+    // Reset per-second counters
+    this.metrics.messagesPerSecond = 0;
+    this.metrics.bytesPerSecond = 0;
+
+    // Clean up blacklist periodically
+    if (Math.random() < 0.01) {
+      // 1% chance each second
+      this.blacklist.clear();
+    }
+  }
+
+  enableEmergencyMode() {
+    console.error('DDoS detected! Enabling emergency mode');
+    // Implement emergency measures
+    // - Increase rate limits
+    // - Block new connections temporarily
+    // - Alert administrators
+  }
+}
+```
+
+## Input Validation
+
+### Message Size Limits
+
+```javascript
+const MAX_MESSAGE_SIZE = 1024 * 1024; // 1MB
+
+wss.on('connection', (ws) => {
+  // Configure max payload size
+  ws._receiver._maxPayload = MAX_MESSAGE_SIZE;
+
+  ws.on('message', (data) => {
+    // Additional size check
+    if (data.length > MAX_MESSAGE_SIZE) {
+      ws.close(1009, 'Message too large');
+      return;
+    }
+
+    // Process message
+    handleMessage(ws, data);
+  });
+
+  // Monitor accumulated message size
+  let accumulatedSize = 0;
+  const resetInterval = setInterval(() => {
+    accumulatedSize = 0;
+  }, 60000); // Reset every minute
+
+  ws.on('message', (data) => {
+    accumulatedSize += data.length;
+
+    if (accumulatedSize > MAX_MESSAGE_SIZE * 10) {
+      ws.close(1008, 'Bandwidth limit exceeded');
+    }
+  });
+
+  ws.on('close', () => {
+    clearInterval(resetInterval);
+  });
+});
+```
+
+### Binary Data Validation
+
+```javascript
+function validateBinaryMessage(buffer) {
+  // Check magic bytes / file signature
+  const magicBytes = buffer.slice(0, 4);
+
+  // Example: Only allow PNG images
+  const PNG_MAGIC = Buffer.from([0x89, 0x50, 0x4e, 0x47]);
+
+  if (!magicBytes.equals(PNG_MAGIC)) {
+    throw new Error('Invalid file type');
+  }
+
+  // Validate size
+  if (buffer.length > 5 * 1024 * 1024) {
+    // 5MB limit
+    throw new Error('File too large');
+  }
+
+  // Additional validation
+  return sanitizeBinaryData(buffer);
+}
+
+ws.on('message', (data) => {
+  if (data instanceof Buffer) {
+    try {
+      const validatedData = validateBinaryMessage(data);
+      processBinaryMessage(validatedData);
+    } catch (error) {
+      ws.send(
+        JSON.stringify({
+          type: 'error',
+          message: error.message,
+        })
+      );
+    }
+  }
+});
+```
+
+### JSON Payload Security
+
+```javascript
+const Ajv = require('ajv');
+const ajv = new Ajv();
+
+// Define message schemas
+const schemas = {
+  chat: {
+    type: 'object',
+    properties: {
+      type: { const: 'chat' },
+      message: {
+        type: 'string',
+        maxLength: 1000,
+        pattern: '^[^<>]*$', // No HTML tags
+      },
+      timestamp: { type: 'number' },
+    },
+    required: ['type', 'message'],
+    additionalProperties: false,
+  },
+
+  command: {
+    type: 'object',
+    properties: {
+      type: { const: 'command' },
+      action: {
+        enum: ['subscribe', 'unsubscribe', 'list'],
+      },
+      params: { type: 'object' },
+    },
+    required: ['type', 'action'],
+    additionalProperties: false,
+  },
+};
+
+// Compile validators
+const validators = {};
+for (const [key, schema] of Object.entries(schemas)) {
+  validators[key] = ajv.compile(schema);
+}
+
+function validateMessage(data) {
+  let message;
+
+  // Parse JSON safely
+  try {
+    message = JSON.parse(data);
+  } catch (error) {
+    throw new Error('Invalid JSON');
+  }
+
+  // Check message type
+  if (!message.type || !validators[message.type]) {
+    throw new Error('Unknown message type');
+  }
+
+  // Validate against schema
+  const validate = validators[message.type];
+  if (!validate(message)) {
+    throw new Error(`Validation failed: ${ajv.errorsText(validate.errors)}`);
+  }
+
+  // Additional sanitization
+  if (message.message) {
+    message.message = sanitizeString(message.message);
+  }
+
+  return message;
+}
+
+function sanitizeString(str) {
+  // Remove control characters
+  str = str.replace(/[\x00-\x1F\x7F]/g, '');
+
+  // Escape HTML entities
+  str = str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+
+  return str;
+}
+```
+
+### SQL Injection Prevention
+
+```javascript
+const mysql = require('mysql2/promise');
+
+// Create connection pool with strict settings
+const pool = mysql.createPool({
+  host: 'localhost',
+  user: 'dbuser',
+  password: 'dbpass',
+  database: 'mydb',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  enableKeepAlive: true,
+  keepAliveInitialDelay: 0,
+  // Security settings
+  stringifyObjects: false,
+  multipleStatements: false, // Prevent multiple statement injection
+});
+
+ws.on('message', async (data) => {
+  const message = validateMessage(data);
+
+  if (message.type === 'query') {
+    try {
+      // Use parameterized queries - NEVER concatenate user input
+      const [rows] = await pool.execute(
+        'SELECT * FROM messages WHERE user_id = ? AND room_id = ? LIMIT ?',
+        [ws.userId, message.roomId, message.limit || 50]
+      );
+
+      ws.send(
+        JSON.stringify({
+          type: 'query_result',
+          data: rows,
+        })
+      );
+    } catch (error) {
+      console.error('Database error:', error);
+      ws.send(
+        JSON.stringify({
+          type: 'error',
+          message: 'Query failed',
+        })
+      );
+    }
+  }
+});
+
+// Safe query builder
+class SafeQueryBuilder {
+  constructor() {
+    this.allowedTables = ['messages', 'users', 'rooms'];
+    this.allowedColumns = {
+      messages: ['id', 'content', 'timestamp', 'user_id'],
+      users: ['id', 'username', 'created_at'],
+      rooms: ['id', 'name', 'topic'],
+    };
+  }
+
+  buildQuery(table, columns, conditions) {
+    // Validate table name
+    if (!this.allowedTables.includes(table)) {
+      throw new Error('Invalid table');
+    }
+
+    // Validate columns
+    const validColumns = columns.filter((col) =>
+      this.allowedColumns[table].includes(col)
+    );
+
+    if (validColumns.length === 0) {
+      throw new Error('No valid columns');
+    }
+
+    // Build query safely
+    const query = `SELECT ${validColumns.join(', ')} FROM ${table}`;
+    const params = [];
+
+    if (conditions && Object.keys(conditions).length > 0) {
+      const whereClauses = [];
+      for (const [key, value] of Object.entries(conditions)) {
+        if (this.allowedColumns[table].includes(key)) {
+          whereClauses.push(`${key} = ?`);
+          params.push(value);
+        }
+      }
+
+      if (whereClauses.length > 0) {
+        return {
+          query: `${query} WHERE ${whereClauses.join(' AND ')}`,
+          params,
+        };
+      }
+    }
+
+    return { query, params };
+  }
+}
+```
+
+## Security Monitoring
+
+### Logging and Auditing
+
+```javascript
+const winston = require('winston');
+
+// Configure security logger
+const securityLogger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  defaultMeta: { service: 'websocket-security' },
+  transports: [
+    new winston.transports.File({
+      filename: 'security-error.log',
+      level: 'error',
+    }),
+    new winston.transports.File({
+      filename: 'security-combined.log',
+    }),
+  ],
+});
+
+// Security event types
+const SecurityEvents = {
+  AUTH_FAILED: 'auth_failed',
+  RATE_LIMIT: 'rate_limit_exceeded',
+  INVALID_ORIGIN: 'invalid_origin',
+  MALICIOUS_PAYLOAD: 'malicious_payload',
+  DDOS_DETECTED: 'ddos_detected',
+  INJECTION_ATTEMPT: 'injection_attempt',
+};
+
+// Log security events
+function logSecurityEvent(event, details) {
+  securityLogger.warn({
+    event,
+    timestamp: new Date().toISOString(),
+    ...details,
+  });
+
+  // Alert on critical events
+  if (isCriticalEvent(event)) {
+    sendSecurityAlert(event, details);
+  }
+}
+
+// Monitor for suspicious patterns
+class SecurityMonitor {
+  constructor() {
+    this.events = [];
+    this.patterns = new Map();
+  }
+
+  recordEvent(ip, event) {
+    const timestamp = Date.now();
+    this.events.push({ ip, event, timestamp });
+
+    // Track patterns per IP
+    if (!this.patterns.has(ip)) {
+      this.patterns.set(ip, []);
+    }
+
+    this.patterns.get(ip).push({ event, timestamp });
+
+    // Check for attack patterns
+    this.detectAttackPatterns(ip);
+
+    // Clean old events (keep last hour)
+    this.events = this.events.filter((e) => timestamp - e.timestamp < 3600000);
+  }
+
+  detectAttackPatterns(ip) {
+    const ipEvents = this.patterns.get(ip);
+    const recentEvents = ipEvents.filter(
+      (e) => Date.now() - e.timestamp < 60000 // Last minute
+    );
+
+    // Detect brute force
+    const authFailures = recentEvents.filter(
+      (e) => e.event === SecurityEvents.AUTH_FAILED
+    ).length;
+
+    if (authFailures > 5) {
+      logSecurityEvent(SecurityEvents.DDOS_DETECTED, {
+        ip,
+        pattern: 'brute_force',
+        authFailures,
+      });
+
+      // Block IP
+      blacklistIP(ip);
+    }
+
+    // Detect injection attempts
+    const injectionAttempts = recentEvents.filter(
+      (e) => e.event === SecurityEvents.INJECTION_ATTEMPT
+    ).length;
+
+    if (injectionAttempts > 3) {
+      logSecurityEvent(SecurityEvents.MALICIOUS_PAYLOAD, {
+        ip,
+        pattern: 'injection_attack',
+        attempts: injectionAttempts,
+      });
+
+      blacklistIP(ip);
+    }
+  }
+}
+```
+
+### Real-time Threat Detection
+
+```javascript
+class ThreatDetector {
+  constructor() {
+    this.signatures = [
+      // XSS patterns
+      /<script[^>]*>.*?<\/script>/gi,
+      /javascript:/gi,
+      /on\w+\s*=/gi,
+
+      // SQL injection patterns
+      /(\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER)\b)/gi,
+      /(\bOR\b\s*\d+\s*=\s*\d+)/gi,
+      /('|")\s*;\s*--/gi,
+
+      // Command injection patterns
+      /(\||&|;|\$\(|\`)/g,
+      /\.\.\//g, // Directory traversal
+
+      // LDAP injection
+      /[()&|!<>=~*]/g,
+    ];
+  }
+
+  scan(message) {
+    const threats = [];
+
+    for (const pattern of this.signatures) {
+      if (pattern.test(message)) {
+        threats.push({
+          type: 'pattern_match',
+          pattern: pattern.toString(),
+          message: message.substring(0, 100),
+        });
+      }
+    }
+
+    return threats;
+  }
+
+  analyzeConnection(ws, req) {
+    const ip = getClientIP(req);
+    const userAgent = req.headers['user-agent'];
+
+    // Check for suspicious user agents
+    const suspiciousAgents = [/bot/i, /crawler/i, /spider/i, /scraper/i];
+
+    for (const pattern of suspiciousAgents) {
+      if (pattern.test(userAgent)) {
+        return {
+          suspicious: true,
+          reason: 'suspicious_user_agent',
+          details: { userAgent, ip },
+        };
+      }
+    }
+
+    // Check for Tor exit nodes
+    if (isTorExitNode(ip)) {
+      return {
+        suspicious: true,
+        reason: 'tor_exit_node',
+        details: { ip },
+      };
+    }
+
+    return { suspicious: false };
+  }
+}
+
+// Usage
+const threatDetector = new ThreatDetector();
+const securityMonitor = new SecurityMonitor();
+
+ws.on('message', (data) => {
+  // Scan for threats
+  const threats = threatDetector.scan(data);
+
+  if (threats.length > 0) {
+    const ip = getClientIP(ws._socket);
+
+    // Log threat
+    logSecurityEvent(SecurityEvents.MALICIOUS_PAYLOAD, {
+      ip,
+      threats,
+      message: data.substring(0, 200),
+    });
+
+    // Record event
+    securityMonitor.recordEvent(ip, SecurityEvents.INJECTION_ATTEMPT);
+
+    // Close connection
+    ws.close(1008, 'Security violation');
+    return;
+  }
+
+  // Process safe message
+  handleMessage(ws, data);
+});
+```
+
+## Security Headers Configuration
+
+```javascript
+// Express middleware for security headers
+app.use((req, res, next) => {
+  // Content Security Policy
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self'; " +
+      "connect-src 'self' wss://api.example.com; " +
+      "script-src 'self' 'unsafe-inline'; " +
+      "style-src 'self' 'unsafe-inline'; " +
+      "img-src 'self' data: https:; " +
+      "font-src 'self'; " +
+      "frame-ancestors 'none';"
+  );
+
+  // Other security headers
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader(
+    'Permissions-Policy',
+    'geolocation=(), microphone=(), camera=()'
+  );
+
+  next();
+});
+```
+
+## Testing Security
+
+### Security Testing Checklist
+
+```javascript
+// Automated security tests
+const securityTests = [
+  {
+    name: 'Origin Validation',
+    test: async () => {
+      const ws = new WebSocket('wss://api.example.com', {
+        headers: { Origin: 'https://evil.com' },
+      });
+
+      return new Promise((resolve) => {
+        ws.on('error', () => resolve(true)); // Should fail
+        ws.on('open', () => resolve(false)); // Should not connect
+      });
+    },
+  },
+
+  {
+    name: 'Rate Limiting',
+    test: async () => {
+      const promises = [];
+      for (let i = 0; i < 100; i++) {
+        promises.push(new WebSocket('wss://api.example.com'));
+      }
+
+      try {
+        await Promise.all(promises);
+        return false; // Should have been rate limited
+      } catch (error) {
+        return true; // Correctly rate limited
+      }
+    },
+  },
+
+  {
+    name: 'Message Size Limit',
+    test: async () => {
+      const ws = new WebSocket('wss://api.example.com');
+      const largeMessage = 'x'.repeat(10 * 1024 * 1024); // 10MB
+
+      return new Promise((resolve) => {
+        ws.on('open', () => {
+          ws.send(largeMessage);
+        });
+
+        ws.on('close', (code) => {
+          resolve(code === 1009); // Should close with message too big
+        });
+      });
+    },
+  },
+
+  {
+    name: 'XSS Prevention',
+    test: async () => {
+      const ws = new WebSocket('wss://api.example.com');
+      const xssPayload = '<script>alert("XSS")</script>';
+
+      return new Promise((resolve) => {
+        ws.on('open', () => {
+          ws.send(
+            JSON.stringify({
+              type: 'message',
+              content: xssPayload,
+            })
+          );
+        });
+
+        ws.on('message', (data) => {
+          const response = JSON.parse(data);
+          // Should be sanitized
+          resolve(!response.content.includes('<script>'));
+        });
+      });
+    },
+  },
+];
+
+// Run security tests
+async function runSecurityTests() {
+  console.log('Running security tests...');
+
+  for (const test of securityTests) {
+    try {
+      const passed = await test.test();
+      console.log(`${test.name}: ${passed ? '✅ PASSED' : '❌ FAILED'}`);
+    } catch (error) {
+      console.log(`${test.name}: ❌ ERROR - ${error.message}`);
+    }
+  }
+}
+```
+
+## Security Best Practices Summary
+
+1. **Always use WSS (WebSocket Secure)** in production
+2. **Validate origin headers** to prevent CSWSH
+3. **Implement authentication** before allowing data exchange
+4. **Set message size limits** to prevent memory exhaustion
+5. **Rate limit connections** and messages per IP/user
+6. **Validate and sanitize** all incoming data
+7. **Use parameterized queries** to prevent injection
+8. **Implement heartbeat mechanisms** to detect stale connections
+9. **Log security events** for monitoring and analysis
+10. **Keep libraries updated** with security patches
+11. **Use Content Security Policy** headers
+12. **Implement connection timeouts** for idle connections
+13. **Monitor for attack patterns** in real-time
+14. **Have an incident response plan** for security breaches
+15. **Regular security audits** and penetration testing
+
+## Further Reading
+
+- [RFC 6455: The WebSocket Protocol](https://tools.ietf.org/html/rfc6455)
+- [OWASP WebSocket Security Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html)
+- [WebSocket API Reference](/reference/api)
+- [WebSocket Close Codes Reference](/reference/close-codes)
+- [Autobahn TestSuite Guide](/guides/testing/autobahn)

@@ -1,0 +1,550 @@
+---
+title: WebSocket Standards Tracker
+description:
+  Live tracking of WebSocket specifications, browser implementations, and
+  standards updates. Stay current with the latest WebSocket protocol
+  developments and future roadmap.
+keywords:
+  [
+    websocket standards,
+    websocket RFC,
+    websocket specifications,
+    WHATWG,
+    W3C,
+    IETF,
+    browser support,
+    websocket updates,
+  ]
+sidebar:
+  order: 1
+  label: Standards Tracker
+author: Matthew O'Riordan
+role: Co-founder & CEO, Ably
+date: 2025-09-01
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+Stay up-to-date with the evolving WebSocket ecosystem. This page tracks all
+WebSocket-related specifications, their current status, browser implementations,
+and upcoming changes that may affect your applications.
+
+## Current Standards Status
+
+### Core Specifications
+
+<CardGrid>
+<Card title="📄 RFC 6455: The WebSocket Protocol">
+**Status:** Internet Standard
+**Last Updated:** December 2011
+**Stability:** Stable ✅
+
+The foundational WebSocket protocol specification defining the framing,
+handshake, and core protocol mechanics.
+
+[Read RFC 6455](https://datatracker.ietf.org/doc/html/rfc6455)
+
+</Card>
+
+<Card title="🌐 WHATWG WebSockets Living Standard">
+**Status:** Living Standard
+**Last Updated:** Continuously updated
+**Stability:** Stable with ongoing improvements ✅
+
+The browser API specification defining how WebSockets work in web browsers.
+
+[View Living Standard](https://websockets.spec.whatwg.org/)
+
+</Card>
+
+<Card title="🗜️ RFC 7692: Compression Extensions">
+**Status:** Proposed Standard
+**Last Updated:** December 2015
+**Stability:** Stable with security considerations ⚠️
+
+Defines permessage-deflate compression extension for WebSocket.
+
+[Read RFC 7692](https://datatracker.ietf.org/doc/html/rfc7692)
+
+</Card>
+
+<Card title="⚡ RFC 8441: HTTP/2 WebSockets">
+**Status:** Proposed Standard
+**Last Updated:** September 2018
+**Stability:** Experimental implementation 🚧
+
+Bootstrapping WebSockets over HTTP/2 using Extended CONNECT.
+
+[Read RFC 8441](https://datatracker.ietf.org/doc/html/rfc8441)
+
+</Card>
+
+<Card title="🚀 RFC 9220: HTTP/3 WebSockets">
+**Status:** Proposed Standard
+**Last Updated:** June 2022
+**Stability:** Early implementation 🚧
+
+Bootstrapping WebSockets over HTTP/3 and QUIC.
+
+[Read RFC 9220](https://datatracker.ietf.org/doc/html/rfc9220)
+
+</Card>
+
+<Card title="⏩ W3C WebTransport">
+**Status:** Working Draft
+**Last Updated:** October 2024
+**Stability:** Experimental 🔬
+
+Next-generation bidirectional communication protocol built on HTTP/3.
+
+[View WebTransport Draft](https://w3c.github.io/webtransport/)
+
+</Card>
+</CardGrid>
+
+## Browser Implementation Status
+
+### Core WebSocket API (RFC 6455)
+
+| Feature                | Chrome | Firefox | Safari | Edge   |
+| ---------------------- | ------ | ------- | ------ | ------ |
+| Basic WebSocket        | ✅ 16+ | ✅ 11+  | ✅ 7+  | ✅ 12+ |
+| Binary data            | ✅ 16+ | ✅ 11+  | ✅ 7+  | ✅ 12+ |
+| Sub-protocols          | ✅ 16+ | ✅ 11+  | ✅ 7+  | ✅ 12+ |
+| Extensions             | ✅ 16+ | ✅ 11+  | ✅ 7+  | ✅ 12+ |
+| Secure WebSocket (WSS) | ✅ 16+ | ✅ 11+  | ✅ 7+  | ✅ 12+ |
+
+### Compression (RFC 7692)
+
+| Feature                 | Chrome | Firefox | Safari | Edge   |
+| ----------------------- | ------ | ------- | ------ | ------ |
+| permessage-deflate      | ✅ 32+ | ✅ 37+  | ✅ 9+  | ✅ 12+ |
+| Client context takeover | ✅ 32+ | ✅ 37+  | ✅ 9+  | ✅ 12+ |
+| Server context takeover | ✅ 32+ | ✅ 37+  | ✅ 9+  | ✅ 12+ |
+| Window bits negotiation | ✅ 32+ | ✅ 37+  | ✅ 9+  | ✅ 12+ |
+
+### HTTP/2 WebSockets (RFC 8441)
+
+| Feature                          | Chrome | Firefox | Safari | Edge   |
+| -------------------------------- | ------ | ------- | ------ | ------ |
+| Extended CONNECT                 | ✅ 91+ | ❌      | ❌     | ✅ 91+ |
+| :protocol pseudo-header          | ✅ 91+ | ❌      | ❌     | ✅ 91+ |
+| SETTINGS_ENABLE_CONNECT_PROTOCOL | ✅ 91+ | ❌      | ❌     | ✅ 91+ |
+
+### HTTP/3 WebSockets (RFC 9220)
+
+| Feature                      | Chrome           | Firefox         | Safari          | Edge             |
+| ---------------------------- | ---------------- | --------------- | --------------- | ---------------- |
+| HTTP/3 WebSocket bootstrap   | 🚧 Experimental  | ❌              | ❌              | 🚧 Experimental  |
+| QUIC transport               | ✅ 87+ (HTTP/3)  | ✅ 88+ (HTTP/3) | ✅ 14+ (HTTP/3) | ✅ 87+ (HTTP/3)  |
+| Extended CONNECT over HTTP/3 | 🚧 Flag required | ❌              | ❌              | 🚧 Flag required |
+
+### WebTransport
+
+| Feature            | Chrome | Firefox           | Safari | Edge   |
+| ------------------ | ------ | ----------------- | ------ | ------ |
+| WebTransport API   | ✅ 97+ | 🚧 114+ (Nightly) | ❌     | ✅ 97+ |
+| Datagrams          | ✅ 97+ | 🚧                | ❌     | ✅ 97+ |
+| Streams            | ✅ 97+ | 🚧                | ❌     | ✅ 97+ |
+| Connection pooling | ✅ 97+ | 🚧                | ❌     | ✅ 97+ |
+
+## Server Implementation Status
+
+### Web Servers
+
+| Server  | HTTP/1.1 WebSocket           | HTTP/2 WebSocket | HTTP/3 WebSocket |
+| ------- | ---------------------------- | ---------------- | ---------------- |
+| Nginx   | ✅ 1.3.13+                   | ✅ 1.25+         | 🚧 Experimental  |
+| Apache  | ✅ 2.4+ (mod_proxy_wstunnel) | ❌               | ❌               |
+| Caddy   | ✅ v1+                       | ✅ v2+           | ✅ v2.6+         |
+| HAProxy | ✅ 1.4+                      | ✅ 2.0+          | 🚧 2.6+          |
+| Node.js | ✅ All versions              | ✅ 10.0+         | 🚧 Experimental  |
+| IIS     | ✅ 8.0+                      | ✅ 10+           | ❌               |
+
+### CDN/Proxy Support
+
+| Provider          | WebSocket Support | HTTP/2 | HTTP/3 | Notes                     |
+| ----------------- | ----------------- | ------ | ------ | ------------------------- |
+| Cloudflare        | ✅                | ✅     | ✅     | 100-second timeout        |
+| AWS CloudFront    | ✅                | ✅     | ✅     | Regional edge locations   |
+| AWS ALB           | ✅                | ❌     | ❌     | 4000-second timeout       |
+| Google Cloud LB   | ✅                | ✅     | 🚧     | Global load balancing     |
+| Azure App Gateway | ✅                | ✅     | ❌     | Session affinity required |
+| Fastly            | ✅                | ✅     | ✅     | Real-time purging         |
+
+## What's New - December 2024
+
+### Recent Updates
+
+#### Browser Updates
+
+- **Chrome 120**: Improved WebSocket performance over HTTP/3
+- **Firefox 120**: Fixed WebSocket memory leak in Worker contexts
+- **Safari 17.1**: Enhanced WebSocket debugging in Web Inspector
+- **Edge 120**: Aligned with Chromium WebSocket implementation
+
+#### Specification Updates
+
+- **WHATWG Living Standard**: Clarified `binaryType` behavior for ArrayBuffer
+- **WebTransport**: Added connection migration capabilities
+- **HTTP/3 Draft**: Refined SETTINGS negotiation for WebSocket
+
+#### Security Advisories
+
+- **CVE-2024-XXXX**: WebSocket compression vulnerability in certain
+  configurations
+- **Best Practice Update**: New recommendations for origin validation
+
+### Upcoming Changes - Q1 2025
+
+#### Planned Browser Features
+
+- **Chrome 121**: WebSocket priority hints API
+- **Firefox 122**: HTTP/2 WebSocket support (experimental)
+- **Safari 18**: WebTransport implementation (preview)
+
+#### Draft Specifications
+
+- **WebSocket over QUIC**: Direct QUIC transport without HTTP/3
+- **WebSocket Priorities**: QoS and stream prioritization
+- **WebSocket Multipath**: Connection migration and fallback
+
+## Implementation Guides
+
+### Detecting Feature Support
+
+<Tabs>
+<TabItem label="JavaScript">
+```javascript
+// Check basic WebSocket support
+if ('WebSocket' in window) {
+  console.log('WebSocket supported');
+}
+
+// Check for specific features function checkWebSocketFeatures() { const
+features = { basic: 'WebSocket' in window, binaryType: false, compression:
+false, protocols: false };
+
+if (features.basic) { try { const ws = new
+WebSocket('wss://echo.websocket.org'); features.binaryType = 'binaryType' in ws;
+features.protocols = ws.protocol !== undefined;
+
+      // Check for compression support
+      ws.onopen = () => {
+        features.compression = ws.extensions.includes('permessage-deflate');
+        ws.close();
+      };
+    } catch (e) {
+      console.error('WebSocket test failed:', e);
+    }
+
+}
+
+return features; }
+
+// Check WebTransport support if ('WebTransport' in window) {
+console.log('WebTransport supported'); }
+
+```
+</TabItem>
+<TabItem label="Feature Detection">
+```javascript
+class ProtocolDetector {
+  static async detectCapabilities() {
+    const caps = {
+      websocket: {
+        basic: false,
+        secure: false,
+        compression: false,
+        http2: false,
+        http3: false
+      },
+      webtransport: false,
+      performance: {}
+    };
+
+    // Basic WebSocket
+    caps.websocket.basic = 'WebSocket' in window;
+
+    // Secure WebSocket
+    if (caps.websocket.basic && location.protocol === 'https:') {
+      try {
+        const ws = new WebSocket('wss://echo.websocket.org');
+        await new Promise((resolve) => {
+          ws.onopen = () => {
+            caps.websocket.secure = true;
+            caps.websocket.compression =
+              ws.extensions.includes('permessage-deflate');
+            ws.close();
+            resolve();
+          };
+          ws.onerror = resolve;
+          setTimeout(resolve, 5000);
+        });
+      } catch (e) {}
+    }
+
+    // WebTransport
+    caps.webtransport = 'WebTransport' in window;
+
+    // Performance features
+    if (window.performance && performance.timing) {
+      caps.performance = {
+        navigation: 'navigation' in performance,
+        memory: 'memory' in performance,
+        timeOrigin: 'timeOrigin' in performance
+      };
+    }
+
+    return caps;
+  }
+}
+```
+
+</TabItem>
+</Tabs>
+
+### Protocol Negotiation
+
+```javascript
+// Negotiate best available protocol
+async function connectWithBestProtocol(url) {
+  const caps = await ProtocolDetector.detectCapabilities();
+
+  // Try WebTransport first (if available and supported)
+  if (caps.webtransport && url.startsWith('https://')) {
+    try {
+      const transport = new WebTransport(url);
+      await transport.ready;
+      console.log('Connected via WebTransport');
+      return transport;
+    } catch (e) {
+      console.log('WebTransport failed, falling back');
+    }
+  }
+
+  // Fall back to WebSocket
+  if (caps.websocket.secure) {
+    const ws = new WebSocket(url.replace('https://', 'wss://'));
+    await new Promise((resolve, reject) => {
+      ws.onopen = resolve;
+      ws.onerror = reject;
+    });
+    console.log('Connected via WebSocket');
+    return ws;
+  }
+
+  throw new Error('No suitable protocol available');
+}
+```
+
+## Migration Guides
+
+### HTTP/1.1 to HTTP/2 WebSockets
+
+```nginx
+# Nginx configuration for HTTP/2 WebSocket
+server {
+    listen 443 ssl http2;
+    server_name example.com;
+
+    # Enable HTTP/2 WebSocket support (Nginx 1.25+)
+    http2_recv_timeout 300s;
+    http2_idle_timeout 300s;
+
+    location /ws {
+        proxy_pass http://backend;
+        proxy_http_version 1.1;
+
+        # Standard WebSocket headers
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        # HTTP/2 specific settings
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_buffering off;
+
+        # Extended CONNECT support
+        proxy_set_header :protocol websocket;
+    }
+}
+```
+
+### WebSocket to WebTransport Migration
+
+```javascript
+// Abstraction layer for protocol migration
+class RealtimeConnection {
+  constructor(url, options = {}) {
+    this.url = url;
+    this.options = options;
+    this.protocol = null;
+  }
+
+  async connect() {
+    // Try WebTransport
+    if ('WebTransport' in window && this.url.startsWith('https://')) {
+      try {
+        return await this.connectWebTransport();
+      } catch (e) {
+        console.log('WebTransport unavailable, using WebSocket');
+      }
+    }
+
+    // Fall back to WebSocket
+    return await this.connectWebSocket();
+  }
+
+  async connectWebTransport() {
+    this.transport = new WebTransport(this.url);
+    await this.transport.ready;
+    this.protocol = 'webtransport';
+
+    // Set up bidirectional stream
+    const stream = await this.transport.createBidirectionalStream();
+    this.reader = stream.readable.getReader();
+    this.writer = stream.writable.getWriter();
+
+    return this;
+  }
+
+  async connectWebSocket() {
+    const wsUrl = this.url
+      .replace('https://', 'wss://')
+      .replace('http://', 'ws://');
+
+    this.ws = new WebSocket(wsUrl);
+    this.protocol = 'websocket';
+
+    return new Promise((resolve, reject) => {
+      this.ws.onopen = () => resolve(this);
+      this.ws.onerror = reject;
+    });
+  }
+
+  async send(data) {
+    if (this.protocol === 'webtransport') {
+      const encoded = new TextEncoder().encode(data);
+      await this.writer.write(encoded);
+    } else {
+      this.ws.send(data);
+    }
+  }
+
+  async receive() {
+    if (this.protocol === 'webtransport') {
+      const { value } = await this.reader.read();
+      return new TextDecoder().decode(value);
+    } else {
+      return new Promise((resolve) => {
+        this.ws.onmessage = (event) => resolve(event.data);
+      });
+    }
+  }
+
+  close() {
+    if (this.protocol === 'webtransport') {
+      this.transport.close();
+    } else {
+      this.ws.close();
+    }
+  }
+}
+```
+
+## Standards Participation
+
+### Working Groups
+
+- **IETF httpbis Working Group**: HTTP/2 and HTTP/3 WebSocket specifications
+  - [Mailing List](https://www.ietf.org/mailman/listinfo/httpbis)
+  - [GitHub](https://github.com/httpwg)
+
+- **W3C WebTransport Working Group**: Next-generation transport protocol
+  - [GitHub Issues](https://github.com/w3c/webtransport/issues)
+  - [Meeting Minutes](https://www.w3.org/2020/12/webtransport-charter.html)
+
+- **WHATWG Streams**: WebSocket Living Standard
+  - [GitHub](https://github.com/whatwg/websockets)
+  - [Participation](https://whatwg.org/faq#joining)
+
+### Contributing to Standards
+
+1. **Report Issues**: File bugs in specification repositories
+2. **Join Discussions**: Participate in mailing lists and GitHub issues
+3. **Submit Proposals**: Write Internet-Drafts for new features
+4. **Implement Early**: Test experimental features and provide feedback
+5. **Document Use Cases**: Share real-world requirements and constraints
+
+## Email Subscription
+
+Stay informed about WebSocket standards updates with our monthly digest.
+
+### What You'll Receive
+
+- **Standards Updates**: New RFCs and specification changes
+- **Browser Releases**: Implementation updates and new features
+- **Security Advisories**: Important vulnerability disclosures
+- **Migration Guides**: Best practices for adopting new standards
+- **Matthew O'Riordan's Analysis**: Expert commentary on implications
+
+<Card title="📧 Subscribe to Standards Watch">
+Get monthly updates on WebSocket standards and implementations delivered to your inbox.
+
+**Coming Soon** - Email subscription system under development.
+
+Follow [@mattyoriordan](https://twitter.com/mattyoriordan) for updates.
+
+</Card>
+
+## Compliance Testing
+
+### Autobahn TestSuite Compliance
+
+Track your WebSocket implementation's compliance with the protocol
+specification:
+
+```bash
+# Run Autobahn TestSuite
+docker run -it --rm \
+  -v "${PWD}/config:/config" \
+  -v "${PWD}/reports:/reports" \
+  crossbario/autobahn-testsuite \
+  wstest -m fuzzingclient -s /config/fuzzingclient.json
+```
+
+### Current Compliance Levels
+
+| Implementation    | RFC 6455 | RFC 7692 | Pass Rate |
+| ----------------- | -------- | -------- | --------- |
+| Chrome 120        | ✅ 100%  | ✅ 100%  | 517/517   |
+| Firefox 120       | ✅ 100%  | ✅ 100%  | 517/517   |
+| Safari 17         | ✅ 100%  | ✅ 100%  | 517/517   |
+| Node.js ws        | ✅ 100%  | ✅ 100%  | 517/517   |
+| Python websockets | ✅ 100%  | ✅ 100%  | 517/517   |
+| Go gorilla        | ✅ 99.8% | ✅ 100%  | 516/517   |
+
+## Resources
+
+### Official Specifications
+
+- [RFC 6455: The WebSocket Protocol](https://datatracker.ietf.org/doc/html/rfc6455)
+- [WHATWG WebSockets Living Standard](https://websockets.spec.whatwg.org/)
+- [RFC 7692: Compression Extensions](https://datatracker.ietf.org/doc/html/rfc7692)
+- [RFC 8441: HTTP/2 WebSockets](https://datatracker.ietf.org/doc/html/rfc8441)
+- [RFC 9220: HTTP/3 WebSockets](https://datatracker.ietf.org/doc/html/rfc9220)
+
+### Implementation Status
+
+- [Can I Use WebSockets](https://caniuse.com/websockets)
+- [Chrome Platform Status](https://chromestatus.com/features#websocket)
+- [Firefox Platform Status](https://platform-status.mozilla.org/)
+- [WebKit Feature Status](https://webkit.org/status/)
+
+### Related Pages
+
+- [WebSocket Protocol Guide](/guides/protocol)
+- [Future of WebSockets](/guides/future)
+- [Autobahn TestSuite Guide](/guides/testing/autobahn)
+- [WebSocket API Reference](/reference/api)

@@ -1,54 +1,174 @@
 ---
-title: WebSockets handbook
-description: Everything you need to know, in one place.
+title: The Canonical WebSocket Reference
+description: Everything you need to know about WebSockets, in one place.
 template: splash
 hero:
-  tagline: WebSockets revolutionized the web, turning clunky, slow real-time interactions into sleek, low-latency experiences, making them the go-to for dynamic, user-friendly applications.
+  tagline:
+    WebSockets revolutionized the web, turning clunky, slow real-time
+    interactions into sleek, low-latency experiences. Your comprehensive guide
+    to mastering WebSocket technology.
   image:
     file: ../../assets/websocket-logo.png
   actions:
-    - text: History of WebSockets
+    - text: Get Started
       link: /guides/road-to-websockets/
       icon: right-arrow
       variant: primary
-    - text: Websocket Protocol
-      link: /guides/websocket-protocol/
-      icon: right-arrow
-      variant: primary
+    - text: API Reference
+      link: /reference/websocket-api/
+      icon: document
+      variant: secondary
 ---
 
-import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+import { LinkCard, CardGrid, Card } from '@astrojs/starlight/components';
 
-## Guides
+## 🚀 Quick Start
 
 <CardGrid>
-	<LinkCard title="The Road to WebSockets" icon="pencil" href="/guides/road-to-websockets/">
-    Edit `src/content/docs/index.mdx` to see this page change.
+  <LinkCard
+    title="Learn the Basics"
+    icon="open-book"
+    href="/guides/road-to-websockets/"
+  >
+    Understand the evolution and fundamentals of WebSocket technology
   </LinkCard>
-  <LinkCard title="WebSocket Protocol" icon="pencil" href="/guides/websocket-protocol/">
-    Edit `src/content/docs/index.mdx` to see this page change.
+  <LinkCard
+    title="Build Your First App"
+    icon="rocket"
+    href="/guides/building-a-websocket-app/"
+  >
+    Step-by-step guide to creating real-time applications
   </LinkCard>
-  <LinkCard title="Building a WebSocket App" icon="pencil" href="/guides/building-a-websocket-app/">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</LinkCard>
-  <LinkCard title="WebSockets at Scale" icon="pencil" href="/guides/websockets-at-scale/">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</LinkCard>
-	<LinkCard title="The Future of WebSockets" icon="pencil" href="/guides/future-of-websockets/">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</LinkCard>
+  <LinkCard
+    title="Security Best Practices"
+    icon="shield"
+    href="/guides/security/"
+  >
+    Protect your WebSocket connections from common vulnerabilities
+  </LinkCard>
+  <LinkCard
+    title="Test Your Implementation"
+    icon="magnifier"
+    href="/guides/testing/autobahn/"
+  >
+    Ensure compliance with the WebSocket protocol using Autobahn TestSuite
+  </LinkCard>
 </CardGrid>
 
-## References, Tools and Resources
+## 📚 Essential References
 
 <CardGrid>
-	<LinkCard title="WebSocket API Reference" icon="pencil" href="/reference/websocket-api/">
-    Edit `src/content/docs/index.mdx` to see this page change.
+  <LinkCard
+    title="WebSocket API"
+    icon="document"
+    href="/reference/websocket-api/"
+  >
+    Complete API reference with events, methods, and properties
   </LinkCard>
-  <LinkCard title="WebSocket Echo Server" icon="pencil" href="/tools/websocket-echo-server/">
-    Edit `src/content/docs/index.mdx` to see this page change.
+  <LinkCard
+    title="Close Codes Reference"
+    icon="warning"
+    href="/reference/close-codes/"
+  >
+    Comprehensive guide to WebSocket close codes and error handling
   </LinkCard>
-  <LinkCard title="WebSocket Resources" icon="pencil" href="/resources/websocket-resources/">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</LinkCard>
+  <LinkCard title="Standards Tracker" icon="information" href="/standards/">
+    Stay updated with the latest WebSocket specifications and browser support
+  </LinkCard>
+  <LinkCard
+    title="Protocol Deep Dive"
+    icon="puzzle"
+    href="/guides/websocket-protocol/"
+  >
+    Understanding frames, handshakes, and the wire protocol
+  </LinkCard>
+</CardGrid>
+
+## 🛠️ Tools & Resources
+
+<CardGrid>
+  <LinkCard
+    title="Echo Server"
+    icon="setting"
+    href="/tools/websocket-echo-server/"
+  >
+    Test your WebSocket connections with our public echo server
+  </LinkCard>
+  <LinkCard
+    title="WebSocket Resources"
+    icon="external"
+    href="/resources/websocket-resources/"
+  >
+    Curated collection of libraries, frameworks, and learning materials
+  </LinkCard>
+  <LinkCard title="Security Hardening" icon="shield" href="/guides/security/">
+    Comprehensive security guide including CSWSH prevention and authentication
+  </LinkCard>
+  <LinkCard
+    title="Scale WebSockets"
+    icon="graph"
+    href="/guides/websockets-at-scale/"
+  >
+    Learn how to handle millions of concurrent connections
+  </LinkCard>
+</CardGrid>
+
+## 🎯 Implementation Guides
+
+<CardGrid stagger>
+  <Card title="By Use Case" icon="rocket">
+    - Real-time chat applications - Live collaboration tools - Gaming and
+    multiplayer - Financial trading platforms - IoT device communication
+  </Card>
+  <Card title="By Platform" icon="laptop">
+    - Browser WebSocket API - Node.js implementations - Mobile app integration -
+    Serverless WebSockets - Edge computing
+  </Card>
+  <Card title="By Language" icon="code">
+    - JavaScript/TypeScript - Python - Go - Rust - Java
+  </Card>
+</CardGrid>
+
+## 📈 What's New
+
+<Card title="Recently Added" icon="star">
+
+### Phase 2 Content Released
+
+- **[Security Hardening Guide](/guides/security/)** - Comprehensive security
+  best practices
+- **[Close Codes Reference](/reference/close-codes/)** - Complete error code
+  documentation
+- **[Standards Tracker](/standards/)** - Live tracking of WebSocket
+  specifications
+- **[Autobahn TestSuite Guide](/guides/testing/autobahn/)** - Protocol
+  compliance testing
+
+### Coming Soon
+
+- Interactive Frame Inspector
+- Handshake Explorer Tool
+- Infrastructure Playbooks (Nginx, AWS, Cloudflare)
+- Language-specific implementation guides
+
+</Card>
+
+## 🌟 Why WebSocket.org?
+
+<CardGrid>
+  <Card title="Authoritative" icon="approve-check">
+    Written and maintained by industry experts with over a decade of WebSocket
+    experience
+  </Card>
+  <Card title="Comprehensive" icon="open-book">
+    From protocol basics to production deployment, everything you need in one
+    place
+  </Card>
+  <Card title="Up-to-date" icon="rocket">
+    Constantly updated with the latest standards, browser support, and best
+    practices
+  </Card>
+  <Card title="Practical" icon="setting">
+    Real-world examples, production-ready code, and battle-tested patterns
+  </Card>
 </CardGrid>

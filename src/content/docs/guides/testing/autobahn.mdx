@@ -1,0 +1,372 @@
+---
+title: Autobahn TestSuite Guide
+description:
+  Complete guide to testing WebSocket implementations with Autobahn TestSuite
+  for protocol compliance
+sidebar:
+  order: 1
+  label: Autobahn TestSuite
+---
+
+import {
+  Card,
+  LinkCard,
+  CardGrid,
+  Tabs,
+  TabItem,
+} from '@astrojs/starlight/components';
+
+The Autobahn TestSuite is the industry standard for WebSocket protocol
+compliance testing. This guide shows you how to use it to ensure your WebSocket
+implementation follows RFC 6455 correctly.
+
+## What is Autobahn TestSuite
+
+Autobahn TestSuite is a comprehensive testing tool that validates WebSocket
+implementations against the official protocol specification. It tests both
+clients and servers for compliance with RFC 6455.
+
+### Key Features
+
+- Over 500 test cases covering all aspects of the protocol
+- Tests for both client and server implementations
+- Detailed HTML reports with pass/fail status
+- Performance and limits testing
+- Compression extension testing
+
+## Installation
+
+<Tabs>
+  <TabItem label="Docker">
+    ```bash docker pull crossbario/autobahn-testsuite ```
+  </TabItem>
+  <TabItem label="Python">```bash pip install autobahntestsuite ```</TabItem>
+  <TabItem label="NPM">
+    ```bash npm install -g autobahn-testsuite-docker ```
+  </TabItem>
+</Tabs>
+
+## Testing a WebSocket Server
+
+### Basic Server Test
+
+Create a test configuration file:
+
+```json
+{
+  "outdir": "./reports/server",
+  "servers": [
+    {
+      "url": "ws://localhost:8080"
+    }
+  ],
+  "cases": ["*"],
+  "exclude-cases": [],
+  "exclude-agent-cases": {}
+}
+```
+
+Run the test:
+
+```bash
+docker run -it --rm \
+  -v "${PWD}/config:/config" \
+  -v "${PWD}/reports:/reports" \
+  --network host \
+  crossbario/autobahn-testsuite \
+  wstest -m fuzzingclient -s /config/fuzzingclient.json
+```
+
+## Testing a WebSocket Client
+
+### Basic Client Test
+
+Create a test configuration:
+
+```json
+{
+  "url": "ws://localhost:9001",
+  "outdir": "./reports/client",
+  "cases": ["*"],
+  "exclude-cases": [],
+  "exclude-agent-cases": {}
+}
+```
+
+Start the test server:
+
+```bash
+docker run -it --rm \
+  -v "${PWD}/config:/config" \
+  -v "${PWD}/reports:/reports" \
+  -p 9001:9001 \
+  crossbario/autobahn-testsuite \
+  wstest -m fuzzingserver -s /config/fuzzingserver.json
+```
+
+Connect your client to `ws://localhost:9001` and follow the test protocol.
+
+## Test Categories
+
+Autobahn organizes tests into several categories:
+
+### Framing Tests
+
+Tests basic frame structure and parsing:
+
+- Frame headers and opcodes
+- Payload length encoding
+- Masking requirements
+- Frame fragmentation
+
+### Pings and Pongs
+
+Tests ping/pong frame handling:
+
+- Ping with payload
+- Pong responses
+- Unsolicited pongs
+- Ping/pong during fragmented messages
+
+### Reserved Bits
+
+Tests handling of reserved bits:
+
+- RSV bits must be 0
+- Extension negotiation
+- Invalid RSV combinations
+
+### Opcodes
+
+Tests handling of various opcodes:
+
+- Valid opcodes (text, binary, close, ping, pong)
+- Invalid and reserved opcodes
+- Continuation frames
+
+### Fragmentation
+
+Tests message fragmentation:
+
+- Fragmented text messages
+- Fragmented binary messages
+- Interleaved control frames
+- Invalid fragmentation sequences
+
+### UTF-8 Handling
+
+Tests UTF-8 validation for text frames:
+
+- Valid UTF-8 sequences
+- Invalid UTF-8 sequences
+- Partial UTF-8 sequences
+- Overlong encodings
+
+### Close Handling
+
+Tests connection closing:
+
+- Close frames with status codes
+- Close frame payloads
+- Close handshake sequences
+- Abnormal closures
+
+### Limits and Performance
+
+Tests implementation limits:
+
+- Maximum frame size
+- Maximum message size
+- Frame processing performance
+- Memory usage
+
+### Compression
+
+Tests compression extensions:
+
+- permessage-deflate
+- Compression parameters
+- Context takeover
+
+## Understanding Test Results
+
+After running tests, open the generated HTML report:
+
+```bash
+open reports/server/index.html
+```
+
+### Result Categories
+
+- **PASS**: Implementation behaves correctly
+- **FAIL**: Protocol violation detected
+- **NON-STRICT**: Minor non-compliance
+- **INFORMATIONAL**: Performance or limit information
+
+### Common Failures and Fixes
+
+#### UTF-8 Validation Failures
+
+**Problem**: Text frames contain invalid UTF-8 **Solution**: Validate UTF-8
+before sending text frames
+
+#### Close Code Violations
+
+**Problem**: Invalid close codes used **Solution**: Only use codes defined in
+RFC 6455
+
+#### Fragmentation Errors
+
+**Problem**: Invalid fragmentation sequence **Solution**: Ensure proper FIN bit
+handling
+
+#### Masking Issues
+
+**Problem**: Client frames not masked **Solution**: Always mask client-to-server
+frames
+
+## CI/CD Integration
+
+### GitHub Actions Example
+
+```yaml
+name: WebSocket Compliance
+on: [push, pull_request]
+
+jobs:
+  autobahn-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Start WebSocket Server
+        run: npm start &
+
+      - name: Wait for Server
+        run: sleep 5
+
+      - name: Run Autobahn Tests
+        run: |
+          docker run -it --rm \
+            -v "$PWD:/workspace" \
+            --network host \
+            crossbario/autobahn-testsuite \
+            wstest -m fuzzingclient -s /workspace/test/autobahn.json
+
+      - name: Upload Reports
+        uses: actions/upload-artifact@v2
+        with:
+          name: autobahn-reports
+          path: reports/
+```
+
+### Jenkins Pipeline
+
+```groovy
+pipeline {
+  agent any
+  stages {
+    stage('Test WebSocket Compliance') {
+      steps {
+        sh 'docker run -v "$PWD:/ws" crossbario/autobahn-testsuite wstest -m fuzzingclient -s /ws/autobahn.json'
+        publishHTML([
+          reportDir: 'reports',
+          reportFiles: 'index.html',
+          reportName: 'Autobahn Report'
+        ])
+      }
+    }
+  }
+}
+```
+
+## Best Practices
+
+<Card title="🚀 Testing Strategy">
+
+**Test Early**: Run Autobahn tests during development
+
+**Test Completely**: Don't skip test categories
+
+**Fix Failures**: Address all FAIL results before production
+
+**Monitor Performance**: Track performance test results
+
+**Automate Testing**: Include in CI/CD pipeline
+
+</Card>
+
+### Selective Testing
+
+For faster development cycles, test specific categories:
+
+```json
+{
+  "cases": ["1.*", "2.*", "6.*"],
+  "exclude-cases": ["6.4.*"]
+}
+```
+
+### Performance Baseline
+
+Establish performance baselines:
+
+```json
+{
+  "cases": ["9.*"],
+  "options": {
+    "perftest": true,
+    "rtts": true
+  }
+}
+```
+
+## Troubleshooting
+
+### Connection Refused
+
+Ensure your WebSocket server is running and accessible from Docker.
+
+### Tests Hanging
+
+Check for proper close frame handling in your implementation.
+
+### Out of Memory
+
+Limit concurrent connections or test categories.
+
+### Report Generation Failed
+
+Ensure write permissions for the output directory.
+
+## Advanced Configuration
+
+### Custom Test Parameters
+
+```json
+{
+  "options": {
+    "failByDrop": true,
+    "echoSizeLimit": 1048576,
+    "autoFragmentSize": 4096
+  }
+}
+```
+
+### Multiple Server Testing
+
+```json
+{
+  "servers": [
+    { "url": "ws://localhost:8080", "agent": "Server-1" },
+    { "url": "ws://localhost:8081", "agent": "Server-2" }
+  ]
+}
+```
+
+## Resources
+
+- [Autobahn TestSuite Documentation](https://github.com/crossbario/autobahn-testsuite)
+- [RFC 6455 Specification](https://tools.ietf.org/html/rfc6455)
+- [WebSocket Protocol Guide](/guides/websocket-protocol/)
+- [WebSocket Security](/guides/security/)
