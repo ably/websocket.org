@@ -1,10 +1,14 @@
 ---
 import Default from '@astrojs/starlight/components/PageFrame.astro';
 import type { Props } from '@astrojs/starlight/props';
+import { getFrontmatter } from '../utils/getFrontmatter';
 
 // Get the current page's frontmatter data
 const { entry } = Astro.props;
-const frontmatter = entry?.data || {};
+
+// Get custom frontmatter data directly from the file
+const customFrontmatter = getFrontmatter(Astro.url.pathname);
+const frontmatter = customFrontmatter || entry?.data || {};
 
 // Get author details
 const author = frontmatter.author || "Matthew O'Riordan";

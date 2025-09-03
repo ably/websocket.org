@@ -2,7 +2,49 @@
 import Default from '@astrojs/starlight/components/Head.astro';
 import type { Props } from '@astrojs/starlight/props';
 import GA4 from './ga4.astro';
+import { getFrontmatter } from '../utils/getFrontmatter';
+
+// Get the current page's frontmatter data
+const { entry } = Astro.props;
+
+// Get custom frontmatter data directly from the file
+const customFrontmatter = getFrontmatter(Astro.url.pathname);
+const frontmatter = customFrontmatter || entry?.data || {};
+
+// Generate JSON-LD for articles
+let jsonLd = null;
+if (frontmatter.category && ['guide', 'reference', 'tutorial'].includes(frontmatter.category)) {
+  const author = frontmatter.author || "Matthew O'Riordan";
+  const datePublished = frontmatter.date ? new Date(frontmatter.date).toISOString() : new Date().toISOString();
+  
+  jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": frontmatter.title || entry?.data?.title,
+    "description": frontmatter.description || entry?.data?.description,
+    "author": {
+      "@type": "Person",
+      "name": author
+    },
+    "datePublished": datePublished,
+    "publisher": {
+      "@type": "Organization",
+      "name": "WebSocket.org",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://websocket.org/images/websocket-logo.png"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://websocket.org${Astro.url.pathname}`
+    }
+  };
+}
 ---
 
 <Default {...Astro.props}><slot /></Default>
 <GA4 {...Astro.props} />
+{jsonLd && (
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+)}
