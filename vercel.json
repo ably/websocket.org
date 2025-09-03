@@ -1,9 +1,4 @@
 {
-    "functions": {
-        "api/**/*.js": {
-            "runtime": "nodejs22.x"
-        }
-    },
     "redirects": [
         { "source": "/echo.html", "destination": "/tools/websocket-echo-server", "permanent": true },
         { "source": "/echo", "destination": "/tools/websocket-echo-server", "permanent": false },
