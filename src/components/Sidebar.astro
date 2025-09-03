@@ -4,19 +4,12 @@ import type { Props } from '@astrojs/starlight/props';
 import Sponsor from './sponsor.astro';
 ---
 
-<div class="sidebar-and-sponsor">
-  <Default {...Astro.props} />
-  <div class="sponsor-container">
-    <Sponsor />
-  </div>
+<Default {...Astro.props} />
+<div class="sponsor-container">
+  <Sponsor />
 </div>
 
 <style>
-  .sidebar-and-sponsor {
-    display: flex;
-    flex-direction: column;
-  }
-
   .sponsor-container {
     margin-top: 1rem;
     padding: 0 1rem;

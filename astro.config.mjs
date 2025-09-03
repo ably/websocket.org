@@ -90,7 +90,9 @@ export default defineConfig({
       },
       components: {
         Head: './src/components/head.astro',
-        Sidebar: './src/components/Sidebar.astro',
+        // Sidebar: './src/components/Sidebar.astro',
+        Content: './src/components/ContentWrapper.astro',
+        PageFrame: './src/components/PageFrameWrapper.astro',
       },
     }),
   ],

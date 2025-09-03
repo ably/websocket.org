@@ -1,0 +1,73 @@
+---
+import Default from '@astrojs/starlight/components/PageFrame.astro';
+import type { Props } from '@astrojs/starlight/props';
+
+// Get the current page's frontmatter data
+const { entry } = Astro.props;
+const frontmatter = entry?.data || {};
+
+// Get author details
+const author = frontmatter.author || "Matthew O'Riordan";
+const authorSlug = author.toLowerCase().replace(/['\s]+/g, '-');
+const publishedDate = frontmatter.date;
+
+// Determine if we should show the author info at the top
+const shouldShowAuthorInfo = 
+  frontmatter.category && 
+  ['guide', 'reference', 'tutorial'].includes(frontmatter.category) &&
+  !Astro.url.pathname.includes('/author/');
+---
+
+<Default {...Astro.props}>
+  <slot name="header" slot="header" />
+  <slot name="sidebar" slot="sidebar" />
+  {shouldShowAuthorInfo && (
+    <div class="article-meta">
+      <span class="article-author">
+        By <a href={`/author/${authorSlug}`}>{author}</a>
+      </span>
+      {publishedDate && (
+        <span class="article-date">
+          • Published on {new Date(publishedDate).toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}
+        </span>
+      )}
+    </div>
+  )}
+  <slot />
+</Default>
+
+<style>
+  .article-meta {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--sl-color-gray-5);
+    font-size: 0.875rem;
+    color: var(--sl-color-text-accent);
+  }
+
+  .article-author a {
+    color: var(--sl-color-accent);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .article-author a:hover {
+    color: var(--sl-color-accent-high);
+    text-decoration: underline;
+  }
+
+  .article-date {
+    margin-left: 0.25rem;
+  }
+
+  @media (max-width: 50em) {
+    .article-meta {
+      font-size: 0.8125rem;
+    }
+  }
+</style>
