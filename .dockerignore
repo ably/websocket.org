@@ -1,0 +1,12 @@
+node_modules
+dist
+.astro
+.git
+.gitignore
+.DS_Store
+.env
+.env.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.vscode/

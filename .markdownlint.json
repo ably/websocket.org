@@ -1,0 +1,70 @@
+{
+  "default": true,
+  "MD003": {
+    "style": "atx"
+  },
+  "MD004": {
+    "style": "dash"
+  },
+  "MD007": {
+    "indent": 2
+  },
+  "MD013": {
+    "line_length": 120,
+    "heading_line_length": 80,
+    "code_blocks": false,
+    "tables": false
+  },
+  "MD024": {
+    "siblings_only": true
+  },
+  "MD025": true,
+  "MD026": {
+    "punctuation": ".,;:!"
+  },
+  "MD029": {
+    "style": "ordered"
+  },
+  "MD033": {
+    "allowed_elements": [
+      "div",
+      "span",
+      "a",
+      "img",
+      "br",
+      "script",
+      "style",
+      "details",
+      "summary",
+      "sup",
+      "sub",
+      "AuthorBio",
+      "SEOMetadata",
+      "CardGrid",
+      "Card",
+      "LinkCard",
+      "Tabs",
+      "TabItem"
+    ]
+  },
+  "MD034": false,
+  "MD035": {
+    "style": "---"
+  },
+  "MD036": true,
+  "MD040": true,
+  "MD041": true,
+  "MD046": {
+    "style": "fenced"
+  },
+  "MD047": true,
+  "MD048": {
+    "style": "backtick"
+  },
+  "MD049": {
+    "style": "underscore"
+  },
+  "MD050": {
+    "style": "asterisk"
+  }
+}

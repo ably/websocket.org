@@ -68,6 +68,7 @@ Vertical Scaling (Scale Up)          Horizontal Scaling (Scale Out)
                                          Multiple machines
                                          sharing workload
 ```
+
 _Figure 5.1: Vertical and horizontal scaling_
 
 At first glance, vertical scaling seems attractive, as it's easier to implement
@@ -201,6 +202,7 @@ them.
      
      Backend Server Farm
 ```
+
 _Figure 5.2: Load balancing_
 
 Load balancers detect the health of backend resources and do not send traffic to
