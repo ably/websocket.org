@@ -1,0 +1,82 @@
+---
+import type { Props } from '@astrojs/starlight/props';
+import { getFrontmatter } from '../utils/getFrontmatter';
+
+// Constants from Starlight
+const PAGE_TITLE_ID = 'starlight__overview';
+
+// Get the current page's frontmatter data
+const { entry } = Astro.props;
+
+// Get custom frontmatter data directly from the file
+const customFrontmatter = getFrontmatter(Astro.url.pathname);
+const frontmatter: any = customFrontmatter || entry?.data || {};
+
+// Get author details
+const author = frontmatter.author || "Matthew O'Riordan";
+const authorSlug = 'matthew-oriordan'; // Fixed slug to match actual file
+const publishedDate = frontmatter.date;
+
+// Determine if we should show the author info
+// Show for all content in guides, reference sections (excluding author pages)
+const pathSegments = Astro.url.pathname.split('/');
+const shouldShowAuthorInfo =
+  (pathSegments[1] === 'guides' || pathSegments[1] === 'reference') &&
+  !Astro.url.pathname.includes('/author/');
+---
+
+<h1 id={PAGE_TITLE_ID}>{entry.data.title}</h1>
+
+{
+  shouldShowAuthorInfo && (
+    <div class="article-meta">
+      <span class="article-author">
+        by <a href={`/author/${authorSlug}/`}>{author}</a>
+      </span>
+      {publishedDate && (
+        <span class="article-date">
+          {' '}
+          • Published on{' '}
+          {new Date(publishedDate).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })}
+        </span>
+      )}
+    </div>
+  )
+}
+
+<style>
+  h1 {
+    margin-top: 1rem;
+    font-size: var(--sl-text-h1);
+    line-height: var(--sl-line-height-headings);
+    font-weight: 600;
+    color: var(--sl-color-white);
+  }
+
+  .article-meta {
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    color: var(--sl-color-gray-3);
+  }
+
+  .article-author a {
+    color: var(--sl-color-gray-2);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .article-author a:hover {
+    color: var(--sl-color-text);
+    text-decoration: underline;
+  }
+
+  .article-date {
+    margin-left: 0.25rem;
+  }
+</style>

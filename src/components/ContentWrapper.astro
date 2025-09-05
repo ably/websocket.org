@@ -1,67 +1,8 @@
 ---
-import Default from '@astrojs/starlight/components/MarkdownContent.astro';
+import Default from '@astrojs/starlight/components/ContentPanel.astro';
 import type { Props } from '@astrojs/starlight/props';
-import AuthorBio from './AuthorBio.astro';
-
-// Get the current page's frontmatter data
-const { entry } = Astro.props;
-const frontmatter: any = entry?.data || {};
-
-// Determine if we should show the author bio
-// Show for guides, references, and other content (but not for tools, resources, or author pages themselves)
-const shouldShowAuthor =
-  frontmatter.category &&
-  ['guide', 'reference', 'tutorial'].includes(frontmatter.category) &&
-  !Astro.url.pathname.includes('/author/');
-
-// Get author details
-const author = frontmatter.author || "Matthew O'Riordan";
-const authorSlug = author.toLowerCase().replace(/['\s]+/g, '-');
 ---
 
 <Default {...Astro.props}>
   <slot />
 </Default>
-
-{
-  shouldShowAuthor && (
-    <div class="author-section">
-      <h2>About the Author</h2>
-      <AuthorBio author={author} showFull={false} />
-      <p class="author-link">
-        <a href={`/author/${authorSlug}`}>View all articles by {author} →</a>
-      </p>
-    </div>
-  )
-}
-
-<style>
-  .author-section {
-    margin-top: 3rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--sl-color-gray-5);
-  }
-
-  .author-section h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    color: var(--sl-color-text);
-  }
-
-  .author-link {
-    margin-top: 1rem;
-    font-size: 0.95rem;
-  }
-
-  .author-link a {
-    color: var(--sl-color-accent);
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s;
-  }
-
-  .author-link a:hover {
-    color: var(--sl-color-accent-high);
-    text-decoration: underline;
-  }
-</style>
