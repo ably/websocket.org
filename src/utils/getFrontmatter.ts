@@ -8,7 +8,7 @@ export function getFrontmatter(pathname: string) {
     // /reference/websocket-api/ -> src/content/docs/reference/websocket-api.md
     const cleanPath = pathname.replace(/^\//, '').replace(/\/$/, '');
     const filePath = path.join(process.cwd(), 'src/content/docs', `${cleanPath}.md`);
-    
+
     if (!fs.existsSync(filePath)) {
       // Try with .mdx extension
       const mdxPath = filePath.replace('.md', '.mdx');
@@ -19,7 +19,7 @@ export function getFrontmatter(pathname: string) {
       }
       return null;
     }
-    
+
     const fileContent = fs.readFileSync(filePath, 'utf-8');
     const { data } = matter(fileContent);
     return data;

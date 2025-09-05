@@ -1,16 +1,16 @@
 ---
-import Default from '@astrojs/starlight/components/Content.astro';
+import Default from '@astrojs/starlight/components/MarkdownContent.astro';
 import type { Props } from '@astrojs/starlight/props';
 import AuthorBio from './AuthorBio.astro';
 
 // Get the current page's frontmatter data
 const { entry } = Astro.props;
-const frontmatter = entry?.data || {};
+const frontmatter: any = entry?.data || {};
 
 // Determine if we should show the author bio
 // Show for guides, references, and other content (but not for tools, resources, or author pages themselves)
-const shouldShowAuthor = 
-  frontmatter.category && 
+const shouldShowAuthor =
+  frontmatter.category &&
   ['guide', 'reference', 'tutorial'].includes(frontmatter.category) &&
   !Astro.url.pathname.includes('/author/');
 
@@ -23,20 +23,17 @@ const authorSlug = author.toLowerCase().replace(/['\s]+/g, '-');
   <slot />
 </Default>
 
-{shouldShowAuthor && (
-  <div class="author-section">
-    <h2>About the Author</h2>
-    <AuthorBio 
-      author={author}
-      showFull={false}
-    />
-    <p class="author-link">
-      <a href={`/author/${authorSlug}`}>
-        View all articles by {author} →
-      </a>
-    </p>
-  </div>
-)}
+{
+  shouldShowAuthor && (
+    <div class="author-section">
+      <h2>About the Author</h2>
+      <AuthorBio author={author} showFull={false} />
+      <p class="author-link">
+        <a href={`/author/${authorSlug}`}>View all articles by {author} →</a>
+      </p>
+    </div>
+  )
+}
 
 <style>
   .author-section {

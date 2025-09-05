@@ -1,6 +1,9 @@
 ---
 title: WebSocket Resources
-description: Comprehensive collection of WebSocket resources, libraries, and tools for developers. A comprehensive collection of WebSocket specifications, documentation, ...
+description:
+  Comprehensive collection of WebSocket resources, libraries, and tools for
+  developers. A comprehensive collection of WebSocket specifications,
+  documentation, ...
 author: Matthew O'Riordan
 authorRole: Co-founder & CEO, Ably
 date: 2025-09-01T00:00:00.000Z
@@ -24,6 +27,7 @@ seo:
     - php
     - java
 ---
+
 ## Official Specifications & Standards
 
 ### Core WebSocket Standards
@@ -135,7 +139,8 @@ seo:
 - [SockJS](https://github.com/sockjs/sockjs-client) - WebSocket emulation with
   fallback
 
-For a comprehensive comparison of the best WebSocket libraries for Node.js, see [this detailed guide](https://ably.com/blog/websocket-libraries-for-node).
+For a comprehensive comparison of the best WebSocket libraries for Node.js, see
+[this detailed guide](https://ably.com/blog/websocket-libraries-for-node).
 
 - [Reconnecting WebSocket](https://github.com/joewalnes/reconnecting-websocket) -
   Automatic reconnection handling
@@ -287,28 +292,30 @@ For a comprehensive comparison of the best WebSocket libraries for Node.js, see 
 
 ## Quick Start Example
 
-Here's a simple WebSocket example to get you started with real-time communication. This demonstrates the basic connection, message handling, and error management pattern that works across all major libraries:
+Here's a simple WebSocket example to get you started with real-time
+communication. This demonstrates the basic connection, message handling, and
+error management pattern that works across all major libraries:
 
 ```javascript
 // Basic WebSocket connection example
 const ws = new WebSocket('wss://echo.websocket.org');
 
 ws.onopen = () => {
-    console.log('Connected to WebSocket server');
-    ws.send(JSON.stringify({ type: 'greeting', message: 'Hello!' }));
+  console.log('Connected to WebSocket server');
+  ws.send(JSON.stringify({ type: 'greeting', message: 'Hello!' }));
 };
 
 ws.onmessage = (event) => {
-    const data = JSON.parse(event.data);
-    console.log('Received:', data);
+  const data = JSON.parse(event.data);
+  console.log('Received:', data);
 };
 
 ws.onerror = (error) => {
-    console.error('WebSocket error:', error);
+  console.error('WebSocket error:', error);
 };
 
 ws.onclose = (event) => {
-    console.log(`Connection closed: ${event.code} - ${event.reason}`);
+  console.log(`Connection closed: ${event.code} - ${event.reason}`);
 };
 ```
 

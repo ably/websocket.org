@@ -8,7 +8,7 @@ const { entry } = Astro.props;
 
 // Get custom frontmatter data directly from the file
 const customFrontmatter = getFrontmatter(Astro.url.pathname);
-const frontmatter = customFrontmatter || entry?.data || {};
+const frontmatter: any = customFrontmatter || entry?.data || {};
 
 // Get author details
 const author = frontmatter.author || "Matthew O'Riordan";
@@ -16,8 +16,8 @@ const authorSlug = author.toLowerCase().replace(/['\s]+/g, '-');
 const publishedDate = frontmatter.date;
 
 // Determine if we should show the author info at the top
-const shouldShowAuthorInfo = 
-  frontmatter.category && 
+const shouldShowAuthorInfo =
+  frontmatter.category &&
   ['guide', 'reference', 'tutorial'].includes(frontmatter.category) &&
   !Astro.url.pathname.includes('/author/');
 ---
@@ -25,22 +25,25 @@ const shouldShowAuthorInfo =
 <Default {...Astro.props}>
   <slot name="header" slot="header" />
   <slot name="sidebar" slot="sidebar" />
-  {shouldShowAuthorInfo && (
-    <div class="article-meta">
-      <span class="article-author">
-        By <a href={`/author/${authorSlug}`}>{author}</a>
-      </span>
-      {publishedDate && (
-        <span class="article-date">
-          • Published on {new Date(publishedDate).toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric' 
-          })}
+  {
+    shouldShowAuthorInfo && (
+      <div class="article-meta">
+        <span class="article-author">
+          By <a href={`/author/${authorSlug}`}>{author}</a>
         </span>
-      )}
-    </div>
-  )}
+        {publishedDate && (
+          <span class="article-date">
+            • Published on{' '}
+            {new Date(publishedDate).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </span>
+        )}
+      </div>
+    )
+  }
   <slot />
 </Default>
 

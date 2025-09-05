@@ -1,6 +1,11 @@
 ---
 title: C# and .NET WebSocket Implementation
-description: Learn how to implement WebSockets with production-ready code examples, best practices, and real-world patterns. Complete guide to WebSocket clients and servers in C#/.NET using ClientWebSocket, ASP.NET Core, SignalR, Unity, performance optimization, security, testing, and production deployment strategies.
+description:
+  Learn how to implement WebSockets with production-ready code examples, best
+  practices, and real-world patterns. Complete guide to WebSocket clients and
+  servers in C#/.NET using ClientWebSocket, ASP.NET Core, SignalR, Unity,
+  performance optimization, security, testing, and production deployment
+  strategies.
 sidebar:
   order: 6
 author: Matthew O'Riordan
@@ -34,41 +39,76 @@ tags:
   - how-to
 ---
 
-C# and .NET provide one of the most comprehensive and mature ecosystems for WebSocket development, offering everything from low-level `ClientWebSocket` APIs to high-level frameworks like SignalR. This guide covers the full spectrum of WebSocket implementation in the .NET ecosystem, from simple client-server connections to enterprise-scale real-time applications.
+C# and .NET provide one of the most comprehensive and mature ecosystems for
+WebSocket development, offering everything from low-level `ClientWebSocket` APIs
+to high-level frameworks like SignalR. This guide covers the full spectrum of
+WebSocket implementation in the .NET ecosystem, from simple client-server
+connections to enterprise-scale real-time applications.
 
-The .NET platform's approach to WebSocket development emphasizes developer productivity, type safety, and performance. The combination of C#'s powerful language features, the extensive .NET Base Class Library, and the rich ecosystem of third-party packages creates an environment where developers can focus on business logic rather than low-level protocol implementation details.
+The .NET platform's approach to WebSocket development emphasizes developer
+productivity, type safety, and performance. The combination of C#'s powerful
+language features, the extensive .NET Base Class Library, and the rich ecosystem
+of third-party packages creates an environment where developers can focus on
+business logic rather than low-level protocol implementation details.
 
 ## Why Choose C# and .NET for WebSocket Development?
 
-The .NET ecosystem offers compelling advantages for WebSocket development that make it a top choice for enterprise and scalable applications:
+The .NET ecosystem offers compelling advantages for WebSocket development that
+make it a top choice for enterprise and scalable applications:
 
-**Comprehensive Framework Support**: From the built-in `ClientWebSocket` class to ASP.NET Core's sophisticated WebSocket middleware, .NET provides extensive native support for WebSocket protocols without requiring external dependencies.
+**Comprehensive Framework Support**: From the built-in `ClientWebSocket` class
+to ASP.NET Core's sophisticated WebSocket middleware, .NET provides extensive
+native support for WebSocket protocols without requiring external dependencies.
 
-**Enterprise-Grade Performance**: .NET's just-in-time compilation, garbage collection optimization, and runtime performance make it capable of handling thousands of concurrent WebSocket connections efficiently.
+**Enterprise-Grade Performance**: .NET's just-in-time compilation, garbage
+collection optimization, and runtime performance make it capable of handling
+thousands of concurrent WebSocket connections efficiently.
 
-**Rich Ecosystem**: SignalR for high-level real-time communication, ASP.NET Core for web applications, and Unity integration for game development provide solutions for every use case.
+**Rich Ecosystem**: SignalR for high-level real-time communication, ASP.NET Core
+for web applications, and Unity integration for game development provide
+solutions for every use case.
 
-**Cross-Platform Compatibility**: With .NET Core/.NET 5+, your WebSocket applications run on Windows, Linux, macOS, and in containers with consistent performance characteristics.
+**Cross-Platform Compatibility**: With .NET Core/.NET 5+, your WebSocket
+applications run on Windows, Linux, macOS, and in containers with consistent
+performance characteristics.
 
-**Excellent Async Programming Support**: C#'s async/await pattern provides intuitive, efficient handling of WebSocket operations, making it easier to write scalable applications that can handle thousands of concurrent connections without complex threading logic.
+**Excellent Async Programming Support**: C#'s async/await pattern provides
+intuitive, efficient handling of WebSocket operations, making it easier to write
+scalable applications that can handle thousands of concurrent connections
+without complex threading logic.
 
-**Strong Type System**: C#'s static typing helps catch WebSocket protocol errors and serialization issues at compile time, reducing runtime errors and improving overall application reliability. The type system also provides excellent IntelliSense support, making development faster and less error-prone.
+**Strong Type System**: C#'s static typing helps catch WebSocket protocol errors
+and serialization issues at compile time, reducing runtime errors and improving
+overall application reliability. The type system also provides excellent
+IntelliSense support, making development faster and less error-prone.
 
-**Mature Tooling Ecosystem**: The .NET ecosystem includes excellent debugging tools, performance profilers, and monitoring solutions that are essential for diagnosing and optimizing WebSocket applications in production environments. Visual Studio and Visual Studio Code provide sophisticated debugging capabilities for real-time applications.
+**Mature Tooling Ecosystem**: The .NET ecosystem includes excellent debugging
+tools, performance profilers, and monitoring solutions that are essential for
+diagnosing and optimizing WebSocket applications in production environments.
+Visual Studio and Visual Studio Code provide sophisticated debugging
+capabilities for real-time applications.
 
-**Strong Typing and Tooling**: C#'s static typing system prevents many runtime errors, while Visual Studio and other IDEs provide excellent debugging, profiling, and development experiences.
+**Strong Typing and Tooling**: C#'s static typing system prevents many runtime
+errors, while Visual Studio and other IDEs provide excellent debugging,
+profiling, and development experiences.
 
-**Security and Reliability**: Built-in security features, extensive logging capabilities, and proven stability make .NET ideal for mission-critical real-time applications.
+**Security and Reliability**: Built-in security features, extensive logging
+capabilities, and proven stability make .NET ideal for mission-critical
+real-time applications.
 
-**Scalability Options**: From simple in-memory solutions to Redis backplanes and Azure Service Bus, .NET offers multiple paths to scale WebSocket applications horizontally.
+**Scalability Options**: From simple in-memory solutions to Redis backplanes and
+Azure Service Bus, .NET offers multiple paths to scale WebSocket applications
+horizontally.
 
 ## Setting Up Your .NET WebSocket Project
 
-Let's establish a comprehensive project structure that demonstrates both client and server implementations across different .NET scenarios.
+Let's establish a comprehensive project structure that demonstrates both client
+and server implementations across different .NET scenarios.
 
 ### Project Structure and Setup
 
-Create a solution with multiple projects to demonstrate different WebSocket implementation patterns:
+Create a solution with multiple projects to demonstrate different WebSocket
+implementation patterns:
 
 ```bash
 # Create solution and projects
@@ -149,7 +189,8 @@ In `WebSocketGuide.Server/WebSocketGuide.Server.csproj`:
 
 ### Configuration System
 
-Create a robust configuration system in `WebSocketGuide.Core/Configuration/WebSocketOptions.cs`:
+Create a robust configuration system in
+`WebSocketGuide.Core/Configuration/WebSocketOptions.cs`:
 
 ```csharp
 using Microsoft.Extensions.Options;
@@ -245,7 +286,8 @@ public class MonitoringOptions
 }
 ```
 
-This guide covers WebSocket implementation in C# and .NET, including ASP.NET Core, SignalR, and Unity patterns.
+This guide covers WebSocket implementation in C# and .NET, including ASP.NET
+Core, SignalR, and Unity patterns.
 
 ## .NET Client Implementation
 
@@ -1668,7 +1710,8 @@ public class UnityWebSocketClient : MonoBehaviour
 
 ### xUnit Integration Tests
 
-Implement comprehensive WebSocket testing with xUnit and ASP.NET Core Test Server:
+Implement comprehensive WebSocket testing with xUnit and ASP.NET Core Test
+Server:
 
 ```csharp
 using Microsoft.AspNetCore.Hosting;
@@ -1692,7 +1735,7 @@ public class WebSocketIntegrationTests : IAsyncLifetime
     public WebSocketIntegrationTests(ITestOutputHelper output)
     {
         _output = output;
-        
+
         var builder = new WebHostBuilder()
             .ConfigureServices(services =>
             {
@@ -2096,7 +2139,7 @@ public class WebSocketPerformanceTests
             {
                 var stopwatch = Stopwatch.StartNew();
                 await client.SendAsync($"Message {i} from connection {connectionId}");
-                
+
                 // Simple echo response timing (in real scenario, you'd wait for response)
                 await Task.Delay(1); // Simulate network latency
                 stopwatch.Stop();
@@ -2233,72 +2276,72 @@ spec:
       labels:
         app: websocket-server
       annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "8080"
-        prometheus.io/path: "/metrics"
+        prometheus.io/scrape: 'true'
+        prometheus.io/port: '8080'
+        prometheus.io/path: '/metrics'
     spec:
       containers:
-      - name: websocket-server
-        image: your-registry/websocket-server:latest
-        ports:
-        - containerPort: 8080
-          name: http
-          protocol: TCP
-        env:
-        - name: ASPNETCORE_ENVIRONMENT
-          value: "Production"
-        - name: WebSocket__MaxConnections
-          value: "10000"
-        - name: WebSocket__Redis__ConnectionString
-          valueFrom:
-            secretKeyRef:
-              name: websocket-secrets
-              key: redis-connection-string
-        - name: Logging__LogLevel__Default
-          value: "Information"
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "100m"
-          limits:
-            memory: "1Gi"
-            cpu: "500m"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8080
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
-        readinessProbe:
-          httpGet:
-            path: /health/ready
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
-        volumeMounts:
-        - name: config
-          mountPath: /app/config
-          readOnly: true
+        - name: websocket-server
+          image: your-registry/websocket-server:latest
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: 'Production'
+            - name: WebSocket__MaxConnections
+              value: '10000'
+            - name: WebSocket__Redis__ConnectionString
+              valueFrom:
+                secretKeyRef:
+                  name: websocket-secrets
+                  key: redis-connection-string
+            - name: Logging__LogLevel__Default
+              value: 'Information'
+          resources:
+            requests:
+              memory: '256Mi'
+              cpu: '100m'
+            limits:
+              memory: '1Gi'
+              cpu: '500m'
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          volumeMounts:
+            - name: config
+              mountPath: /app/config
+              readOnly: true
       volumes:
-      - name: config
-        configMap:
-          name: websocket-config
+        - name: config
+          configMap:
+            name: websocket-config
       affinity:
         podAntiAffinity:
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: app
-                  operator: In
-                  values:
-                  - websocket-server
-              topologyKey: kubernetes.io/hostname
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - websocket-server
+                topologyKey: kubernetes.io/hostname
 
 ---
 apiVersion: v1
@@ -2312,11 +2355,11 @@ spec:
   selector:
     app: websocket-server
   ports:
-  - port: 80
-    targetPort: 8080
-    protocol: TCP
-    name: http
-  sessionAffinity: ClientIP  # Important for WebSocket connections
+    - port: 80
+      targetPort: 8080
+      protocol: TCP
+      name: http
+  sessionAffinity: ClientIP # Important for WebSocket connections
   sessionAffinityConfig:
     clientIP:
       timeoutSeconds: 3600
@@ -2334,25 +2377,25 @@ spec:
   minReplicas: 2
   maxReplicas: 10
   metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 80
-  - type: Pods
-    pods:
-      metric:
-        name: websocket_active_connections
-      target:
-        type: AverageValue
-        averageValue: "1000"
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+    - type: Pods
+      pods:
+        metric:
+          name: websocket_active_connections
+        target:
+          type: AverageValue
+          averageValue: '1000'
 
 ---
 apiVersion: v1
@@ -2484,55 +2527,88 @@ For enterprise deployments on Azure Service Fabric:
 
 ### Connection Problems
 
-**Issue**: WebSocket connections are being refused or timing out
-**Solution**: Check firewall settings, proxy configurations, and ensure your server is properly configured to accept WebSocket upgrades. Verify the Origin header is in your allowed origins list.
+**Issue**: WebSocket connections are being refused or timing out **Solution**:
+Check firewall settings, proxy configurations, and ensure your server is
+properly configured to accept WebSocket upgrades. Verify the Origin header is in
+your allowed origins list.
 
-**Issue**: Connections drop frequently in production
-**Solution**: Implement proper heartbeat/ping mechanisms, check load balancer configuration for sticky sessions, and ensure your connection timeout settings are appropriate.
+**Issue**: Connections drop frequently in production **Solution**: Implement
+proper heartbeat/ping mechanisms, check load balancer configuration for sticky
+sessions, and ensure your connection timeout settings are appropriate.
 
-**Issue**: Memory leaks with long-running connections
-**Solution**: Properly implement IDisposable patterns, use weak event subscriptions where appropriate, and monitor memory usage with diagnostic tools like PerfView or Application Insights.
+**Issue**: Memory leaks with long-running connections **Solution**: Properly
+implement IDisposable patterns, use weak event subscriptions where appropriate,
+and monitor memory usage with diagnostic tools like PerfView or Application
+Insights.
 
 ### Performance Issues
 
-**Issue**: High CPU usage with many concurrent connections
-**Solution**: Profile your message handling code, consider using channels for message processing, and ensure you're not blocking async operations.
+**Issue**: High CPU usage with many concurrent connections **Solution**: Profile
+your message handling code, consider using channels for message processing, and
+ensure you're not blocking async operations.
 
-**Issue**: Message delivery delays under load
-**Solution**: Implement message queuing, consider batching small messages, and optimize your JSON serialization with source generators.
+**Issue**: Message delivery delays under load **Solution**: Implement message
+queuing, consider batching small messages, and optimize your JSON serialization
+with source generators.
 
-**Issue**: SignalR group operations are slow
-**Solution**: Use Redis backplane for scale-out scenarios, optimize group membership operations, and consider message filtering strategies.
+**Issue**: SignalR group operations are slow **Solution**: Use Redis backplane
+for scale-out scenarios, optimize group membership operations, and consider
+message filtering strategies.
 
 ### Authentication and Authorization Issues
 
-**Issue**: JWT tokens expiring during long-lived connections
-**Solution**: Implement token refresh mechanisms, use shorter-lived access tokens with refresh tokens, or implement connection re-authentication flows.
+**Issue**: JWT tokens expiring during long-lived connections **Solution**:
+Implement token refresh mechanisms, use shorter-lived access tokens with refresh
+tokens, or implement connection re-authentication flows.
 
-**Issue**: CORS errors in browser clients
-**Solution**: Configure CORS properly in your ASP.NET Core application, ensure your allowed origins include the correct protocols and ports.
+**Issue**: CORS errors in browser clients **Solution**: Configure CORS properly
+in your ASP.NET Core application, ensure your allowed origins include the
+correct protocols and ports.
 
 ## Conclusion
 
-C# and .NET provide a comprehensive, mature, and powerful platform for WebSocket development. From the low-level `ClientWebSocket` API that gives you complete control over the connection lifecycle, to high-level frameworks like SignalR that abstract away the complexity of real-time communication, the .NET ecosystem has solutions for every use case.
+C# and .NET provide a comprehensive, mature, and powerful platform for WebSocket
+development. From the low-level `ClientWebSocket` API that gives you complete
+control over the connection lifecycle, to high-level frameworks like SignalR
+that abstract away the complexity of real-time communication, the .NET ecosystem
+has solutions for every use case.
 
 Key takeaways from this guide:
 
-- **Choose the Right Approach**: Use `ClientWebSocket` for maximum control, ASP.NET Core WebSocket middleware for custom server implementations, and SignalR for rapid development of real-time applications.
+- **Choose the Right Approach**: Use `ClientWebSocket` for maximum control,
+  ASP.NET Core WebSocket middleware for custom server implementations, and
+  SignalR for rapid development of real-time applications.
 
-- **Implement Robust Error Handling**: WebSocket connections are inherently unreliable due to network conditions. Implement comprehensive reconnection strategies, circuit breakers, and graceful degradation.
+- **Implement Robust Error Handling**: WebSocket connections are inherently
+  unreliable due to network conditions. Implement comprehensive reconnection
+  strategies, circuit breakers, and graceful degradation.
 
-- **Design for Scale**: Consider connection pooling, message batching, Redis backplanes for SignalR, and horizontal scaling strategies from the beginning.
+- **Design for Scale**: Consider connection pooling, message batching, Redis
+  backplanes for SignalR, and horizontal scaling strategies from the beginning.
 
-- **Prioritize Security**: Always use WSS in production, implement proper authentication and authorization, validate all inputs, and follow security best practices.
+- **Prioritize Security**: Always use WSS in production, implement proper
+  authentication and authorization, validate all inputs, and follow security
+  best practices.
 
-- **Monitor and Observe**: Implement comprehensive monitoring, health checks, and distributed tracing to understand your WebSocket application's behavior in production.
+- **Monitor and Observe**: Implement comprehensive monitoring, health checks,
+  and distributed tracing to understand your WebSocket application's behavior in
+  production.
 
-- **Test Thoroughly**: Use the testing patterns demonstrated in this guide to ensure your WebSocket implementation works correctly under load and handles edge cases gracefully.
+- **Test Thoroughly**: Use the testing patterns demonstrated in this guide to
+  ensure your WebSocket implementation works correctly under load and handles
+  edge cases gracefully.
 
-The .NET ecosystem's strong typing, excellent tooling, cross-platform capabilities, and enterprise-grade features make it an excellent choice for building robust, scalable, and maintainable WebSocket applications. Whether you're building a simple chat application, a real-time collaborative tool, or a high-frequency trading platform, .NET has the tools and frameworks you need to succeed.
+The .NET ecosystem's strong typing, excellent tooling, cross-platform
+capabilities, and enterprise-grade features make it an excellent choice for
+building robust, scalable, and maintainable WebSocket applications. Whether
+you're building a simple chat application, a real-time collaborative tool, or a
+high-frequency trading platform, .NET has the tools and frameworks you need to
+succeed.
 
-With the patterns, practices, and code examples provided in this guide, you have everything needed to implement production-ready WebSocket applications that can handle thousands of concurrent connections while maintaining excellent performance, security, and reliability.
+With the patterns, practices, and code examples provided in this guide, you have
+everything needed to implement production-ready WebSocket applications that can
+handle thousands of concurrent connections while maintaining excellent
+performance, security, and reliability.
 
 ### Monitoring
 
@@ -2544,8 +2620,28 @@ With the patterns, practices, and code examples provided in this guide, you have
 
 ## The .NET Advantage for Enterprise WebSocket Solutions
 
-The .NET ecosystem's approach to WebSocket development reflects Microsoft's broader strategy of providing comprehensive, enterprise-ready solutions. This isn't just about providing WebSocket APIs - it's about integrating WebSocket capabilities throughout the entire platform. From Azure SignalR Service for managed WebSocket infrastructure to Visual Studio's sophisticated debugging capabilities for WebSocket connections, the entire toolchain is optimized for productive development.
+The .NET ecosystem's approach to WebSocket development reflects Microsoft's
+broader strategy of providing comprehensive, enterprise-ready solutions. This
+isn't just about providing WebSocket APIs - it's about integrating WebSocket
+capabilities throughout the entire platform. From Azure SignalR Service for
+managed WebSocket infrastructure to Visual Studio's sophisticated debugging
+capabilities for WebSocket connections, the entire toolchain is optimized for
+productive development.
 
-The evolution from .NET Framework to .NET Core and now .NET 6+ represents a fundamental shift in how Microsoft approaches web development. The platform is now truly cross-platform, high-performance, and cloud-native. For WebSocket applications, this means being able to develop on any operating system, deploy to any cloud provider, and achieve performance that rivals or exceeds traditional compiled languages. The performance improvements in recent .NET versions have been particularly impressive for I/O-bound operations like WebSocket communication.
+The evolution from .NET Framework to .NET Core and now .NET 6+ represents a
+fundamental shift in how Microsoft approaches web development. The platform is
+now truly cross-platform, high-performance, and cloud-native. For WebSocket
+applications, this means being able to develop on any operating system, deploy
+to any cloud provider, and achieve performance that rivals or exceeds
+traditional compiled languages. The performance improvements in recent .NET
+versions have been particularly impressive for I/O-bound operations like
+WebSocket communication.
 
-Integration with the broader Microsoft ecosystem provides unique advantages for enterprise WebSocket applications. Azure Active Directory integration simplifies authentication, Application Insights provides comprehensive monitoring, and Azure DevOps enables sophisticated CI/CD pipelines. For organizations already invested in the Microsoft ecosystem, these integrations reduce development time and operational complexity significantly. The ability to use the same identity provider, monitoring solution, and deployment pipeline for both traditional web applications and WebSocket services simplifies the overall architecture.
+Integration with the broader Microsoft ecosystem provides unique advantages for
+enterprise WebSocket applications. Azure Active Directory integration simplifies
+authentication, Application Insights provides comprehensive monitoring, and
+Azure DevOps enables sophisticated CI/CD pipelines. For organizations already
+invested in the Microsoft ecosystem, these integrations reduce development time
+and operational complexity significantly. The ability to use the same identity
+provider, monitoring solution, and deployment pipeline for both traditional web
+applications and WebSocket services simplifies the overall architecture.

@@ -82,7 +82,10 @@ export default defineConfig({
         },
         {
           label: 'Resources',
-          items: [{ label: 'WebSocket Resources', link: '/resources/websocket-resources/' }],
+          items: [
+            { label: 'WebSocket Resources', link: '/resources/websocket-resources/' },
+            { label: '📖 Once Upon a Socket', link: '/once-upon-a-socket' },
+          ],
         },
       ],
       editLink: {
