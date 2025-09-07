@@ -84,6 +84,7 @@ export default defineConfig({
           label: 'Resources',
           items: [
             { label: 'WebSocket Resources', link: '/resources/websocket-resources/' },
+            { label: 'Community', link: '/resources/community/' },
             { label: '📖 Once Upon a Socket', link: '/once-upon-a-socket' },
           ],
         },

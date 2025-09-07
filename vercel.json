@@ -1,10 +1,103 @@
 {
-    "redirects": [
-        { "source": "/echo.html", "destination": "/tools/websocket-echo-server", "permanent": true },
-        { "source": "/echo", "destination": "/tools/websocket-echo-server", "permanent": false },
-        { "source": "/demos/racer/run/", "destination": "https://ably.com/examples", "permanent": true },
-        { "source": "/index.html", "destination": "/", "permanent": true },
-        { "source": "/aboutwebsocket.html", "destination": "/guides/websocket-protocol", "permanent": true },
-        { "source": "/quantum.html", "destination": "/guides/road-to-websockets", "permanent": true }
-    ]
+  "redirects": [
+    { "source": "/echo.html", "destination": "/tools/websocket-echo-server", "permanent": true },
+    { "source": "/echo", "destination": "/tools/websocket-echo-server", "permanent": false },
+    {
+      "source": "/demos/racer/run/",
+      "destination": "https://ably.com/examples",
+      "permanent": true
+    },
+    { "source": "/index.html", "destination": "/", "permanent": true },
+    {
+      "source": "/aboutwebsocket.html",
+      "destination": "/guides/websocket-protocol",
+      "permanent": true
+    },
+    { "source": "/quantum.html", "destination": "/guides/road-to-websockets", "permanent": true },
+    { "source": "/css/style.css;254406", "destination": "/", "permanent": true },
+    { "source": "/community.html", "destination": "/resources/community/", "permanent": true },
+    { "source": "/community", "destination": "/resources/community/", "permanent": true },
+    { "source": "/echo.html,", "destination": "/tools/websocket-echo-server", "permanent": true },
+    { "source": "/aboutwebsoc", "destination": "/guides/websocket-protocol", "permanent": true },
+    { "source": "/echo.htmlas", "destination": "/tools/websocket-echo-server", "permanent": true },
+    { "source": "/echo.html ", "destination": "/tools/websocket-echo-server", "permanent": true },
+    {
+      "source": "/portfolio/polling.html",
+      "destination": "/guides/road-to-websockets",
+      "permanent": true
+    },
+    { "source": "/ ", "destination": "/", "permanent": true },
+    { "source": "/echo.html)", "destination": "/tools/websocket-echo-server", "permanent": true },
+    { "source": "/echo.html.", "destination": "/tools/websocket-echo-server", "permanent": true },
+    {
+      "source": "/echo.html，然后连接到",
+      "destination": "/tools/websocket-echo-server",
+      "permanent": true
+    },
+    { "source": "/echo.html]", "destination": "/tools/websocket-echo-server", "permanent": true },
+    {
+      "source": "/aboutwebsocket.html!",
+      "destination": "/guides/websocket-protocol",
+      "permanent": true
+    },
+    { "source": "/quantum.html]", "destination": "/guides/road-to-websockets", "permanent": true },
+    {
+      "source": "/performance-monitoring.html",
+      "destination": "/guides/websockets-at-scale",
+      "permanent": true
+    },
+    {
+      "source": "/aboutwebsocket.html ",
+      "destination": "/guides/websocket-protocol",
+      "permanent": true
+    },
+    { "source": "/r/n", "destination": "/", "permanent": true },
+    { "source": "/echol", "destination": "/tools/websocket-echo-server", "permanent": true },
+    { "source": "/aboutwebsocke", "destination": "/guides/websocket-protocol", "permanent": true },
+    { "source": "/echo.htm!", "destination": "/tools/websocket-echo-server", "permanent": true },
+    { "source": "/echo.htms", "destination": "/tools/websocket-echo-server", "permanent": true },
+    {
+      "source": "/intro.html",
+      "destination": "/guides/building-a-websocket-app",
+      "permanent": true
+    },
+    { "source": "/stomp", "destination": "/guides/websocket-protocol", "permanent": true },
+    {
+      "source": "/test_tools.html",
+      "destination": "/tools/websocket-echo-server",
+      "permanent": true
+    },
+    {
+      "source": "/js/echo.js:136:17",
+      "destination": "/tools/websocket-echo-server",
+      "permanent": true
+    },
+    {
+      "source": "/encrypted-textSource",
+      "destination": "/guides/websocket-protocol",
+      "permanent": true
+    },
+    { "source": "/echo.html:", "destination": "/tools/websocket-echo-server", "permanent": true },
+    { "source": "/secure.html", "destination": "/guides/security/", "permanent": true },
+    {
+      "source": "/troubleshooting.html",
+      "destination": "/guides/building-a-websocket-app",
+      "permanent": true
+    },
+    {
+      "source": "/quick-tutorial/",
+      "destination": "/guides/building-a-websocket-app",
+      "permanent": true
+    },
+    {
+      "source": "/aboutwebsocket.htm",
+      "destination": "/guides/websocket-protocol",
+      "permanent": true
+    },
+    {
+      "source": "/echo.htmlは、成功しています。",
+      "destination": "/tools/websocket-echo-server",
+      "permanent": true
+    }
+  ]
 }
