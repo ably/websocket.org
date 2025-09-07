@@ -5,16 +5,45 @@
 WebSocket.org is the canonical resource for WebSocket protocol implementation.
 This is an Astro-based static site with strict quality standards.
 
-## Critical Pre-Commit Checklist
+## MANDATORY: Pre-Commit Requirements
 
-**ALWAYS run before considering any task complete:**
+### 🚨 CRITICAL: ALL Changes MUST Pass These Checks
+
+**These commands MUST ALL pass with ZERO errors before ANY task is complete:**
 
 ```bash
-npm run lint        # Check for linting issues
-npm run lint:fix    # Auto-fix what's possible
-npm run format      # Format code
-npm run dev         # Test changes in dev server
-npm test           # Run tests if applicable
+# Run in this EXACT order:
+npm run lint:fix    # 1. Auto-fix linting issues
+npm run lint        # 2. Verify linting passes (MUST show zero errors)
+npm run format      # 3. Format all code with Prettier (MUST complete without errors)
+npm run lint        # 4. Run lint again to ensure formatting didn't break anything
+```
+
+### ⛔ NEVER Consider Work Complete If
+
+- `npm run lint` shows ANY errors
+- `npm run format` shows ANY errors
+- The pre-commit hook would fail
+- You haven't run ALL the above commands
+
+### Common Issues That Block Commits
+
+1. **Linting Errors (MD013, MD009, MD047)**
+   - Lines over 120 characters
+   - Trailing spaces
+   - Missing newline at end of file
+
+2. **Formatting Issues**
+   - Prettier formatting not applied
+   - Inconsistent indentation
+   - Improper line breaks
+
+### The Final Check Before Completion
+
+```bash
+# This sequence MUST succeed completely:
+npm run lint:fix && npm run format && npm run lint
+# If ANY command fails, fix the issues and run the entire sequence again
 ```
 
 ### Testing Infrastructure Guides
@@ -82,6 +111,28 @@ src/
 - Document browser compatibility accurately
 
 ## Content Guidelines
+
+### Page Structure
+
+- **IMPORTANT**: Never add a top-level heading (`# Title`) in content pages
+- The page title is automatically generated from the frontmatter `title` field
+- Start content directly after frontmatter or with `## H2` sections
+- Example:
+
+  ```markdown
+  ---
+  title: Your Page Title
+  description: Page description
+  ---
+
+  Start content here without # heading.
+
+  ## First Section
+
+  Content...
+  ```
+
+### Writing Standards
 
 - Practical, production-focused (beyond MDN's API docs)
 - Include infrastructure configs (Nginx, AWS ALB, etc.)
