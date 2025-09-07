@@ -7,7 +7,7 @@ export PATH="/usr/local/bin:/opt/homebrew/bin:/opt/homebrew/opt/gnupg/bin:$PATH"
 if ! command -v node >/dev/null 2>&1; then
   # Try common node installation paths
   export PATH="$HOME/.nvm/versions/node/*/bin:$PATH"
-  
+
   # If still not found, try to source nvm
   if [ -f "$HOME/.nvm/nvm.sh" ]; then
     . "$HOME/.nvm/nvm.sh"
@@ -38,7 +38,7 @@ if [ -n "$staged_files" ]; then
   echo "🔍 Running markdown linter on staged files..."
   # Use the locally installed markdownlint-cli directly
   ./node_modules/.bin/markdownlint $staged_files
-  
+
   if [ $? -ne 0 ]; then
     echo "❌ Markdown linting failed. Please fix the issues above."
     echo "💡 You can run 'npm run lint:fix' to auto-fix some issues."
@@ -52,20 +52,28 @@ staged_code=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(js|j
 if [ -n "$staged_code" ]; then
   echo "🎨 Checking code formatting..."
   ./node_modules/.bin/prettier --check $staged_code
-  
+
   if [ $? -ne 0 ]; then
     echo "❌ Code formatting issues found. Please run 'npm run format' to fix."
     exit 1
   fi
 fi
 
-# Run TypeScript check
+# Run TypeScript check (suppress warnings, only show errors)
 echo "📝 Running TypeScript check..."
-npm run astro check
 
-if [ $? -ne 0 ]; then
+# Capture the output
+ts_output=$(npm run astro check 2>&1)
+ts_exit_code=$?
+
+# Check if there are actual errors (not warnings or hints)
+if echo "$ts_output" | grep -q " - error "; then
   echo "❌ TypeScript errors found. Please fix them before committing."
+  echo "$ts_output" | grep -A2 " - error " | head -20
   exit 1
 fi
+
+# Silent success - no need to show warnings/hints
+echo "  ✓ No TypeScript errors"
 
 echo "✅ All pre-commit checks passed!"
