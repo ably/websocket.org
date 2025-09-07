@@ -1,9 +1,12 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
+import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://websocket.org',
   integrations: [
+    sitemap(),
     starlight({
       title: 'WebSocket.org',
       social: {
