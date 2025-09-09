@@ -1,0 +1,988 @@
+---
+title: "WebSockets vs Server-Sent Events (SSE): Choosing Your Real-Time Protocol"
+description: "In-depth comparison of WebSockets and Server-Sent Events. Learn when to use SSE's simple server-push model vs WebSocket's bidirectional communication, with code examples and production insights."
+author: "Matthew O'Riordan"
+authorRole: "Co-founder & CEO, Ably"
+date: 2025-01-07
+keywords: ["websocket vs server sent events", "websocket vs sse", "eventsource api", "server push technology", "real-time streaming", "sse vs websocket performance"]
+---
+
+import { Tabs, TabItem } from '@astrojs/starlight/components';
+
+## Quick Summary
+
+Server-Sent Events (SSE) provides a simple, HTTP-based protocol for server-to-client streaming, while WebSockets offers full bidirectional communication. Choose SSE when you only need server push with automatic reconnection and HTTP/2 compatibility. Choose WebSockets for chat, gaming, or any scenario requiring client-to-server communication beyond the initial request.
+
+## Table of Contents
+
+- [At a Glance Comparison](#at-a-glance-comparison)
+- [How Server-Sent Events Work](#how-server-sent-events-work)
+- [How WebSockets Work](#how-websockets-work)
+- [Key Differences](#key-differences)
+- [Use Case Analysis](#use-case-analysis)
+- [Implementation Examples](#implementation-examples)
+- [Browser Quirks and Limitations](#browser-quirks-and-limitations)
+- [Conclusion](#conclusion)
+- [Further Reading](#further-reading)
+
+## At a Glance Comparison
+
+| Feature | Server-Sent Events | WebSockets |
+|---------|-------------------|------------|
+| **Direction** | Server → Client only | Bidirectional |
+| **Protocol** | HTTP/1.1 or HTTP/2 | WebSocket (after HTTP upgrade) |
+| **Automatic Reconnection** | ✅ Built-in | ❌ Manual implementation |
+| **Connection Limit** | 6 per domain (HTTP/1.1) | No browser limit |
+| **Binary Data** | ❌ Text only | ✅ Binary and text |
+| **Compression** | ✅ HTTP compression | ✅ Permessage-deflate |
+| **HTTP/2 Multiplexing** | ✅ Full support | ❌ No benefit |
+| **Proxy/CDN Support** | ✅ Excellent | ✅ Good (modern CDNs) |
+| **CORS Support** | ✅ Standard | ⚠️ Origin check only |
+| **Browser Support** | 97% | 99%+ |
+| **Message Framing** | ✅ Built-in with IDs | ❌ Manual implementation |
+| **Complexity** | Low | Medium |
+
+## How Server-Sent Events Work
+
+SSE uses a persistent HTTP connection to stream events from server to client using a simple text-based format.
+
+### The EventSource API
+
+```javascript
+const eventSource = new EventSource('/events');
+
+eventSource.onopen = (event) => {
+  console.log('Connection opened');
+};
+
+eventSource.onmessage = (event) => {
+  console.log('Received:', event.data);
+};
+
+eventSource.onerror = (event) => {
+  if (event.target.readyState === EventSource.CLOSED) {
+    console.log('Connection closed');
+  } else {
+    console.log('Connection error, will retry');
+  }
+};
+
+// Named events
+eventSource.addEventListener('user-login', (event) => {
+  console.log('User logged in:', event.data);
+});
+```
+
+### SSE Wire Format
+
+The SSE protocol uses a simple text format:
+
+```
+HTTP/1.1 200 OK
+Content-Type: text/event-stream
+Cache-Control: no-cache
+Connection: keep-alive
+
+data: First message
+
+data: Second message
+id: 2
+
+event: user-login
+data: {"username": "alice"}
+
+: This is a comment (heartbeat)
+
+data: Multi-line message
+data: Line 2
+data: Line 3
+
+retry: 5000
+
+```
+
+Each message is separated by double newlines (`\n\n`), with fields including:
+- `data:` - The message payload
+- `event:` - Event type for named events
+- `id:` - Message ID for resumption
+- `retry:` - Reconnection time in milliseconds
+- `:` - Comments (often used for keepalive)
+
+### Connection Lifecycle
+
+```
+Client                           Server
+  |                                |
+  |-------- GET /events --------->|
+  | (Includes Last-Event-ID if     |
+  |  reconnecting)                 |
+  |                                |
+  |<-- HTTP 200 text/event-stream -|
+  |                                |
+  |                                |
+  |<---- data: message 1\n\n ------|
+  |                                |
+  |<---- data: message 2\n\n ------|
+  |                                |
+  |<------ : keepalive\n\n -------|
+  |                                |
+  |\                              /|
+  | \  Connection drops          / |
+  |  \                          /  |
+  |                                |
+  |-- GET /events (Last-Event-ID) >|
+  | (Automatic reconnection)       |
+  |                                |
+  |<--- Resume from message 3 -----|
+  |                                |
+```
+
+## How WebSockets Work
+
+WebSockets create a full-duplex communication channel through an HTTP upgrade handshake.
+
+### WebSocket Connection
+
+```javascript
+const ws = new WebSocket('wss://example.com/socket');
+
+ws.onopen = (event) => {
+  console.log('Connected');
+  ws.send('Hello Server');
+};
+
+ws.onmessage = (event) => {
+  console.log('Received:', event.data);
+};
+
+ws.onerror = (error) => {
+  console.error('Error:', error);
+};
+
+ws.onclose = (event) => {
+  console.log('Disconnected:', event.code, event.reason);
+  // Manual reconnection needed
+};
+
+// Send various data types
+ws.send('Text message');
+ws.send(JSON.stringify({ type: 'json' }));
+ws.send(new Blob(['binary data']));
+ws.send(new ArrayBuffer(8));
+```
+
+## Key Differences
+
+### 1. Communication Direction
+
+**SSE: Unidirectional (Server → Client)**
+```javascript
+// SSE: Client can only receive
+eventSource.onmessage = (event) => {
+  updateUI(event.data);
+};
+
+// To send data, need separate HTTP request
+async function sendToServer(data) {
+  await fetch('/api/action', {
+    method: 'POST',
+    body: JSON.stringify(data)
+  });
+}
+```
+
+**WebSocket: Bidirectional**
+```javascript
+// WebSocket: Both send and receive on same connection
+ws.onmessage = (event) => {
+  updateUI(event.data);
+};
+
+ws.send(JSON.stringify({
+  action: 'user-input',
+  data: 'Hello'
+}));
+```
+
+### 2. Automatic Reconnection
+
+**SSE: Built-in reconnection with resume**
+```javascript
+// No code needed! EventSource handles it automatically
+const eventSource = new EventSource('/events');
+
+// Server can set retry interval
+// retry: 5000
+```
+
+**WebSocket: Manual reconnection required**
+```javascript
+class ReconnectingWebSocket {
+  constructor(url) {
+    this.url = url;
+    this.reconnectDelay = 1000;
+    this.shouldReconnect = true;
+    this.connect();
+  }
+  
+  connect() {
+    this.ws = new WebSocket(this.url);
+    
+    this.ws.onclose = () => {
+      if (this.shouldReconnect) {
+        setTimeout(() => {
+          this.reconnectDelay *= 2; // Exponential backoff
+          this.connect();
+        }, this.reconnectDelay);
+      }
+    };
+    
+    this.ws.onopen = () => {
+      this.reconnectDelay = 1000; // Reset delay
+    };
+  }
+}
+```
+
+### 3. Data Types
+
+**SSE: Text only (UTF-8)**
+```javascript
+// SSE: Must serialize binary data
+eventSource.onmessage = (event) => {
+  // event.data is always a string
+  const text = event.data;
+  
+  // For binary, need base64 encoding
+  const binary = atob(event.data);
+};
+```
+
+**WebSocket: Binary and text**
+```javascript
+// WebSocket: Native binary support
+ws.binaryType = 'arraybuffer'; // or 'blob'
+
+ws.onmessage = (event) => {
+  if (event.data instanceof ArrayBuffer) {
+    // Binary data
+    const view = new DataView(event.data);
+    processBytes(view);
+  } else {
+    // Text data
+    const text = event.data;
+  }
+};
+
+// Send binary directly
+const buffer = new ArrayBuffer(1024);
+ws.send(buffer);
+```
+
+### 4. Message Boundaries and Framing
+
+**SSE: Built-in message framing**
+```javascript
+// Each event is discrete and complete
+eventSource.onmessage = (event) => {
+  // event.data contains one complete message
+  // No need to handle partial messages
+};
+```
+
+**WebSocket: Messages always complete but need structure**
+```javascript
+// WebSocket ensures message boundaries but not structure
+ws.onmessage = (event) => {
+  try {
+    const message = JSON.parse(event.data);
+    // Handle based on message type
+    switch(message.type) {
+      case 'chat': handleChat(message); break;
+      case 'status': handleStatus(message); break;
+    }
+  } catch (e) {
+    console.error('Invalid message format');
+  }
+};
+```
+
+### 5. HTTP/2 Benefits
+
+**SSE: Full HTTP/2 multiplexing**
+```javascript
+// SSE over HTTP/2: Multiple streams, one connection
+const events1 = new EventSource('/events/stream1');
+const events2 = new EventSource('/events/stream2');
+const events3 = new EventSource('/events/stream3');
+// All share single HTTP/2 connection!
+```
+
+**WebSocket: No HTTP/2 benefits**
+```javascript
+// Each WebSocket needs separate TCP connection
+const ws1 = new WebSocket('wss://example.com/socket1');
+const ws2 = new WebSocket('wss://example.com/socket2');
+// Two separate TCP connections required
+```
+
+## Use Case Analysis
+
+### When to Use SSE
+
+✅ **Perfect for:**
+- Live news feeds
+- Stock price updates
+- Server monitoring dashboards
+- Social media feeds
+- Notification systems
+- Progress indicators
+- Live sports scores
+- Log streaming
+
+**Example: Live Dashboard**
+```javascript
+// SSE excels at server-push dashboards
+const dashboard = new EventSource('/api/metrics');
+
+dashboard.addEventListener('cpu', (e) => {
+  updateCPUChart(JSON.parse(e.data));
+});
+
+dashboard.addEventListener('memory', (e) => {
+  updateMemoryChart(JSON.parse(e.data));
+});
+
+dashboard.addEventListener('requests', (e) => {
+  updateRequestCount(JSON.parse(e.data));
+});
+
+// Automatic reconnection ensures reliability
+dashboard.onerror = () => {
+  showReconnectingIndicator();
+};
+```
+
+### When to Use WebSockets
+
+✅ **Perfect for:**
+- Chat applications
+- Multiplayer games
+- Collaborative editing
+- Video/audio signaling
+- Remote control systems
+- Trading platforms
+- IoT device control
+- Real-time location sharing
+
+**Example: Chat Application**
+```javascript
+// WebSocket needed for bidirectional chat
+const chat = new WebSocket('wss://chat.example.com');
+
+// Send messages
+function sendMessage(text) {
+  chat.send(JSON.stringify({
+    type: 'message',
+    text: text,
+    timestamp: Date.now()
+  }));
+}
+
+// Receive messages
+chat.onmessage = (event) => {
+  const msg = JSON.parse(event.data);
+  displayMessage(msg);
+};
+
+// Send typing indicators
+function sendTyping() {
+  chat.send(JSON.stringify({
+    type: 'typing',
+    user: currentUser
+  }));
+}
+```
+
+### The Hybrid Approach
+
+Sometimes using both makes sense:
+
+```javascript
+// Use SSE for server broadcasts
+const broadcasts = new EventSource('/api/broadcasts');
+broadcasts.onmessage = (e) => {
+  showNotification(e.data);
+};
+
+// Use WebSocket for interactive features
+const interactive = new WebSocket('wss://api.example.com/interactive');
+interactive.onmessage = handleInteractiveMessage;
+interactive.send(JSON.stringify({ action: 'subscribe', room: 'lobby' }));
+
+// Use regular HTTP for standard operations
+async function updateProfile(data) {
+  await fetch('/api/profile', {
+    method: 'PUT',
+    body: JSON.stringify(data)
+  });
+}
+```
+
+## Implementation Examples
+
+### Server Implementation
+
+<Tabs>
+<TabItem label="Node.js">
+```javascript
+// SSE Server
+const express = require('express');
+const app = express();
+
+app.get('/events', (req, res) => {
+  res.writeHead(200, {
+    'Content-Type': 'text/event-stream',
+    'Cache-Control': 'no-cache',
+    'Connection': 'keep-alive',
+    'Access-Control-Allow-Origin': '*'
+  });
+  
+  // Send initial data
+  res.write('data: Connected\n\n');
+  
+  // Send periodic updates
+  const interval = setInterval(() => {
+    const data = JSON.stringify({
+      time: new Date().toISOString(),
+      value: Math.random()
+    });
+    res.write(`data: ${data}\n\n`);
+  }, 1000);
+  
+  // Send named events
+  setTimeout(() => {
+    res.write('event: special\n');
+    res.write('data: Special event occurred\n\n');
+  }, 5000);
+  
+  // Cleanup on disconnect
+  req.on('close', () => {
+    clearInterval(interval);
+  });
+});
+
+// WebSocket Server (for comparison)
+const WebSocket = require('ws');
+const wss = new WebSocket.Server({ port: 8080 });
+
+wss.on('connection', (ws) => {
+  ws.on('message', (message) => {
+    // Echo to all clients
+    wss.clients.forEach(client => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(message);
+      }
+    });
+  });
+});
+
+app.listen(3000);
+```
+</TabItem>
+<TabItem label="Python">
+```python
+# SSE Server with Flask
+from flask import Flask, Response
+import json
+import time
+
+app = Flask(__name__)
+
+def generate_events():
+    """Generator function for SSE"""
+    count = 0
+    while True:
+        count += 1
+        
+        # Regular message
+        data = json.dumps({
+            'count': count,
+            'time': time.time()
+        })
+        yield f"data: {data}\n\n"
+        
+        # Named event every 5 messages
+        if count % 5 == 0:
+            yield f"event: milestone\n"
+            yield f"data: Reached {count} messages\n\n"
+        
+        # Heartbeat comment
+        if count % 10 == 0:
+            yield ": keepalive\n\n"
+        
+        time.sleep(1)
+
+@app.route('/events')
+def events():
+    return Response(
+        generate_events(),
+        mimetype='text/event-stream',
+        headers={
+            'Cache-Control': 'no-cache',
+            'X-Accel-Buffering': 'no'  # Disable Nginx buffering
+        }
+    )
+
+# WebSocket with asyncio (for comparison)
+import asyncio
+import websockets
+
+async def websocket_handler(websocket, path):
+    async for message in websocket:
+        # Broadcast to all connected clients
+        await asyncio.gather(*[
+            client.send(message)
+            for client in connected_clients
+        ])
+
+if __name__ == '__main__':
+    app.run(threaded=True)
+```
+</TabItem>
+<TabItem label="Go">
+```go
+package main
+
+import (
+    "encoding/json"
+    "fmt"
+    "net/http"
+    "time"
+)
+
+// SSE Server
+func sseHandler(w http.ResponseWriter, r *http.Request) {
+    // Set SSE headers
+    w.Header().Set("Content-Type", "text/event-stream")
+    w.Header().Set("Cache-Control", "no-cache")
+    w.Header().Set("Connection", "keep-alive")
+    w.Header().Set("Access-Control-Allow-Origin", "*")
+    
+    flusher, ok := w.(http.Flusher)
+    if !ok {
+        http.Error(w, "SSE not supported", http.StatusInternalServerError)
+        return
+    }
+    
+    // Send events
+    ticker := time.NewTicker(1 * time.Second)
+    defer ticker.Stop()
+    
+    count := 0
+    for {
+        select {
+        case <-r.Context().Done():
+            return
+        case <-ticker.C:
+            count++
+            
+            // Regular data message
+            data := map[string]interface{}{
+                "count": count,
+                "time":  time.Now().Unix(),
+            }
+            jsonData, _ := json.Marshal(data)
+            fmt.Fprintf(w, "data: %s\n\n", jsonData)
+            
+            // Named event
+            if count%5 == 0 {
+                fmt.Fprintf(w, "event: milestone\n")
+                fmt.Fprintf(w, "data: Count reached %d\n\n", count)
+            }
+            
+            // Send message ID for resume
+            fmt.Fprintf(w, "id: %d\n\n", count)
+            
+            flusher.Flush()
+        }
+    }
+}
+
+// WebSocket handler (for comparison)
+func wsHandler(w http.ResponseWriter, r *http.Request) {
+    conn, err := upgrader.Upgrade(w, r, nil)
+    if err != nil {
+        return
+    }
+    defer conn.Close()
+    
+    for {
+        messageType, p, err := conn.ReadMessage()
+        if err != nil {
+            return
+        }
+        
+        // Broadcast to all clients
+        for client := range clients {
+            client.WriteMessage(messageType, p)
+        }
+    }
+}
+
+func main() {
+    http.HandleFunc("/events", sseHandler)
+    http.HandleFunc("/ws", wsHandler)
+    http.ListenAndServe(":3000", nil)
+}
+```
+</TabItem>
+</Tabs>
+
+### Client Implementation
+
+<Tabs>
+<TabItem label="JavaScript">
+```javascript
+// SSE Client with Reconnection and Event Handling
+class SSEClient {
+  constructor(url) {
+    this.url = url;
+    this.eventSource = null;
+    this.listeners = new Map();
+    this.reconnectTime = 1000;
+    this.lastEventId = null;
+  }
+  
+  connect() {
+    // Include last event ID for resume
+    const url = this.lastEventId 
+      ? `${this.url}?lastEventId=${this.lastEventId}`
+      : this.url;
+      
+    this.eventSource = new EventSource(url);
+    
+    this.eventSource.onopen = () => {
+      console.log('SSE Connected');
+      this.reconnectTime = 1000; // Reset backoff
+    };
+    
+    this.eventSource.onmessage = (event) => {
+      this.lastEventId = event.lastEventId;
+      this.emit('message', event.data);
+    };
+    
+    this.eventSource.onerror = (event) => {
+      if (event.target.readyState === EventSource.CLOSED) {
+        console.log('SSE Disconnected');
+        // EventSource will auto-reconnect
+      }
+    };
+    
+    // Register named event listeners
+    this.listeners.forEach((callback, eventName) => {
+      this.eventSource.addEventListener(eventName, (event) => {
+        this.lastEventId = event.lastEventId;
+        callback(event.data);
+      });
+    });
+  }
+  
+  on(eventName, callback) {
+    this.listeners.set(eventName, callback);
+    if (this.eventSource) {
+      this.eventSource.addEventListener(eventName, (event) => {
+        callback(event.data);
+      });
+    }
+  }
+  
+  emit(eventName, data) {
+    const callback = this.listeners.get(eventName);
+    if (callback) callback(data);
+  }
+  
+  close() {
+    if (this.eventSource) {
+      this.eventSource.close();
+    }
+  }
+}
+
+// Usage
+const client = new SSEClient('/api/events');
+
+client.on('message', (data) => {
+  console.log('Received:', data);
+});
+
+client.on('notification', (data) => {
+  showNotification(JSON.parse(data));
+});
+
+client.connect();
+```
+</TabItem>
+<TabItem label="React Hook">
+```jsx
+// Custom React Hook for SSE
+import { useEffect, useState, useRef } from 'react';
+
+function useServerSentEvents(url, options = {}) {
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+  const [readyState, setReadyState] = useState(0);
+  const eventSourceRef = useRef(null);
+  
+  useEffect(() => {
+    const eventSource = new EventSource(url, options);
+    eventSourceRef.current = eventSource;
+    
+    eventSource.onopen = () => {
+      setReadyState(EventSource.OPEN);
+      setError(null);
+    };
+    
+    eventSource.onmessage = (event) => {
+      try {
+        const parsedData = JSON.parse(event.data);
+        setData(parsedData);
+      } catch (e) {
+        setData(event.data);
+      }
+    };
+    
+    eventSource.onerror = (event) => {
+      setReadyState(eventSource.readyState);
+      if (eventSource.readyState === EventSource.CLOSED) {
+        setError('Connection closed');
+      } else {
+        setError('Connection error');
+      }
+    };
+    
+    // Custom event listeners
+    if (options.events) {
+      Object.entries(options.events).forEach(([eventName, handler]) => {
+        eventSource.addEventListener(eventName, (event) => {
+          handler(event.data);
+        });
+      });
+    }
+    
+    return () => {
+      eventSource.close();
+    };
+  }, [url]);
+  
+  return {
+    data,
+    error,
+    readyState,
+    eventSource: eventSourceRef.current
+  };
+}
+
+// Usage in component
+function LiveDashboard() {
+  const { data, error, readyState } = useServerSentEvents('/api/metrics', {
+    events: {
+      alert: (data) => {
+        console.error('Alert:', data);
+      },
+      update: (data) => {
+        console.log('Update:', data);
+      }
+    }
+  });
+  
+  if (error) return <div>Error: {error}</div>;
+  if (readyState === EventSource.CONNECTING) return <div>Connecting...</div>;
+  
+  return (
+    <div>
+      <h2>Live Metrics</h2>
+      <pre>{JSON.stringify(data, null, 2)}</pre>
+    </div>
+  );
+}
+```
+</TabItem>
+</Tabs>
+
+## Browser Quirks and Limitations
+
+### Connection Limits
+
+**SSE: 6 connections per domain (HTTP/1.1)**
+```javascript
+// Problem: Browser limits SSE connections
+const stream1 = new EventSource('/events/1'); // ✓
+const stream2 = new EventSource('/events/2'); // ✓
+const stream3 = new EventSource('/events/3'); // ✓
+const stream4 = new EventSource('/events/4'); // ✓
+const stream5 = new EventSource('/events/5'); // ✓
+const stream6 = new EventSource('/events/6'); // ✓
+const stream7 = new EventSource('/events/7'); // ✗ Blocked!
+
+// Solution 1: Use HTTP/2
+// HTTP/2 multiplexes all streams over one connection
+
+// Solution 2: Domain sharding
+const stream1 = new EventSource('https://events1.example.com/stream');
+const stream2 = new EventSource('https://events2.example.com/stream');
+
+// Solution 3: Multiplex through single connection
+const events = new EventSource('/events/all');
+events.onmessage = (e) => {
+  const { channel, data } = JSON.parse(e.data);
+  routeToHandler(channel, data);
+};
+```
+
+**WebSocket: No browser limit**
+```javascript
+// WebSocket has no connection limit
+for (let i = 0; i < 100; i++) {
+  const ws = new WebSocket(`wss://example.com/socket/${i}`);
+  // All 100 connections work (server permitting)
+}
+```
+
+### Mobile Browser Behavior
+
+**SSE on Mobile:**
+```javascript
+// SSE may disconnect on mobile background
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    // Page backgrounded - SSE may disconnect
+    console.log('App backgrounded');
+  } else {
+    // Page foregrounded - SSE will reconnect automatically
+    console.log('App foregrounded - SSE reconnecting');
+  }
+});
+
+// iOS Safari specific workaround
+let keepAliveInterval;
+const eventSource = new EventSource('/events');
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) {
+    // Ensure connection is alive when returning
+    keepAliveInterval = setInterval(() => {
+      fetch('/keepalive');
+    }, 30000);
+  } else {
+    clearInterval(keepAliveInterval);
+  }
+});
+```
+
+### CORS Differences
+
+**SSE: Standard CORS**
+```javascript
+// SSE follows normal CORS rules
+const eventSource = new EventSource('https://other-domain.com/events', {
+  withCredentials: true // Include cookies
+});
+
+// Server must include CORS headers
+// Access-Control-Allow-Origin: https://your-domain.com
+// Access-Control-Allow-Credentials: true
+```
+
+**WebSocket: Origin checking only**
+```javascript
+// WebSocket doesn't use CORS, only Origin header
+const ws = new WebSocket('wss://other-domain.com/socket');
+// Server should validate Origin header manually
+```
+
+
+
+
+
+
+
+
+
+## When to Choose Which
+
+### Choose SSE When:
+
+✅ **You only need server-to-client communication**
+- Live feeds and notifications
+- Progress updates
+- Monitoring dashboards
+- Log streaming
+
+✅ **You want automatic reconnection**
+- Unreliable networks
+- Mobile applications
+- Critical update streams
+
+✅ **You need HTTP/2 benefits**
+- Multiple event streams
+- Existing HTTP/2 infrastructure
+- CDN compatibility
+
+✅ **Simplicity is important**
+- Quick prototypes
+- Simple event streaming
+- Limited client resources
+
+### Choose WebSockets When:
+
+✅ **You need bidirectional communication**
+- Chat applications
+- Multiplayer games
+- Collaborative editing
+- Remote control
+
+✅ **You need binary data support**
+- File transfers
+- Audio/video streaming
+- Binary protocols
+- IoT sensor data
+
+✅ **You need lowest latency**
+- Trading platforms
+- Gaming
+- Real-time control systems
+
+✅ **You have complex interaction patterns**
+- Request-response over same connection
+- Multiple message types
+- Stateful protocols
+
+## Conclusion
+
+Server-Sent Events and WebSockets each excel in different scenarios. SSE shines with its simplicity, automatic reconnection, and HTTP/2 compatibility, making it perfect for server-push notifications and live feeds. WebSockets provide the bidirectional communication and binary support needed for interactive applications like chat and gaming.
+
+**Key Takeaways:**
+
+1. **Use SSE** for unidirectional server-to-client streaming with automatic reconnection
+2. **Use WebSockets** for bidirectional communication and binary data
+3. **SSE is simpler** to implement and debug
+4. **WebSockets are more flexible** but require more complexity
+5. **Consider HTTP/2** when using SSE for maximum efficiency
+6. **Both can coexist** in the same application for different features
+
+The choice often comes down to your specific requirements: if you only need server push with reliability, SSE is likely the better choice. If you need any form of client-to-server communication beyond the initial request, WebSockets become necessary.
+
+## Further Reading
+
+- [Server-Sent Events Specification](https://html.spec.whatwg.org/multipage/server-sent-events.html)
+- [EventSource MDN Documentation](https://developer.mozilla.org/en-US/docs/Web/API/EventSource)
+- [WebSocket Protocol RFC 6455](https://datatracker.ietf.org/doc/html/rfc6455)
+- [Building a WebSocket Application](/guides/building-a-websocket-app/)
+- [WebSocket Security Guide](/guides/security/)
+
+While raw SSE or WebSocket implementation is straightforward, production applications often benefit from using established libraries like Socket.IO or commercial services that provide automatic protocol selection, handle reconnection logic, and manage scaling complexities.
+
+---
+
+*Written by [Matthew O'Riordan](/author/matthew-oriordan/), Co-founder & CEO of Ably, with experience building real-time systems reaching 2 billion+ devices monthly.*
