@@ -64,6 +64,21 @@ export default defineConfig({
           ],
         },
         {
+          label: 'Protocol Comparisons',
+          collapsed: true,
+          items: [
+            { label: 'Overview', link: '/comparisons/' },
+            { label: 'WebSockets vs HTTP', link: '/comparisons/http/' },
+            { label: 'WebSockets vs SSE', link: '/comparisons/sse/' },
+            { label: 'WebSockets vs Long Polling', link: '/comparisons/long-polling/' },
+            { label: 'WebSockets vs WebTransport', link: '/comparisons/webtransport/' },
+            { label: 'WebSockets vs MQTT', link: '/comparisons/mqtt/' },
+            { label: 'WebSockets vs WebRTC', link: '/comparisons/webrtc/' },
+            { label: 'WebSockets vs gRPC', link: '/comparisons/grpc/' },
+            { label: 'Decision Matrix', link: '/comparisons/decision-guide/' },
+          ],
+        },
+        {
           label: 'Reference',
           items: [
             {
