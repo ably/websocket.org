@@ -73,7 +73,7 @@ We're grateful to everyone who has contributed to making WebSocket.org better:
 - [Matthew O'Riordan](https://github.com/mattheworiordan) - Project Lead
 - [林博仁(Buo-ren, Lin)](https://github.com/brlin-tw)
 - [Énio Carlos](https://github.com/eniocarboni)
-- [Raj Gupta](https://github.com/rajgupta)
+- [Raj Gupta](https://github.com/Raj-G07)
 - [Sam Hobbs](https://github.com/samhobbs)
 
 Want to see your name here? Check out our
