@@ -185,10 +185,10 @@ Key benefits:
 
 | Browser         | Version | Status           | Notes                                        |
 | --------------- | ------- | ---------------- | -------------------------------------------- |
-| Chrome/Chromium | 97+     | ⚠️ Experimental  | Behind flag: `--enable-quic`                 |
-| Firefox         | 88+     | ⚠️ Experimental  | `network.http.http3.enabled` in about:config |
-| Safari          | 16+     | ❌ Not Supported | No announced plans                           |
-| Edge            | 97+     | ⚠️ Experimental  | Same as Chrome                               |
+| Chrome/Chromium | -       | 🔬 In Development | Intent to Prototype announced, not yet implemented |
+| Firefox         | -       | ❌ Not Supported | No implementation or timeline announced      |
+| Safari          | -       | ❌ Not Supported | No announced plans                           |
+| Edge            | -       | 🔬 In Development | Same as Chrome (Chromium-based)             |
 
 ### WebTransport Support
 
@@ -207,8 +207,8 @@ Key benefits:
 | ------------- | ------- | ---------------- | --------------------- | -------------------------------- |
 | **Nginx**     | 1.25+   | ✅ Experimental  | ⚠️ In Development     | Requires `--with-http_v3_module` |
 | **Apache**    | -       | ❌ Not Available | ❌ Not Available      | No HTTP/3 support yet            |
-| **Caddy**     | 2.6+    | ✅ Full Support  | ✅ Full Support       | Automatic HTTPS with HTTP/3      |
-| **LiteSpeed** | 5.4+    | ✅ Full Support  | ✅ Full Support       | Enterprise and OpenLiteSpeed     |
+| **Caddy**     | 2.6+    | ✅ Full Support  | ⚠️ In Development     | Blocked by Go language support (golang/go#53209) |
+| **LiteSpeed** | 5.4+    | ✅ Full Support  | ❌ Not Available      | lsquic library does not support RFC 9220 |
 | **HAProxy**   | 2.6+    | ⚠️ Experimental  | ⚠️ Experimental       | Via QUIC library integration     |
 
 ### Application Servers
@@ -230,6 +230,23 @@ Key benefits:
 | **Google Cloud** | Load Balancer | ✅ Available    | ⚠️ Beta               | HTTP/3 in preview                        |
 | **Azure**        | Front Door    | ✅ Available    | ⚠️ Limited            | HTTP/3 support, WebSocket limitations    |
 | **Fastly**       | CDN           | ✅ Full Support | ✅ Full Support       | QUIC and HTTP/3 enabled                  |
+
+### Implementation Reality Check (2025)
+
+**Important**: As of September 2025, WebSocket over HTTP/3 (RFC 9220) has **no production implementations** in browsers or most web servers, despite the RFC being published in 2022:
+
+- **Browser Support**: Chrome has only reached "Intent to Prototype" stage. Firefox has no announced implementation. No browser currently supports this feature, even experimentally.
+- **Server Support**: Most servers including LiteSpeed's lsquic library do not implement RFC 9220. Caddy support is blocked by upstream Go language limitations.
+- **Production Use**: WebSocket over HTTP/3 cannot be used in production environments today.
+
+The tables above show theoretical support based on RFC specifications, but practical adoption is still in very early stages. For production applications requiring WebSocket functionality today, use:
+- WebSocket over HTTP/1.1 (universal support)
+- WebSocket over HTTP/2 (RFC 8441 - wide browser and server support)
+- WebTransport (available in Chrome/Edge, better suited for new projects)
+
+For the latest implementation status, check:
+- [Chrome Platform Status: WebSockets over HTTP/3](https://chromestatus.com/feature/5080537855688704)
+- [Chromium Issue #40210995](https://issues.chromium.org/issues/40210995)
 
 ## WebTransport: A Next-Generation Alternative
 
@@ -393,8 +410,8 @@ The transition to HTTP/3 WebSockets and WebTransport doesn't mean WebSockets
 will disappear. Instead, they will evolve alongside new standards, each serving
 specific use cases:
 
-- **WebSockets (HTTP/3)**: Reliable, broadly supported communication for
-  general-purpose real-time apps.
+- **WebSockets (HTTP/2)**: Reliable, broadly supported communication for
+  general-purpose real-time apps (HTTP/3 support still in development).
 - **WebTransport**: Advanced scenarios requiring lower latency, multiplexed
   streams, and mixed reliability.
 

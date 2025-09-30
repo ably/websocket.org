@@ -75,6 +75,8 @@ We're grateful to everyone who has contributed to making WebSocket.org better:
 - [Énio Carlos](https://github.com/eniocarboni)
 - [Raj Gupta](https://github.com/Raj-G07)
 - [Sam Hobbs](https://github.com/samhobbs)
+- [Alex Pokotilo](https://github.com/alexpokotilo) - Technical accuracy
+  improvements
 
 Want to see your name here? Check out our
 [Contributing Guide](https://github.com/ably/websocket.org/blob/main/CONTRIBUTING.md)
