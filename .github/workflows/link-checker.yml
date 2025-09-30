@@ -28,7 +28,7 @@ jobs:
       run: npm run build
     
     - name: Check for broken links
-      uses: lycheeverse/lychee-action@v1
+      uses: lycheeverse/lychee-action@v2.0.2
       with:
         # Check the built site
         args: >
