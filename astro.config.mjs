@@ -9,9 +9,7 @@ export default defineConfig({
     sitemap(),
     starlight({
       title: 'WebSocket.org',
-      social: {
-        github: 'https://github.com/ably/websocket.org',
-      },
+      social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/ably/websocket.org' }],
       sidebar: [
         {
           label: 'Guides',

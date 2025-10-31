@@ -1,11 +1,11 @@
 ---
 import Default from '@astrojs/starlight/components/Head.astro';
-import type { Props } from '@astrojs/starlight/props';
 import GA4 from './ga4.astro';
 import { getFrontmatter } from '../utils/getFrontmatter';
 
-// Get the current page's frontmatter data
-const { entry } = Astro.props;
+// Get the current page's route data from Astro.locals
+const route = Astro.locals.starlightRoute;
+const entry = route?.entry;
 
 // Get custom frontmatter data directly from the file
 const customFrontmatter = getFrontmatter(Astro.url.pathname);

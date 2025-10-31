@@ -8,7 +8,18 @@ export const collections = {
         author: z.string().optional(),
         authorRole: z.string().optional(),
         date: z.coerce.date().optional(),
-        category: z.enum(['guide', 'reference', 'tutorial', 'news']).optional(),
+        category: z
+          .enum([
+            'guide',
+            'reference',
+            'tutorial',
+            'news',
+            'author',
+            'resource',
+            'tool',
+            'infrastructure',
+          ])
+          .optional(),
         tags: z.array(z.string()).optional(),
         seo: z
           .object({

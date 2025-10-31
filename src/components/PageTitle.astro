@@ -1,12 +1,12 @@
 ---
-import type { Props } from '@astrojs/starlight/props';
 import { getFrontmatter } from '../utils/getFrontmatter';
 
 // Constants from Starlight
 const PAGE_TITLE_ID = 'starlight__overview';
 
-// Get the current page's frontmatter data
-const { entry } = Astro.props;
+// Get the current page's route data from Astro.locals
+const route = Astro.locals.starlightRoute;
+const entry = route?.entry;
 
 // Get custom frontmatter data directly from the file
 const customFrontmatter = getFrontmatter(Astro.url.pathname);
