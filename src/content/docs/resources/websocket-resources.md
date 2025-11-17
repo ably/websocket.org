@@ -234,8 +234,8 @@ For a comprehensive comparison of the best WebSocket libraries for Node.js, see
   Step-by-step tutorial
 - [WebSocket Security - Cross-Site Hijacking](https://www.christian-schneider.net/CrossSiteWebSocketHijacking.html) -
   Security best practices
-- [Exponential Backoff in JavaScript](https://advancedweb.hu/exponential-backoff-javascript/) -
-  Reconnection strategies
+- [Exponential Backoff in JavaScript](https://advancedweb.hu/how-to-implement-an-exponential-backoff-retry-strategy-in-javascript/)
+  \- Reconnection strategies
 - [Patterns for Building Realtime Features](https://ably.com/blog/patterns-for-building-realtime-features) -
   Architectural patterns and best practices
 
